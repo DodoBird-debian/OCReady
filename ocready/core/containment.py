@@ -5,9 +5,12 @@ assigned to a Job Object before their initial thread runs. These OS counters
 are not identical to RSS, so the existing RSS monitor remains authoritative
 for the selected application's observed working-set budget.
 """
+import json
 import os
 import shutil
+import signal
 import subprocess
+import tempfile
 import time
 import uuid
 from dataclasses import dataclass
@@ -42,6 +45,17 @@ class WorkerLimit:
     group: Path | None = None
     windows_job: object | None = None
     oom: bool = False
+    status_path: Path | None = None
+    directory: object | None = None
+    process_group: int = 0
+
+    def poll(self, child: subprocess.Popen) -> int | None:
+        if self.status_path:
+            try:
+                return int(self.status_path.read_text(encoding="ascii").strip())
+            except (OSError, ValueError):
+                pass
+        return child.poll()
 
     def sample(self) -> None:
         if self.group:
@@ -64,6 +78,12 @@ class WorkerLimit:
                 pass
 
     def close(self) -> None:
+        if self.process_group and os.name == "posix":
+            try:
+                os.killpg(self.process_group, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            self.process_group = 0
         if self.windows_job:
             self.windows_job.close()
             self.windows_job = None
@@ -74,10 +94,19 @@ class WorkerLimit:
             except (OSError, subprocess.SubprocessError):
                 pass
             self.unit = ""
+        if self.directory:
+            self.directory.cleanup()
+            self.directory = None
 
 
 def linux_gate() -> Path | None:
-    gate = runtime_root() / "bin" / "ocready-exec-gate"
+    root = runtime_root()
+    gate = root / "bin" / "ocready-exec-gate"
+    try:
+        if json.loads((root / "manifest.json").read_text(encoding="utf-8")).get("exec_gate_protocol") != 2:
+            return None
+    except (OSError, ValueError, AttributeError):
+        return None
     session = os.environ.get("DBUS_SESSION_BUS_ADDRESS")
     runtime = os.environ.get("XDG_RUNTIME_DIR")
     bus_exists = bool(runtime and (Path(runtime) / "bus").is_socket())
@@ -96,8 +125,16 @@ def _linux_limit(pid: int, allowance: int) -> WorkerLimit:
                "MemoryMax", "t", str(allowance), "MemorySwapMax", "t", "0",
                "CollectMode", "s", "inactive", "0"]
     try:
-        reply = subprocess.run(command, stdin=subprocess.DEVNULL, capture_output=True,
+        modern = list(command)
+        modern[modern.index("fail") + 1] = "6"
+        modern[-1:-1] = ["OOMPolicy", "s", "continue"]
+        reply = subprocess.run(modern, stdin=subprocess.DEVNULL, capture_output=True,
                                timeout=3, env=_control_env())
+        if reply.returncode and b"OOMPolicy" in reply.stderr:
+            # Scope OOMPolicy appeared in systemd 253. Older scopes can still
+            # retain evidence because the small supervisor outlives the engine.
+            reply = subprocess.run(command, stdin=subprocess.DEVNULL, capture_output=True,
+                                   timeout=3, env=_control_env())
         if reply.returncode:
             guard.detail = "User cgroup scope unavailable: " + reply.stderr.decode("utf-8", errors="replace").strip()[:300]
             return guard
@@ -113,11 +150,11 @@ def _linux_limit(pid: int, allowance: int) -> WorkerLimit:
                     limit = int((group / "memory.max").read_text())
                     if limit == allowance:
                         try:
-                            (group / "memory.oom.group").write_text("1")
+                            (group / "memory.oom.group").write_text("0")
                         except OSError:
                             pass
                         guard.mode, guard.limit_bytes, guard.group = "cgroup-v2", allowance, group
-                        guard.detail = "Worker cgroup memory.max + zero swap; whole-tree RSS monitoring also active."
+                        guard.detail = "Worker cgroup memory.max + zero swap, supervised until counters are read; whole-tree RSS monitoring also active."
                         return guard
             time.sleep(.01)
     except (OSError, ValueError, subprocess.SubprocessError):
@@ -133,18 +170,21 @@ def start_worker(command: list[str], *, budget: int, resident: int, stdout, stde
         raise BudgetExceeded("There is too little memory headroom to start OCR. Try a smaller crop or a larger edition.")
     guard = WorkerLimit()
     gate = linux_gate() if os.name == "posix" else None
+    directory = tempfile.TemporaryDirectory(prefix="ocready-worker-") if gate else None
+    status_path = Path(directory.name) / "status" if directory else None
     creationflags = 0
     if os.name == "nt":
         creationflags = subprocess.CREATE_NO_WINDOW | 0x00000004  # CREATE_SUSPENDED
-    child = subprocess.Popen([str(gate), *command] if gate else command,
+    child = subprocess.Popen([str(gate), str(status_path), "--", *command] if gate else command,
                              stdin=subprocess.PIPE if gate else subprocess.DEVNULL,
                              stdout=stdout, stderr=stderr, env=env, cwd=cwd,
-                             creationflags=creationflags)
+                             creationflags=creationflags, start_new_session=os.name == "posix")
     try:
         if gate:
             guard = _linux_limit(child.pid, allowance)
+            guard.status_path, guard.directory = status_path, directory
             child.stdin.write(b"x")
-            child.stdin.close()
+            child.stdin.flush()
         elif os.name == "nt":
             from ocready.core.windows_job import WindowsJob, resume_process
             try:
@@ -160,6 +200,8 @@ def start_worker(command: list[str], *, budget: int, resident: int, stdout, stde
             except OSError:
                 guard.detail = "A Windows Job Object was unavailable; RSS monitoring is active."
             resume_process(child.pid)
+        if os.name == "posix":
+            guard.process_group = child.pid
         return child, guard
     except BaseException:
         guard.close()

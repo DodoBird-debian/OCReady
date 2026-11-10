@@ -110,3 +110,12 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Validated 32 crop/rotation/flip combinations against the actual rasterized preprocessing result, plus a combined resize case and out-of-bounds handling.
 - Added a native GUI test that clicks a rotated word in the original image and copies its Arabic Unicode text correctly.
 - Validation: 81 tests and Ruff passed locally. Capture cancellation/import state and model-specific memory headroom are the next UI/resource priorities.
+
+## Iteration 10 — retain kernel memory-limit evidence
+
+- Windows source CI passed the native Job Object allocation and descendant-cleanup tests. Ubuntu CI exposed a cgroup evidence-lifetime race after a very fast OOM kill: memory was constrained, but the UI could report a generic engine failure after the kernel counters disappeared.
+- Reworked the Linux gate into a small supervisor that retains the worker scope until status/counters are observed. Used `OOMPolicy=continue` when supported, with a version-compatible fallback for pre-253 systemd.
+- Kept kernel OOM targeting on the engine while the supervisor remains lightweight. Added explicit process-group cleanup for headless systems without a user service bus.
+- Added a real native regression that delays the observer after an OOM kill and still verifies the kernel event, plus an orphan-cleanup test with cgroup support deliberately unavailable.
+- Versioned the gate protocol in the runtime manifest so source/runtime mismatches safely retain RSS monitoring instead of invoking an incompatible helper.
+- Validation: 83 local tests and Ruff passed after rebuilding the runtime. Updated Linux/Windows CI still needs to verify the compatibility fix.

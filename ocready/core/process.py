@@ -53,7 +53,8 @@ def run_process(
                     raise OCRError("The OCR engine took too long. Try a smaller crop or another method.")
                 if stdout.tell() > MAX_OUTPUT or stderr.tell() > MAX_OUTPUT:
                     raise OCRError("The OCR engine produced too much diagnostic output.")
-                if child.poll() is not None:
+                exit_code = guard.poll(child)
+                if exit_code is not None:
                     break
                 cancel.wait(0.04)
             stdout.seek(0)
@@ -63,8 +64,8 @@ def run_process(
             guard.completed()
             if guard.oom:
                 raise BudgetExceeded("The operating system stopped the OCR worker at its memory allowance. Try a smaller crop or a larger edition.")
-            if child.returncode:
-                detail = error.strip()[-1600:] or f"exit code {child.returncode}"
+            if exit_code:
+                detail = error.strip()[-1600:] or f"exit code {exit_code}"
                 raise OCRError(f"OCR engine failed: {detail}")
             return ProcessResult(output, error, peak, time.monotonic() - started,
                                  guard.mode, guard.limit_bytes, guard.peak_bytes)
@@ -73,3 +74,5 @@ def run_process(
                 stop_tree(child.pid)
             child.wait()
             guard.close()
+            if child.stdin:
+                child.stdin.close()

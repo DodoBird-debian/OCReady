@@ -133,7 +133,7 @@ def main() -> None:
     version = subprocess.check_output([str(program), "--version"], env=env, text=True).splitlines()[0]
     files = {str(p.relative_to(RUNTIME)): hashlib.sha256(p.read_bytes()).hexdigest()
              for base in ("bin", "lib", "tessdata", "notices") for p in (RUNTIME / base).rglob("*") if p.is_file()}
-    (RUNTIME / "manifest.json").write_text(json.dumps({"version": version, "platform": sys.platform, "files": files}, indent=2) + "\n")
+    (RUNTIME / "manifest.json").write_text(json.dumps({"version": version, "platform": sys.platform, "exec_gate_protocol": 2, "files": files}, indent=2) + "\n")
     print(f"Ready: {version}; {len(files)} runtime files")
 
 
