@@ -25,6 +25,7 @@ from PySide6.QtWidgets import (
 )
 
 from ocready.core.editions import EDITIONS, edition_for
+from ocready.core.geometry import words_on_source
 from ocready.core.images import load_image
 from ocready.core.memory import tree_rss
 from ocready.core.models import load_packs
@@ -526,10 +527,12 @@ class MainWindow(QMainWindow):
         original = self.view_original.isChecked()
         self.canvas.set_image(self.source if original else self.preview)
         self.view_original.setText("Show processed" if original else "Show original")
-        if self.result and not original and self.editor.linked:
-            self.canvas.set_words(self.result.words)
+        if self.result and self.editor.linked:
+            words = words_on_source(self.result.words, self.source.size, self.preview.size, self.recipe) if original else self.result.words
+            self.canvas.set_words(words)
         if original and self.recipe != Recipe():
-            self._set_status("Original image. Switch to the processed view to select recognized words.")
+            message = "Original image. Recognized words stay linked through cleanup, crop, and rotation." if self.result and self.editor.linked else "Original image. Cleanup settings are retained for recognition."
+            self._set_status(message)
 
     def _edition_changed(self, *_args) -> None:
         if not hasattr(self, "method_combo"):

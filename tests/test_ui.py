@@ -176,3 +176,23 @@ def test_automatic_direction_is_independent_per_paragraph(window, app):
     cursor = window.editor.textCursor()
     cursor.setPosition(first.next().position())
     assert window.editor.cursorRect(cursor).x() > window.editor.viewport().width() / 2
+
+
+def test_original_image_keeps_located_word_selection_after_rotation(window, app):
+    from ocready.core.types import Box, OCRResult, Word
+    window.load_example()
+    window.recipe = Recipe(rotation=90)
+    window._apply_recipe()
+    # For a clockwise turn, a source word at (100, 200, 80, 30) becomes this box.
+    word = Word("مرحبا", Box(490, 100, 30, 80), 95, 0, 5, (1, 1, 1, 1))
+    result = OCRResult("مرحبا", [word])
+    window._recognized(window.job, result, [result])
+    window.view_original.setChecked(True)
+    window.toggle_original()
+    assert window.canvas.words[0].box == Box(100, 200, 80, 30)
+    point = window.canvas.mapFromScene(window.canvas.rect_for(window.canvas.words[0].box).center())
+    QTest.mouseClick(window.canvas.viewport(), Qt.MouseButton.LeftButton, pos=point)
+    app.processEvents()
+    window.copy_image_selection()
+    assert QApplication.clipboard().text() == "مرحبا"
+    assert window.editor.linked

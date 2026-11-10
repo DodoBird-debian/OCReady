@@ -101,3 +101,12 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Corrected controller compatibility with systemd 257 and page-rounded `memory.max` readback during implementation.
 - Validation: Ruff and 46 local tests passed, including the three native containment cases. The previous iteration's full six-build matrix is now green, including real packaged GUI and memory checks on both platforms.
 - Remaining: Windows native worker validation, packaged containment smoke checks, model-specific memory/preview headroom, original-image geometry linking after transformations, capture lifecycle validation, and full application containment/certification.
+
+## Iteration 9 — source highlighting across transformations
+
+- Added an engine-independent inverse geometry module covering crop offsets, all quarter-turn rotations, horizontal/vertical flips, and final resizing.
+- Original-image view now keeps real OCR word selection and editor linking after preprocessing, instead of requiring the processed view. Text order and character ranges stay identical between views.
+- Mapped boxes are clamped to the working source and never fabricated for generative results without geometry.
+- Validated 32 crop/rotation/flip combinations against the actual rasterized preprocessing result, plus a combined resize case and out-of-bounds handling.
+- Added a native GUI test that clicks a rotated word in the original image and copies its Arabic Unicode text correctly.
+- Validation: 81 tests and Ruff passed locally. Capture cancellation/import state and model-specific memory headroom are the next UI/resource priorities.
