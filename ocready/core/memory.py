@@ -3,9 +3,19 @@ import os
 import psutil
 
 
+def application_root_pid() -> int:
+    """Count Nuitka's resident launcher too, but never follow an unrelated PID."""
+    current = os.getpid()
+    try:
+        launcher = int(os.environ.get("NUITKA_ONEFILE_PARENT", "0"))
+    except ValueError:
+        return current
+    return launcher if launcher == os.getppid() and launcher > 0 else current
+
+
 def tree_rss(pid: int | None = None) -> int:
     try:
-        root = psutil.Process(pid or os.getpid())
+        root = psutil.Process(pid if pid is not None else application_root_pid())
         processes = [root, *root.children(recursive=True)]
     except psutil.Error:
         return 0

@@ -8,15 +8,16 @@
   "scenarios": [
     {
       "edition": "pocket",
+      "max_pixels": 2000000,
       "scenario": "sample",
-      "peak_rss_bytes": 199495680,
+      "peak_rss_bytes": 198316032,
       "budget_bytes": 350000000,
       "below_budget": true,
-      "elapsed_seconds": 1.253,
+      "elapsed_seconds": 1.234,
       "exit_code": 0,
       "details": {
-        "elapsed": 0.7704260130003604,
-        "peak_rss": 95133696,
+        "elapsed": 0.7741718850002144,
+        "peak_rss": 160796672,
         "engine": "tesseract-fast",
         "backend": "CPU",
         "words": 31
@@ -25,15 +26,16 @@
     },
     {
       "edition": "pocket",
+      "max_pixels": 2000000,
       "scenario": "dark",
-      "peak_rss_bytes": 200409088,
+      "peak_rss_bytes": 199872512,
       "budget_bytes": 350000000,
       "below_budget": true,
-      "elapsed_seconds": 1.224,
+      "elapsed_seconds": 1.301,
       "exit_code": 0,
       "details": {
-        "elapsed": 0.7833586229999128,
-        "peak_rss": 95330304,
+        "elapsed": 0.8241835819999324,
+        "peak_rss": 160190464,
         "engine": "tesseract-fast",
         "backend": "CPU",
         "words": 31
@@ -42,35 +44,37 @@
     },
     {
       "edition": "pocket",
+      "max_pixels": 2000000,
       "scenario": "max-pixels",
-      "peak_rss_bytes": 199835648,
+      "peak_rss_bytes": 198246400,
       "budget_bytes": 350000000,
       "below_budget": true,
-      "elapsed_seconds": 1.717,
+      "elapsed_seconds": 1.618,
       "exit_code": 0,
       "details": {
-        "elapsed": 1.2461240669999825,
-        "peak_rss": 129257472,
+        "elapsed": 1.1504861260000325,
+        "peak_rss": 179388416,
         "engine": "tesseract-fast",
         "backend": "CPU",
-        "words": 120
+        "words": 95
       },
       "error": ""
     },
     {
       "edition": "pocket",
+      "max_pixels": 2000000,
       "scenario": "gui-onefile",
-      "peak_rss_bytes": 347303936,
+      "peak_rss_bytes": 311861248,
       "budget_bytes": 350000000,
       "below_budget": true,
-      "elapsed_seconds": 2.328,
+      "elapsed_seconds": 2.177,
       "exit_code": 0,
       "details": {
-        "elapsed": 1.2432841490003739,
-        "peak_rss": 281157632,
+        "elapsed": 1.1063666730001387,
+        "peak_rss": 311861248,
         "engine": "tesseract-fast",
         "backend": "CPU",
-        "words": 120
+        "words": 95
       },
       "error": ""
     }

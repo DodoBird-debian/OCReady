@@ -2,7 +2,7 @@
 
 The budgets are decimal **350,000,000 / 1,000,000,000 / 4,000,000,000 bytes** for Pocket / Everyday / Studio. They cover the application plus its descendant OCR processes. GPU VRAM is separate. A weight file's byte size is a lower bound, not an inference memory measurement.
 
-Image admission is part of the budget. Pocket processes at most 3 million pixels, Everyday 8 million, Studio 16 million. Inputs above twice those pixel counts (and above the global 32 million decode limit) are rejected **before decoding**, because resizing an arbitrarily large compressed image can itself exhaust RAM. Accepted images are fitted to the processing cap. The UI displays the working image dimensions.
+Image admission is part of the budget. Pocket processes at most 2 million pixels, Everyday 8 million, Studio 16 million. Inputs above twice those pixel counts (and above the global 32 million decode limit) are rejected **before decoding**, because resizing an arbitrarily large compressed image can itself exhaust RAM. Accepted images are fitted to the processing cap. The UI displays the working image dimensions.
 
 ## Linux workload measurements
 
@@ -10,14 +10,14 @@ Machine: AMD Ryzen 5 3600, Debian 13, Python 3.12.16, Qt/PySide 6.8.3, Tesseract
 
 | Workload | Pocket / 350 MB | Everyday / 1 GB | Studio / 4 GB |
 | --- | ---: | ---: | ---: |
-| Small bilingual screenshot | 78.0 MB | 98.0 MB | 97.9 MB |
-| Dark screenshot + inversion | 78.0 MB | 97.9 MB | 112.7 MB |
-| Image at processing pixel cap | 111.5 MB | 206.5 MB | 326.9 MB |
-| Native GUI, four repeated cap-sized jobs | 272.2 MB | 508.2 MB | 853.5 MB |
+| Small bilingual screenshot | 78.0 MB | 98.1 MB | 98.0 MB |
+| Dark screenshot + inversion | 78.2 MB | 109.3 MB | 98.1 MB |
+| Image at processing pixel cap | 96.2 MB | 206.6 MB | 326.8 MB |
+| Native GUI, four repeated cap-sized jobs | 241.5 MB | 516.4 MB | 789.3 MB |
 
 Everyday and Studio used Precision (best language data); Pocket used Fast. The repeated GUI workload includes loading, display, recognition, and retained buffers between four documents. It does not prove an absence of leaks over an unlimited session. These runs passed their respective budgets.
 
-The compiled Linux Pocket onefile artifact also passed three headless cases while an external observer included the onefile launcher and extraction overhead: 199.5 MB sample, 200.4 MB inverted image, 199.8 MB cap-sized image. A full compiled GUI run at the pixel cap reached **347.3 MB**, just below 350 MB. This margin is too small for a comfortable release. The next iteration must reduce image-buffer pressure and include launcher residency in the internal governor. At this revision the internal monitor sees the application and its children; the external artifact benchmark also counts its onefile parent launcher.
+The current compiled Linux Pocket onefile artifact also passed four cases while an external observer included the onefile launcher and extraction overhead: 198.3 MB sample, 199.9 MB inverted image, 198.2 MB cap-sized image, and **311.9 MB for the full cap-sized GUI**. The prior 3 MP Pocket cap reached 347.3 MB. Reducing it to 2 MP restored about 35 MB of measured headroom. The internal governor now also counts Nuitka's actual parent launcher, after verifying the environment PID is the real OS parent.
 
 A separate real GLM-OCR Q8 CPU run on the small bilingual image observed 1.86 GB total RSS. That is a different workload from the table and does not certify large-image VLM inference. CUDA discovery and real GPU failure fallback have been tested; successful CUDA inference remains unverified with the installed driver.
 
@@ -36,7 +36,7 @@ The benchmark emits a nonzero exit code if an observed budget is exceeded or an 
 
 ## Guardrails versus strict containment
 
-The recognition runner samples process-tree RSS every 40 ms, stops a job that exceeds its edition's budget, and always cleans up the child process. The image decoder, processing pixel limits, sequential engine loading, one OpenMP thread, bounded context/output, and model admission reduce the chance of exceeding a budget.
+The recognition runner samples process-tree RSS every 40 ms, including the resident onefile launcher when present, stops a job that exceeds its edition's budget, and always cleans up the child process. The image decoder, processing pixel limits, sequential engine loading, one OpenMP thread, bounded context/output, and model admission reduce the chance of exceeding a budget. VLM images are also fitted within 1600 × 1600 before inference, in addition to the runner's image-token limit.
 
 Sampling cannot prevent or observe every brief allocation spike. It is **not an OS-enforced absolute RAM ceiling**. Linux `RLIMIT_AS` limits virtual address space, not RSS, and is unsuitable as a substitute for this requirement. Strong containment needs delegated cgroup v2 memory limits on Linux, and memory-aware Job Objects on Windows, combined with a reserve for the UI and launcher. Those hard-limit integrations and cross-platform memory certification remain open release gates.
 

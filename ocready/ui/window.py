@@ -388,6 +388,7 @@ class MainWindow(QMainWindow):
                         self.compare_check):
             control.setEnabled(not busy)
         self.recognize_button.setEnabled(self.source is not None and not busy)
+        self.editor.setReadOnly(busy)
         if not busy:
             self._method_changed()
         self._update_text_stats()
@@ -574,7 +575,10 @@ class MainWindow(QMainWindow):
     def recognize(self) -> None:
         if self.source is None or self.worker or not self._confirm_replace():
             return
+        preview_pending = self.preview_timer.isActive()
         self.preview_timer.stop()
+        if preview_pending:
+            self._apply_recipe()
         self.job += 1
         method = self.method_combo.currentData()
         pack = next((p for p in self.packs if method == f"vision:{p.id}"), None)
@@ -699,7 +703,7 @@ class MainWindow(QMainWindow):
 
     def _update_memory(self) -> None:
         self.memory.setText(f"{tree_rss() / 1_000_000:.0f} / {self.edition.budget_label}")
-        self.memory.setToolTip("Current application + OCR process-tree RSS. Sampled; GPU VRAM is separate.")
+        self.memory.setToolTip("Current app, onefile launcher, and OCR process-tree RSS. Sampled; GPU VRAM is separate.")
 
     def capture_region(self) -> None:
         # The platform adapter is isolated so native capture can evolve independently.

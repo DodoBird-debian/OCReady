@@ -32,6 +32,10 @@ def recognize_image(source: Image.Image, request: Request, *, cancel: threading.
     started = time.monotonic()
     progress("Preparing image…")
     processed = preprocess(source, request.recipe, request.edition)
+    if request.method.startswith("vision"):
+        # Vision-encoder activation memory can grow rapidly with image size.
+        # Bound the image before handing it to a user-supplied VLM runner.
+        processed.thumbnail((1600, 1600), Image.Resampling.LANCZOS)
     results = []
     with tempfile.TemporaryDirectory(prefix="ocready-ocr-") as directory:
         image_path = Path(directory) / "image.png"

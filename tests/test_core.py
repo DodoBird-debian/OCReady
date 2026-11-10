@@ -18,6 +18,18 @@ def test_editions_use_decimal_bytes():
         edition_for("tiny")
 
 
+def test_onefile_monitor_only_follows_the_actual_launcher(monkeypatch):
+    from ocready.core.memory import application_root_pid
+    monkeypatch.setattr("ocready.core.memory.os.getpid", lambda: 200)
+    monkeypatch.setattr("ocready.core.memory.os.getppid", lambda: 100)
+    monkeypatch.setenv("NUITKA_ONEFILE_PARENT", "100")
+    assert application_root_pid() == 100
+    monkeypatch.setenv("NUITKA_ONEFILE_PARENT", "999")
+    assert application_root_pid() == 200
+    monkeypatch.setenv("NUITKA_ONEFILE_PARENT", "invalid")
+    assert application_root_pid() == 200
+
+
 def test_tsv_preserves_logical_arabic_order():
     header = "level\tpage_num\tblock_num\tpar_num\tline_num\tword_num\tleft\ttop\twidth\theight\tconf\ttext\n"
     tsv = header + "5\t1\t1\t1\t1\t1\t200\t10\t70\t30\t96\tمرحبا\n5\t1\t1\t1\t1\t2\t100\t10\t80\t30\t90\tبالعالم\n"

@@ -33,6 +33,12 @@ def main() -> None:
         assert gui["linked"] and gui["words"] >= 25, gui
         assert "مرحبا بالعالم" in gui["text"], gui["text"]
         print(f"Compiled native GUI passed: {gui['words']} linked words; {gui['rss'] / 1e6:.1f} MB idle RSS")
+    if "--benchmark" in sys.argv:
+        profile = json.loads((binary.parent / "build-manifest.json").read_text())
+        report = root / "test-output" / f"packaged-{profile['edition']}.json"
+        subprocess.run([sys.executable, str(root / "scripts" / "benchmark.py"),
+                        "--edition", profile["edition"], "--binary", str(binary), "--output", str(report)],
+                       cwd=root, check=True)
 
 
 if __name__ == "__main__":

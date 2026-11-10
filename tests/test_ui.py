@@ -109,6 +109,7 @@ def test_recognition_worker_returns_to_idle(window, app):
     window.recognize()
     assert window.worker is not None
     assert not window.recognize_button.isEnabled()
+    assert window.editor.isReadOnly()
     deadline = time.monotonic() + 8
     while window.worker and time.monotonic() < deadline:
         app.processEvents()
@@ -116,6 +117,19 @@ def test_recognition_worker_returns_to_idle(window, app):
     assert window.worker is None
     assert "مرحبا بالعالم" in window.editor.toPlainText()
     assert window.recognize_button.isEnabled()
+    assert not window.editor.isReadOnly()
+
+
+def test_recognition_flushes_a_pending_preview(window, app):
+    if not readiness()[0]:
+        pytest.skip("Prepare OCR runtime to test background recognition")
+    window.load_example()
+    window.invert.setChecked(True)
+    assert window.preview_timer.isActive()
+    window.recognize()
+    assert not window.preview_timer.isActive()
+    assert window.preview.getpixel((0, 0)) == (0, 0, 0)
+    window.cancel_recognition()
 
 
 def test_stale_result_does_not_replace_new_document(recognized):
@@ -135,3 +149,14 @@ def test_paste_image_from_native_clipboard(window, app):
     window.paste_image()
     assert window.source is not None
     assert window._source_name == "Clipboard image"
+
+
+def test_settings_model_form_opens_without_a_configured_model(window, app):
+    from ocready.ui.settings import SettingsDialog
+    dialog = SettingsDialog(window)
+    dialog.show()
+    app.processEvents()
+    assert dialog.fields["projector"].text() == ""
+    assert dialog.memory.value() == 2800
+    assert dialog.list.count() == 0
+    dialog.accept()

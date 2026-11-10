@@ -50,7 +50,7 @@ No document content is uploaded. Vision inference is a local subprocess. Model i
 
 Budgets use decimal MB/GB. GPU VRAM is separate and must also be reported. Small-tier vision models require a measured complete inference footprint before admission. Arabic accuracy and Windows behavior are separate validation gates.
 
-See [measured memory workloads and limitations](docs/MEMORY.md). Linux source benchmarks and a compiled Pocket executable have been exercised; the compiled cap-sized GUI case is currently close to the Pocket ceiling and is being improved.
+See [measured memory workloads and limitations](docs/MEMORY.md). The current Linux Pocket executable peaked at 312 MB in the cap-sized GUI benchmark, including its launcher. All three Linux source editions passed their documented workloads. These measurements are not universal hard-memory certifications.
 
 ## License
 

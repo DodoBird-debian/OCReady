@@ -58,3 +58,15 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Both Linux and Windows source CI jobs passed all 32 tests. Six edition/platform binary builds were dispatched; the Windows Studio build and real packaged OCR smoke test have passed, with the other jobs still running at this record.
 - Documented input limits, observed peaks, onefile startup overhead, sampling limitations, and remaining hard-containment requirements in MEMORY.md.
 - Validation: Ruff and 32 tests passed; real Linux compiled CLI and GUI smoke tests passed; benchmark exit codes passed. A real CUDA PTX failure again completed through CPU fallback; successful GPU inference still needs a compatible runner/driver.
+
+## Iteration 5 — Pocket memory headroom and interaction safeguards
+
+- Reduced Pocket's processing cap from 3 MP to 2 MP (decode admission 4 MP) after the measured compiled-GUI near miss. The rebuilt binary peaked at 311.9 MB instead of 347.3 MB, counting its launcher.
+- Fixed the internal governor to count Nuitka's resident onefile parent, with validation against the actual OS parent PID. The packaged small-image monitor now reports about 161 MB rather than omitting roughly 66 MB of launcher residency.
+- Re-ran all 12 source workloads: Pocket maximum GUI 241.5 MB, Everyday 516.4 MB, Studio 789.3 MB. Checked in fresh reports including explicit pixel caps.
+- Prevented editing existing text while a new recognition result is pending, preserving copy access. Flushed pending cleanup previews before recognition to keep displayed pixels and returned geometry aligned.
+- Bounded VLM input dimensions to 1600 × 1600, in addition to image-token/context/output limits.
+- Added compiled native-GUI plus cap-sized memory benchmarks to future Linux/Windows build checks and artifact reports.
+- The initial six-platform/edition build matrix completed successfully: all three editions compiled on Linux and Windows and passed real packaged Arabic/English OCR smoke checks. Those initial artifacts predate this headroom fix; updated builds are required before release.
+- Validation: 35 tests and Ruff passed; rebuilt Linux Pocket compiled CLI/GUI smoke tests and all four external compiled-memory scenarios passed.
+- Next: updated platform builds, a CUDA runner compiled for the existing driver, embedding selected vision packs and vision-only editions, further source-geometry and usability improvements, and stronger memory containment.

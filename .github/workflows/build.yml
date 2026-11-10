@@ -47,7 +47,7 @@ jobs:
         run: uv run python scripts/build.py --edition ${{ matrix.edition }} --jobs 2
       - name: Smoke-test compiled binary
         if: github.event_name != 'workflow_dispatch' || inputs.edition == 'all' || inputs.edition == matrix.edition
-        run: uv run python scripts/smoke_binary.py dist/${{ matrix.edition }}
+        run: uv run python scripts/smoke_binary.py dist/${{ matrix.edition }} --benchmark
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: github.event_name != 'workflow_dispatch' || inputs.edition == 'all' || inputs.edition == matrix.edition
         with:
@@ -55,4 +55,5 @@ jobs:
           path: |
             dist/${{ matrix.edition }}/OCReady-*
             dist/${{ matrix.edition }}/build-manifest.json
+            test-output/packaged-${{ matrix.edition }}.json
           if-no-files-found: error

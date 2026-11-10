@@ -8,15 +8,16 @@
   "scenarios": [
     {
       "edition": "pocket",
+      "max_pixels": 2000000,
       "scenario": "sample",
-      "peak_rss_bytes": 78016512,
+      "peak_rss_bytes": 77950976,
       "budget_bytes": 350000000,
       "below_budget": true,
-      "elapsed_seconds": 0.46,
+      "elapsed_seconds": 0.459,
       "exit_code": 0,
       "details": {
-        "elapsed": 0.3571312899998702,
-        "peak_rss": 78213120,
+        "elapsed": 0.3601877269998113,
+        "peak_rss": 76853248,
         "engine": "tesseract-fast",
         "backend": "CPU",
         "words": 31
@@ -25,15 +26,16 @@
     },
     {
       "edition": "pocket",
+      "max_pixels": 2000000,
       "scenario": "dark",
-      "peak_rss_bytes": 78028800,
+      "peak_rss_bytes": 78155776,
       "budget_bytes": 350000000,
       "below_budget": true,
       "elapsed_seconds": 0.458,
       "exit_code": 0,
       "details": {
-        "elapsed": 0.3671050650000325,
-        "peak_rss": 76984320,
+        "elapsed": 0.3590531310001097,
+        "peak_rss": 78356480,
         "engine": "tesseract-fast",
         "backend": "CPU",
         "words": 31
@@ -42,54 +44,56 @@
     },
     {
       "edition": "pocket",
+      "max_pixels": 2000000,
       "scenario": "max-pixels",
-      "peak_rss_bytes": 111542272,
+      "peak_rss_bytes": 96227328,
       "budget_bytes": 350000000,
       "below_budget": true,
-      "elapsed_seconds": 0.982,
+      "elapsed_seconds": 0.792,
       "exit_code": 0,
       "details": {
-        "elapsed": 0.8477760069999931,
-        "peak_rss": 111542272,
+        "elapsed": 0.6701357509996342,
+        "peak_rss": 96227328,
         "engine": "tesseract-fast",
         "backend": "CPU",
-        "words": 120
+        "words": 95
       },
       "error": ""
     },
     {
       "edition": "pocket",
+      "max_pixels": 2000000,
       "scenario": "gui-repeated",
-      "peak_rss_bytes": 272191488,
+      "peak_rss_bytes": 241520640,
       "budget_bytes": 350000000,
       "below_budget": true,
-      "elapsed_seconds": 4.007,
+      "elapsed_seconds": 3.279,
       "exit_code": 0,
       "details": {
         "iterations": [
           {
-            "characters": 786,
-            "elapsed": 0.8450956349997796,
-            "worker_peak_rss": 253546496,
-            "idle_rss": 172539904
+            "characters": 580,
+            "elapsed": 0.6812980550002976,
+            "worker_peak_rss": 218103808,
+            "idle_rss": 160329728
           },
           {
-            "characters": 786,
-            "elapsed": 0.8426230540003417,
-            "worker_peak_rss": 260141056,
-            "idle_rss": 184553472
+            "characters": 580,
+            "elapsed": 0.6847262259998388,
+            "worker_peak_rss": 231432192,
+            "idle_rss": 167411712
           },
           {
-            "characters": 786,
-            "elapsed": 0.8055278830001953,
-            "worker_peak_rss": 272191488,
-            "idle_rss": 196571136
+            "characters": 580,
+            "elapsed": 0.6634840290003012,
+            "worker_peak_rss": 233639936,
+            "idle_rss": 169426944
           },
           {
-            "characters": 786,
-            "elapsed": 0.8383660919998874,
-            "worker_peak_rss": 259334144,
-            "idle_rss": 183693312
+            "characters": 580,
+            "elapsed": 0.6716158859999268,
+            "worker_peak_rss": 241520640,
+            "idle_rss": 177422336
           }
         ]
       },
@@ -97,15 +101,16 @@
     },
     {
       "edition": "everyday",
+      "max_pixels": 8000000,
       "scenario": "sample",
-      "peak_rss_bytes": 98037760,
+      "peak_rss_bytes": 98103296,
       "budget_bytes": 1000000000,
       "below_budget": true,
-      "elapsed_seconds": 0.744,
+      "elapsed_seconds": 0.665,
       "exit_code": 0,
       "details": {
-        "elapsed": 0.6533038510001461,
-        "peak_rss": 98037760,
+        "elapsed": 0.5592900310002733,
+        "peak_rss": 97906688,
         "engine": "tesseract-best",
         "backend": "CPU",
         "words": 31
@@ -114,15 +119,16 @@
     },
     {
       "edition": "everyday",
+      "max_pixels": 8000000,
       "scenario": "dark",
-      "peak_rss_bytes": 97935360,
+      "peak_rss_bytes": 109301760,
       "budget_bytes": 1000000000,
       "below_budget": true,
-      "elapsed_seconds": 0.714,
+      "elapsed_seconds": 0.682,
       "exit_code": 0,
       "details": {
-        "elapsed": 0.6157629429999361,
-        "peak_rss": 97935360,
+        "elapsed": 0.5980262879998008,
+        "peak_rss": 98213888,
         "engine": "tesseract-best",
         "backend": "CPU",
         "words": 31
@@ -131,15 +137,16 @@
     },
     {
       "edition": "everyday",
+      "max_pixels": 8000000,
       "scenario": "max-pixels",
-      "peak_rss_bytes": 206487552,
+      "peak_rss_bytes": 206622720,
       "budget_bytes": 1000000000,
       "below_budget": true,
-      "elapsed_seconds": 3.767,
+      "elapsed_seconds": 3.747,
       "exit_code": 0,
       "details": {
-        "elapsed": 3.589638079999986,
-        "peak_rss": 206487552,
+        "elapsed": 3.577740317000007,
+        "peak_rss": 206622720,
         "engine": "tesseract-best",
         "backend": "CPU",
         "words": 312
@@ -148,37 +155,38 @@
     },
     {
       "edition": "everyday",
+      "max_pixels": 8000000,
       "scenario": "gui-repeated",
-      "peak_rss_bytes": 508166144,
+      "peak_rss_bytes": 516427776,
       "budget_bytes": 1000000000,
       "below_budget": true,
-      "elapsed_seconds": 15.477,
+      "elapsed_seconds": 15.545,
       "exit_code": 0,
       "details": {
         "iterations": [
           {
             "characters": 2053,
-            "elapsed": 3.6813295719998678,
-            "worker_peak_rss": 454447104,
-            "idle_rss": 269795328
+            "elapsed": 3.6336102039999787,
+            "worker_peak_rss": 454819840,
+            "idle_rss": 333647872
           },
           {
             "characters": 2053,
-            "elapsed": 3.7098244170001635,
-            "worker_peak_rss": 508166144,
-            "idle_rss": 357679104
+            "elapsed": 3.698087459999897,
+            "worker_peak_rss": 508186624,
+            "idle_rss": 357691392
           },
           {
             "characters": 2053,
-            "elapsed": 3.5594793879999997,
-            "worker_peak_rss": 452157440,
-            "idle_rss": 303923200
+            "elapsed": 3.6559437780001645,
+            "worker_peak_rss": 516362240,
+            "idle_rss": 365838336
           },
           {
             "characters": 2053,
-            "elapsed": 3.59534362300019,
-            "worker_peak_rss": 503365632,
-            "idle_rss": 352854016
+            "elapsed": 3.6020857449998402,
+            "worker_peak_rss": 503562240,
+            "idle_rss": 353038336
           }
         ]
       },
@@ -186,15 +194,16 @@
     },
     {
       "edition": "studio",
+      "max_pixels": 16000000,
       "scenario": "sample",
-      "peak_rss_bytes": 97935360,
+      "peak_rss_bytes": 98033664,
       "budget_bytes": 4000000000,
       "below_budget": true,
-      "elapsed_seconds": 0.677,
+      "elapsed_seconds": 0.695,
       "exit_code": 0,
       "details": {
-        "elapsed": 0.5938405689998945,
-        "peak_rss": 97935360,
+        "elapsed": 0.6017854540000371,
+        "peak_rss": 98033664,
         "engine": "tesseract-best",
         "backend": "CPU",
         "words": 31
@@ -203,15 +212,16 @@
     },
     {
       "edition": "studio",
+      "max_pixels": 16000000,
       "scenario": "dark",
-      "peak_rss_bytes": 112726016,
+      "peak_rss_bytes": 98086912,
       "budget_bytes": 4000000000,
       "below_budget": true,
-      "elapsed_seconds": 0.673,
+      "elapsed_seconds": 0.703,
       "exit_code": 0,
       "details": {
-        "elapsed": 0.589619737999783,
-        "peak_rss": 98029568,
+        "elapsed": 0.6069543540002087,
+        "peak_rss": 98086912,
         "engine": "tesseract-best",
         "backend": "CPU",
         "words": 31
@@ -220,15 +230,16 @@
     },
     {
       "edition": "studio",
+      "max_pixels": 16000000,
       "scenario": "max-pixels",
-      "peak_rss_bytes": 326893568,
+      "peak_rss_bytes": 326819840,
       "budget_bytes": 4000000000,
       "below_budget": true,
-      "elapsed_seconds": 7.031,
+      "elapsed_seconds": 7.029,
       "exit_code": 0,
       "details": {
-        "elapsed": 6.765462484000182,
-        "peak_rss": 326893568,
+        "elapsed": 6.756264864000059,
+        "peak_rss": 326819840,
         "engine": "tesseract-best",
         "backend": "CPU",
         "words": 654
@@ -237,37 +248,38 @@
     },
     {
       "edition": "studio",
+      "max_pixels": 16000000,
       "scenario": "gui-repeated",
-      "peak_rss_bytes": 853475328,
+      "peak_rss_bytes": 789303296,
       "budget_bytes": 4000000000,
       "below_budget": true,
-      "elapsed_seconds": 28.76,
+      "elapsed_seconds": 29.144,
       "exit_code": 0,
       "details": {
         "iterations": [
           {
             "characters": 4247,
-            "elapsed": 6.8906563440000355,
-            "worker_peak_rss": 647303168,
-            "idle_rss": 422690816
+            "elapsed": 6.9017305360002865,
+            "worker_peak_rss": 647155712,
+            "idle_rss": 422604800
           },
           {
             "characters": 4247,
-            "elapsed": 6.775645307000104,
-            "worker_peak_rss": 789426176,
-            "idle_rss": 486670336
+            "elapsed": 6.891687474999799,
+            "worker_peak_rss": 789303296,
+            "idle_rss": 486572032
           },
           {
             "characters": 4247,
-            "elapsed": 6.791948047000005,
-            "worker_peak_rss": 853475328,
-            "idle_rss": 550666240
+            "elapsed": 6.834862553000221,
+            "worker_peak_rss": 725516288,
+            "idle_rss": 489095168
           },
           {
             "characters": 4247,
-            "elapsed": 6.789602565000223,
-            "worker_peak_rss": 653451264,
-            "idle_rss": 416878592
+            "elapsed": 6.859528429999955,
+            "worker_peak_rss": 637100032,
+            "idle_rss": 400662528
           }
         ]
       },

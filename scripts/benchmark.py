@@ -151,7 +151,7 @@ def main() -> int:
                 elif scenario == "gui-onefile":
                     command = [*base, str(image), "--edition", edition, "--ui-smoke-output", str(output)]
                 result = observe(command, output, EDITIONS[edition].budget)
-                result = {"edition": edition, "scenario": scenario, **result}
+                result = {"edition": edition, "max_pixels": EDITIONS[edition].max_pixels, "scenario": scenario, **result}
                 # Preserve evidence without copying all recognized document contents into reports.
                 if "text" in result["details"]:
                     details = result["details"].get("result", result["details"])
