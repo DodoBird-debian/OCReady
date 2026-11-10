@@ -70,3 +70,10 @@ The plan describes both the implementation sequence and release gates. Pending i
 - The initial six-platform/edition build matrix completed successfully: all three editions compiled on Linux and Windows and passed real packaged Arabic/English OCR smoke checks. Those initial artifacts predate this headroom fix; updated builds are required before release.
 - Validation: 35 tests and Ruff passed; rebuilt Linux Pocket compiled CLI/GUI smoke tests and all four external compiled-memory scenarios passed.
 - Next: updated platform builds, a CUDA runner compiled for the existing driver, embedding selected vision packs and vision-only editions, further source-geometry and usability improvements, and stronger memory containment.
+
+## Iteration 6 — Windows benchmark encoding correction
+
+- The updated matrix passed five edition/platform builds and packaged checks. Windows Pocket compiled and passed small-image real OCR and native-GUI checks, but its cap-sized benchmark report reader failed on Arabic UTF-8 bytes under Windows cp1252.
+- Corrected all benchmark JSON reads/writes to specify UTF-8 explicitly. Added a cross-platform regression test that simulates the Windows default codepage and preserves Arabic text.
+- This was a verification-tool failure, not evidence of a memory exceedance. The full Windows Pocket memory check still needs a successful rerun.
+- Local validation: targeted encoding regression passed. In-progress vision-pack work remains a separate iteration.

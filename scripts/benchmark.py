@@ -69,7 +69,7 @@ def gui_child(image_path: str, edition: str, output: str, loops: int) -> int:
             return
         if window.result is None:
             failed = True
-            Path(output).write_text(json.dumps({"error": window.status.text()}))
+            Path(output).write_text(json.dumps({"error": window.status.text()}), encoding="utf-8")
             timer.stop()
             window.close()
             app.quit()
@@ -79,7 +79,7 @@ def gui_child(image_path: str, edition: str, output: str, loops: int) -> int:
         if remaining > 0:
             run_next()
         else:
-            Path(output).write_text(json.dumps({"iterations": measurements}))
+            Path(output).write_text(json.dumps({"iterations": measurements}), encoding="utf-8")
             timer.stop()
             window.close()
             app.quit()
@@ -114,7 +114,7 @@ def observe(command: list[str], output: Path, budget: int) -> dict:
             process.wait()
         log.seek(0)
         error = log.read()[-3000:].decode("utf-8", errors="replace")
-    details = json.loads(output.read_text()) if output.exists() else {"error": error}
+    details = json.loads(output.read_text(encoding="utf-8")) if output.exists() else {"error": error}
     return {"peak_rss_bytes": peak, "budget_bytes": budget, "below_budget": peak < budget,
             "elapsed_seconds": round(time.monotonic() - start, 3), "exit_code": process.returncode,
             "details": details, "error": error if process.returncode else ""}
@@ -163,7 +163,7 @@ def main() -> int:
               "platform": sys.platform, "python": sys.version.split()[0], "cpu_count": psutil.cpu_count(),
               "binary": bool(args.binary), "scenarios": records}
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
+    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return 0 if all(row["below_budget"] and row["exit_code"] == 0 for row in records) else 2
 
 
