@@ -77,3 +77,16 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Corrected all benchmark JSON reads/writes to specify UTF-8 explicitly. Added a cross-platform regression test that simulates the Windows default codepage and preserves Arabic text.
 - This was a verification-tool failure, not evidence of a memory exceedance. The full Windows Pocket memory check still needs a successful rerun.
 - Local validation: targeted encoding regression passed. In-progress vision-pack work remains a separate iteration.
+
+## Iteration 7 — embedded vision editions, real CUDA, and Arabic layout
+
+- Added embedding of one or multiple model packs (runner, libraries, model, projector, provenance and notices), plus true vision-only builds. Runtime extraction safely preserves internal library aliases and rejects escaping links.
+- Compiled and ran a 269.6 MB Linux vision-only Everyday executable with a Q4 SmolVLM model and Q8 projector inside the binary. Packaged CLI and native-GUI transcriptions passed; observed small-image CLI peak was 775 MB, counting the launcher. Large embedded-vision jobs still need tighter pixel/working-set admission tuning.
+- Enabled memory-admissible vision packs in Everyday. Measured SmolVLM Q8 over all four source scenarios, including 8 MP input and repeated GUI inference; largest GUI peak was 847.5 MB. This model reads English and omits Arabic, so manifests and UI enforce English-only selection. Default bilingual OCR stays classical.
+- Added native CUDA runner build tooling with pinned llama.cpp/NVIDIA inputs and no system driver changes. Resolved local SDK/glibc compatibility and relocatable compiler/runtime linking issues.
+- Real GLM-OCR CUDA inference on the GTX 1660 Ti completed in 6.9 seconds with 1.24 GB host process-tree RSS; the same model took 23.8 seconds on CPU. The earlier incompatible CUDA runner had already exercised real CPU fallback.
+- Auto mode now detects CUDA support in either a dedicated CUDA runner or a shared CPU/CUDA executable.
+- Reworked the text editor's paragraph layout while keeping rich-text paste disabled: English aligns left, Arabic aligns right, and logical Unicode/copy order is preserved. Added a cursor-position assertion to verify actual rendered placement, not just format metadata.
+- Validation: 43 tests and Ruff passed; real embedded-vision CLI/GUI checks passed; tiny-model source memory workloads passed. Native CUDA inference was exercised on real hardware.
+- Windows Pocket's encoding-corrected rerun is now green, including compiled CLI, GUI and cap-sized memory scenarios. The latest feature changes still need an updated full-platform build matrix.
+- Remaining: embedded-vision large-image headroom, broader bilingual accuracy corpora and real desktop snip interactions, cross-platform GPU validation, strict OS memory containment, packaging provenance refinements, and continued usability review.

@@ -26,8 +26,12 @@ def runtime_root() -> Path:
                 with tarfile.open(bundle, "r:gz") as archive:
                     for member in archive.getmembers():
                         path = Path(member.name)
-                        if path.is_absolute() or ".." in path.parts or not (member.isfile() or member.isdir()):
+                        if path.is_absolute() or ".." in path.parts or not (member.isfile() or member.isdir() or member.islnk() or member.issym()):
                             raise RuntimeError("Unsafe path in bundled OCR runtime.")
+                        if member.islnk() or member.issym():
+                            link = Path(member.linkname)
+                            if link.is_absolute() or ".." in link.parts:
+                                raise RuntimeError("Unsafe link in bundled OCR runtime.")
                     archive.extractall(staging, filter="data")
                 staging.rename(target)
     return target

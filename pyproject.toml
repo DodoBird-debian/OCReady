@@ -17,6 +17,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<10", "ruff>=0.12,<1", "nuitka>=2.8,<5", "ordered-set>=4", "zstandard>=0.23", "patchelf>=0.17; sys_platform == 'linux'"]
+cuda-build = ["cmake>=3.28,<4", "ninja>=1.11,<2"]
 
 [project.scripts]
 ocready = "ocready.__main__:main"

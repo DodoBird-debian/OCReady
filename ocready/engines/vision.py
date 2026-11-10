@@ -33,7 +33,7 @@ def has_cuda(runner: str, edition: Edition, cancel: threading.Event | None) -> b
 
 
 def command(pack: ModelPack, image: Path, *, cuda: bool) -> list[str]:
-    runner = pack.cuda_runner if cuda else pack.runner
+    runner = (pack.cuda_runner or pack.runner) if cuda else pack.runner
     args = [str(Path(runner).expanduser()), "-m", str(Path(pack.model).expanduser()),
             "--mmproj", str(Path(pack.projector).expanduser()), "--image", str(image.resolve()),
             "-p", pack.prompt, "-n", str(pack.tokens), "--temp", "0", "--seed", "1",
@@ -57,18 +57,21 @@ def recognize(image: Path, edition: Edition, pack: ModelPack, *, language: str =
     if backend not in {"auto", "cpu", "cuda"}:
         raise OCRError("Choose Auto, CPU, or CUDA for vision inference.")
     pack.validate()
+    if any(value not in pack.languages.split("+") for value in language.split("+")):
+        raise OCRError(f"{pack.name} is configured for {pack.languages}. Choose a matching language, or use Fast/Precision OCR for Arabic + English.")
     allowed, detail = pack.admission(edition, tree_rss())
     if not allowed:
         raise OCRError(detail)
     started = time.monotonic()
-    cuda = bool(backend != "cpu" and pack.cuda_runner and has_cuda(pack.cuda_runner, edition, cancel))
+    cuda_program = pack.cuda_runner or pack.runner
+    cuda = bool(backend != "cpu" and has_cuda(cuda_program, edition, cancel))
     note = "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR."
     if backend == "cuda" and not cuda:
         note += " CUDA was unavailable; used CPU."
     progress(f"Reading with {pack.name} · {'CUDA' if cuda else 'CPU'}…")
     try:
         process = run_process(command(pack, image, cuda=cuda), budget=edition.budget, cancel=cancel,
-                              timeout=300, env=runner_env(pack.cuda_runner if cuda else pack.runner))
+                              timeout=300, env=runner_env(cuda_program if cuda else pack.runner))
     except (Cancelled, BudgetExceeded):
         raise
     except OCRError as exc:

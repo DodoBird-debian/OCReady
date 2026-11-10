@@ -25,6 +25,7 @@ def test_model_validation_and_admission(pack):
     pack.validate()
     assert pack.admission(EDITIONS["studio"])[0]
     assert not pack.admission(EDITIONS["pocket"])[0]
+    assert dataclasses.replace(pack, memory_mb=500).admission(EDITIONS["everyday"])[0]
     assert not dataclasses.replace(pack, memory_mb=3799).admission(EDITIONS["studio"])[0]
     Path(pack.projector).write_bytes(b"not GGUF")
     with pytest.raises(OCRError, match="not a GGUF"):
@@ -60,6 +61,24 @@ def test_cpu_command_disables_all_gpu_offload(pack):
     assert args[args.index("-ngl") + 1] == "0"
     assert "--no-mmproj-offload" in args
     assert args[args.index("-n") + 1] == "512"
+
+
+def test_auto_can_accelerate_with_the_same_runner(pack, tmp_path, monkeypatch):
+    monkeypatch.setattr(vision, "has_cuda", lambda runner, *_args: runner == pack.runner)
+    calls = []
+    def fake_run(args, **kwargs):
+        calls.append(args)
+        return ProcessResult("Read text", "", 700_000_000, 1)
+    monkeypatch.setattr(vision, "run_process", fake_run)
+    result = vision.recognize(tmp_path / "image.png", EDITIONS["studio"], pack)
+    assert calls[0][0] == pack.runner
+    assert calls[0][calls[0].index("-ngl") + 1] == "99"
+    assert result.backend == "CUDA"
+
+
+def test_english_only_model_does_not_silently_claim_arabic(pack, tmp_path):
+    with pytest.raises(OCRError, match="configured for eng"):
+        vision.recognize(tmp_path / "image.png", EDITIONS["studio"], dataclasses.replace(pack, languages="eng"))
 
 
 def test_cuda_initialization_failure_retries_cpu(pack, tmp_path, monkeypatch):

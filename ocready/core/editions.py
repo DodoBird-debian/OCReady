@@ -18,7 +18,7 @@ class Edition:
 
 EDITIONS = {
     "pocket": Edition("pocket", "Pocket", 350_000_000, 2_000_000, 3000),
-    "everyday": Edition("everyday", "Everyday", 1_000_000_000, 8_000_000, 6000, best_data=True),
+    "everyday": Edition("everyday", "Everyday", 1_000_000_000, 8_000_000, 6000, best_data=True, vision=True),
     "studio": Edition("studio", "Studio", 4_000_000_000, 16_000_000, 8000, best_data=True, vision=True),
 }
 

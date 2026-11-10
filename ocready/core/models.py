@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from ocready.core.editions import Edition
-from ocready.core.paths import config_root
+from ocready.core.paths import build_profile, config_root, runtime_root
 from ocready.core.types import OCRError
 
 TRANSCRIPTION_PROMPT = (
@@ -28,6 +28,8 @@ class ModelPack:
     prompt: str = TRANSCRIPTION_PROMPT
     source: str = "User-provided local model"
     license: str = "See the model's license"
+    languages: str = "ara+eng"
+    bundled: bool = False
 
     def validate(self) -> None:
         if not re.fullmatch(r"[a-zA-Z0-9_-]{1,60}", self.id):
@@ -40,6 +42,8 @@ class ModelPack:
             raise OCRError("Set a runner memory estimate between 100 and 3800 MB.")
         if not self.prompt.strip() or len(self.prompt) > 4000:
             raise OCRError("Set a nonempty transcription prompt shorter than 4000 characters.")
+        if self.languages not in {"ara+eng", "ara", "eng"}:
+            raise OCRError("Model languages must be ara+eng, ara, or eng.")
         for name, value in (("CPU runner", self.runner), ("model", self.model), ("vision projector", self.projector)):
             path = Path(value).expanduser()
             if not value or not path.is_file():
@@ -53,7 +57,7 @@ class ModelPack:
 
     def admission(self, edition: Edition, resident_bytes: int = 150_000_000) -> tuple[bool, str]:
         if not edition.vision:
-            return False, "Local vision inference is enabled in Studio; smaller editions use compact classical OCR."
+            return False, "Local vision inference needs Everyday or Studio. Pocket uses compact classical OCR."
         # The estimate must include all runner buffers; raw model sizes are only a lower bound.
         weight_bytes = sum(Path(p).stat().st_size for p in (self.model, self.projector) if Path(p).is_file())
         required = max(self.memory_mb * 1_000_000, weight_bytes + 128_000_000) + resident_bytes + 80_000_000
@@ -72,10 +76,12 @@ class ModelPack:
         try:
             pack = cls(**{key: value for key, value in data.items() if key in allowed})
             if not all(isinstance(getattr(pack, field), str) for field in
-                       ("id", "name", "runner", "model", "projector", "cuda_runner", "prompt", "source", "license")):
+                       ("id", "name", "runner", "model", "projector", "cuda_runner", "prompt", "source", "license", "languages")):
                 raise ValueError("paths and names must be strings")
             if type(pack.memory_mb) is not int or type(pack.tokens) is not int:
                 raise ValueError("memory and token limits must be integers")
+            if type(pack.bundled) is not bool:
+                raise ValueError("bundled must be a boolean")
             return pack
         except (TypeError, ValueError) as exc:
             raise OCRError(f"Invalid model manifest: {exc}") from exc
@@ -96,7 +102,7 @@ def load_pack(path: Path) -> ModelPack:
         raise OCRError(f"Could not read the model manifest: {exc}") from exc
 
 
-def load_packs() -> list[ModelPack]:
+def _load_user_packs() -> list[ModelPack]:
     path = config_root() / "models.json"
     try:
         if path.stat().st_size > 1_000_000:
@@ -115,6 +121,20 @@ def load_packs() -> list[ModelPack]:
         return packs
     except (OSError, ValueError):
         return []
+
+
+def load_packs() -> list[ModelPack]:
+    packs = {}
+    if "vision" in build_profile()["methods"]:
+        for path in sorted((runtime_root() / "vision").glob("*/pack.json")):
+            try:
+                pack = dataclasses.replace(load_pack(path), bundled=True)
+                packs[pack.id] = pack
+            except OCRError:
+                continue
+    for pack in _load_user_packs():
+        packs[pack.id] = pack
+    return list(packs.values())
 
 
 def save_packs(packs: list[ModelPack]) -> None:

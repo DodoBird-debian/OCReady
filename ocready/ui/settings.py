@@ -1,3 +1,4 @@
+import dataclasses
 import json
 import uuid
 from pathlib import Path
@@ -51,7 +52,7 @@ class SettingsDialog(QDialog):
         tabs.addTab(runtime, "Offline OCR & diagnostics")
         models = QWidget()
         layout = QVBoxLayout(models)
-        intro = QLabel("Add a local vision model for difficult images. Choose Studio in the main window to use it.\nSelect a llama-mtmd-cli runner, GGUF model, and matching vision projector. Nothing is uploaded.")
+        intro = QLabel("Add a local vision model for difficult images. Everyday admits compact packs; Studio admits larger ones.\nSelect a llama-mtmd-cli runner, GGUF model, and matching vision projector. Nothing is uploaded.")
         intro.setWordWrap(True)
         layout.addWidget(intro)
         row = QHBoxLayout()
@@ -100,9 +101,14 @@ class SettingsDialog(QDialog):
             self.backend.addItem(name, key)
         self.backend.setCurrentIndex(max(0, self.backend.findData(window.vision_backend)))
         form.addRow("Compute", self.backend)
+        self.languages = QComboBox()
+        for name, key in (("Arabic + English", "ara+eng"), ("English only", "eng"), ("Arabic only", "ara")):
+            self.languages.addItem(name, key)
+        form.addRow("Model languages", self.languages)
         self.prompt = QPlainTextEdit()
         self.prompt.setMaximumHeight(80)
         self.prompt.setPlainText(TRANSCRIPTION_PROMPT)
+        self.languages.setCurrentIndex(0)
         form.addRow("Recognition prompt", self.prompt)
         layout.addLayout(form)
         self.message = QLabel("Estimates are not certified memory measurements. AI transcription can omit or invent text.")
@@ -151,6 +157,7 @@ class SettingsDialog(QDialog):
         self.memory.setValue(pack.memory_mb)
         self.tokens.setValue(pack.tokens)
         self.prompt.setPlainText(pack.prompt)
+        self.languages.setCurrentIndex(self.languages.findData(pack.languages))
 
     def browse(self, key: str) -> None:
         file_filter = "GGUF models (*.gguf);;All files (*)" if key in {"model", "projector"} else "All files (*)"
@@ -160,14 +167,17 @@ class SettingsDialog(QDialog):
 
     def save_model(self) -> None:
         try:
-            pack = ModelPack(id=self.pack_id, name=self.name.text().strip(),
-                             **{key: str(Path(field.text()).expanduser().resolve()) if field.text().strip() else "" for key, field in self.fields.items()},
-                             memory_mb=self.memory.value(), tokens=self.tokens.value(), prompt=self.prompt.toPlainText())
+            existing = next((pack for pack in self.packs if pack.id == self.pack_id), None)
+            base = existing or ModelPack(self.pack_id, self.name.text().strip(), "", "", "")
+            pack = dataclasses.replace(base, name=self.name.text().strip(),
+                                       **{key: str(Path(field.text()).expanduser().resolve()) if field.text().strip() else "" for key, field in self.fields.items()},
+                                       memory_mb=self.memory.value(), tokens=self.tokens.value(), prompt=self.prompt.toPlainText(),
+                                       languages=self.languages.currentData())
             pack.validate()
             self._persist([p for p in self.packs if p.id != pack.id] + [pack])
             self.window.vision_backend = self.backend.currentData()
             self.list.setCurrentRow(next(i for i, p in enumerate(self.packs) if p.id == pack.id))
-            self.message.setText("Model saved. Select Studio, then choose it in the recognition method list.")
+            self.message.setText("Model saved. Choose an edition with enough RAM, then select the model in the method list.")
         except Exception as exc:
             self.message.setText(str(exc))
 
@@ -192,6 +202,9 @@ class SettingsDialog(QDialog):
     def remove_pack(self) -> None:
         row = self.list.currentRow()
         if row >= 0:
+            if self.packs[row].bundled:
+                self.message.setText("This model is built into this edition. Its configuration and files are kept with the application.")
+                return
             self._persist([p for i, p in enumerate(self.packs) if i != row])
             self.message.setText("Configuration removed. Your model files were kept.")
 

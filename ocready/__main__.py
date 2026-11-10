@@ -10,13 +10,19 @@ from ocready.core.types import OCRError
 
 
 def diagnostics() -> dict:
+    from ocready.core.models import load_packs
     from ocready.engines.tesseract import data_dir, executable, readiness
+    profile = build_profile()
+    classical = any(method.startswith("tesseract") for method in profile["methods"])
+    packs = load_packs()
+    ready, status = readiness() if classical else (bool(packs), "Local vision packs available" if packs else "No local vision pack configured")
     return {
         "version": __version__, "platform": sys.platform,
         "runtime": str(runtime_root()), "tesseract": str(executable() or "missing"),
         "fast_data": str(data_dir("fast") or "missing"),
         "best_data": str(data_dir("best") or "missing"),
-        "ready": readiness()[0], "status": readiness()[1],
+        "ready": ready, "status": status, "methods": profile["methods"],
+        "vision_models": [{"id": p.id, "languages": p.languages, "bundled": p.bundled} for p in packs],
         "memory_policy": "process-tree RSS sampled every 40 ms; not an OS-enforced hard ceiling",
         "editions": {k: {"budget_bytes": v.budget, "max_pixels": v.max_pixels} for k, v in EDITIONS.items()},
     }
@@ -28,8 +34,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("image", nargs="?", help="Image to open, or recognize with --text / --json")
     parser.add_argument("--version", action="version", version=f"OCReady {__version__}")
     parser.add_argument("--edition", choices=profile["available_editions"], default=profile["edition"])
-    parser.add_argument("--language", choices=("ara+eng", "ara", "eng"), default="ara+eng")
-    parser.add_argument("--method", choices=("tesseract-fast", "tesseract-best", "vision"), default="tesseract-fast")
+    parser.add_argument("--language", choices=("ara+eng", "ara", "eng"))
+    parser.add_argument("--method", choices=("tesseract-fast", "tesseract-best", "vision"), default=profile["methods"][0])
     parser.add_argument("--model-pack", type=Path, help="Local vision model JSON manifest")
     parser.add_argument("--backend", choices=("auto", "cpu", "cuda"), default="auto")
     parser.add_argument("--layout", choices=("auto", "block", "sparse"), default="auto")
@@ -61,9 +67,13 @@ def main(argv: list[str] | None = None) -> int:
             source = load_image(args.image, edition)
             recipe = Recipe(invert=args.invert, grayscale=args.grayscale, autocontrast=args.autocontrast,
                             threshold=args.threshold, rotation=args.rotate)
-            from ocready.core.models import load_pack
+            from ocready.core.models import load_pack, load_packs
             pack = load_pack(args.model_pack) if args.model_pack else None
-            result, _ = recognize_image(source, Request(edition, args.language, args.method, args.layout,
+            if args.method == "vision" and not pack:
+                packs = load_packs()
+                pack = next((p for p in packs if p.id == profile.get("default_model")), packs[0] if packs else None)
+            language = args.language or (pack.languages if pack and args.method == "vision" else "ara+eng")
+            result, _ = recognize_image(source, Request(edition, language, args.method, args.layout,
                                                         recipe, args.compare, pack, args.backend))
             encoded = json.dumps(result.to_dict(), ensure_ascii=False, indent=2) if args.json else result.text
         else:

@@ -1,12 +1,14 @@
+import unicodedata
+
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QColor, QFont, QTextCharFormat, QTextCursor
-from PySide6.QtWidgets import QPlainTextEdit, QTextEdit
+from PySide6.QtWidgets import QTextEdit
 
 from ocready.core.text import codepoint_offset, utf16_offset
 from ocready.core.types import OCRResult
 
 
-class TextEditor(QPlainTextEdit):
+class TextEditor(QTextEdit):
     sourceSelection = Signal(object)
     linkChanged = Signal(bool)
 
@@ -15,10 +17,13 @@ class TextEditor(QPlainTextEdit):
         self.setPlaceholderText("Your text will appear here.\n\nOpen an image, paste a screenshot, or capture a region.\nThen choose Recognize text.\n\nالعربية والإنجليزية، جاهزتان للنسخ.")
         self.setAccessibleName("Recognized text. Editable, with native Arabic and English support.")
         self.setFont(QFont("Noto Sans", 13))
+        self.setAcceptRichText(False)
+        self.setAutoFormatting(QTextEdit.AutoFormattingFlag.AutoNone)
         self.setTabStopDistance(32)
         self.result: OCRResult | None = None
         self.linked = False
         self._setting = False
+        self.direction = "auto"
         self.textChanged.connect(self._on_edit)
         self.selectionChanged.connect(self._on_selection)
         self.set_direction("auto")
@@ -27,6 +32,7 @@ class TextEditor(QPlainTextEdit):
         self._setting = True
         self.result = result
         self.setPlainText(result.text)
+        self.set_direction(self.direction)
         self.document().setModified(False)
         self.linked = bool(result.words)
         self._setting = False
@@ -46,7 +52,7 @@ class TextEditor(QPlainTextEdit):
         self.linkChanged.emit(False)
 
     def _on_edit(self) -> None:
-        if not self._setting and self.linked:
+        if not self._setting and self.linked and self.result and self.toPlainText() != self.result.text:
             self.invalidate_link()
 
     def _on_selection(self) -> None:
@@ -82,9 +88,30 @@ class TextEditor(QPlainTextEdit):
                 scrollbar.setValue(scrollbar.value() + position.y() - self.viewport().height() // 2)
 
     def set_direction(self, value: str) -> None:
+        self.direction = value
         direction = {"auto": Qt.LayoutDirection.LayoutDirectionAuto,
                      "rtl": Qt.LayoutDirection.RightToLeft, "ltr": Qt.LayoutDirection.LeftToRight}[value]
+        setting, modified = self._setting, self.document().isModified()
+        self._setting = True
         option = self.document().defaultTextOption()
         option.setTextDirection(direction)
         self.document().setDefaultTextOption(option)
+        cursor = QTextCursor(self.document())
+        cursor.beginEditBlock()
+        block = self.document().firstBlock()
+        while block.isValid():
+            strong = next((unicodedata.bidirectional(character) for character in block.text()
+                           if unicodedata.bidirectional(character) in {"L", "R", "AL"}), "L")
+            rtl = value == "rtl" or (value == "auto" and strong in {"R", "AL"})
+            cursor.setPosition(block.position())
+            formatting = cursor.blockFormat()
+            formatting.setLayoutDirection(Qt.LayoutDirection.RightToLeft if rtl else Qt.LayoutDirection.LeftToRight)
+            formatting.setAlignment((Qt.AlignmentFlag.AlignRight if rtl else Qt.AlignmentFlag.AlignLeft)
+                                    | Qt.AlignmentFlag.AlignAbsolute)
+            cursor.setBlockFormat(formatting)
+            block = block.next()
+        cursor.endEditBlock()
+        self.document().setModified(modified)
+        self._setting = setting
         self.viewport().update()
+

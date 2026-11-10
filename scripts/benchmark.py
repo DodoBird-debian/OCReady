@@ -40,7 +40,7 @@ def make_image(path: Path, edition: str, dark=False, maximum=False) -> None:
     image.save(path)
 
 
-def gui_child(image_path: str, edition: str, output: str, loops: int) -> int:
+def gui_child(image_path: str, edition: str, output: str, loops: int, pack_path: Path | None = None) -> int:
     from PySide6.QtCore import QTimer
     from PySide6.QtWidgets import QApplication
 
@@ -49,6 +49,11 @@ def gui_child(image_path: str, edition: str, output: str, loops: int) -> int:
     app = QApplication.instance() or QApplication([])
     apply_theme(app)
     window = MainWindow(edition=edition)
+    if pack_path:
+        from ocready.core.models import load_pack
+        pack = load_pack(pack_path)
+        window.packs = [pack]
+        window.refresh_methods()
     window.show()
     remaining = loops
     measurements = []
@@ -58,7 +63,9 @@ def gui_child(image_path: str, edition: str, output: str, loops: int) -> int:
         nonlocal remaining
         window.editor.document().setModified(False)
         window.open_path(image_path)
-        if edition != "pocket":
+        if pack_path:
+            window.method_combo.setCurrentIndex(window.method_combo.findData(f"vision:{pack.id}"))
+        elif edition != "pocket":
             window.method_combo.setCurrentIndex(1)
         window.recognize()
         remaining -= 1
@@ -125,11 +132,12 @@ def main() -> int:
     parser.add_argument("--edition", choices=["all", *EDITIONS], default="all")
     parser.add_argument("--output", type=Path, default=ROOT / "test-output" / "benchmarks.json")
     parser.add_argument("--binary", type=Path, help="Include onefile launcher overhead in headless scenarios")
+    parser.add_argument("--vision-pack", type=Path, help="Benchmark a local VLM pack instead of classical OCR")
     parser.add_argument("--gui-child", nargs=4, metavar=("IMAGE", "EDITION", "OUTPUT", "LOOPS"), help=argparse.SUPPRESS)
     args = parser.parse_args()
     if args.gui_child:
         image, edition, output, loops = args.gui_child
-        return gui_child(image, edition, output, int(loops))
+        return gui_child(image, edition, output, int(loops), args.vision_pack)
     editions = list(EDITIONS) if args.edition == "all" else [args.edition]
     records = []
     with tempfile.TemporaryDirectory(prefix="ocready-benchmark-") as temporary:
@@ -142,12 +150,18 @@ def main() -> int:
                 make_image(image, edition, dark=scenario == "dark", maximum=scenario in {"max-pixels", "gui-repeated", "gui-onefile"})
                 base = [str(args.binary.resolve())] if args.binary else [sys.executable, "-m", "ocready"]
                 command = [*base, str(image), "--json", "--layout", "sparse", "--edition", edition, "--output", str(output)]
-                if edition != "pocket":
+                if args.vision_pack:
+                    from ocready.core.models import load_pack
+                    pack = load_pack(args.vision_pack)
+                    command += ["--method", "vision", "--model-pack", str(args.vision_pack.resolve()), "--language", pack.languages]
+                elif edition != "pocket":
                     command += ["--method", "tesseract-best"]
                 if scenario == "dark":
                     command.append("--invert")
                 if scenario == "gui-repeated":
                     command = [sys.executable, str(Path(__file__).resolve()), "--gui-child", str(image), edition, str(output), "4"]
+                    if args.vision_pack:
+                        command += ["--vision-pack", str(args.vision_pack.resolve())]
                 elif scenario == "gui-onefile":
                     command = [*base, str(image), "--edition", edition, "--ui-smoke-output", str(output)]
                 result = observe(command, output, EDITIONS[edition].budget)

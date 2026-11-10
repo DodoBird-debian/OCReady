@@ -49,4 +49,4 @@ def attach_smoke_run(app, window, image: str | None, output: Path) -> None:
     window._smoke_timer.timeout.connect(poll)
     window._smoke_timer.start(50)
     QTimer.singleShot(200, start)
-    QTimer.singleShot(30_000, lambda: finish("GUI smoke test timed out"))
+    QTimer.singleShot(120_000, lambda: finish("GUI smoke test timed out"))

@@ -534,10 +534,6 @@ class MainWindow(QMainWindow):
     def _edition_changed(self, *_args) -> None:
         if not hasattr(self, "method_combo"):
             return
-        enabled = self.edition.best_data
-        self.method_combo.model().item(1).setEnabled(enabled)
-        if not enabled and self.method_combo.currentData() == "tesseract-best":
-            self.method_combo.setCurrentIndex(0)
         self.refresh_methods()
         if self.source is not None:
             self._apply_recipe()
@@ -548,16 +544,19 @@ class MainWindow(QMainWindow):
         selected = self.method_combo.currentData()
         self.method_combo.blockSignals(True)
         self.method_combo.clear()
-        self.method_combo.addItem("Fast OCR", "tesseract-fast")
-        self.method_combo.addItem("Precision OCR", "tesseract-best")
-        self.method_combo.model().item(0).setEnabled("tesseract-fast" in self.profile["methods"])
-        self.method_combo.model().item(1).setEnabled(self.edition.best_data and "tesseract-best" in self.profile["methods"])
+        for name, method in (("Fast OCR", "tesseract-fast"), ("Precision OCR", "tesseract-best")):
+            if method in self.profile["methods"]:
+                self.method_combo.addItem(name, method)
+                self.method_combo.model().item(self.method_combo.count() - 1).setEnabled(method != "tesseract-best" or self.edition.best_data)
         for pack in self.packs if "vision" in self.profile["methods"] else []:
             self.method_combo.addItem(f"{pack.name} · AI", f"vision:{pack.id}")
             allowed, reason = pack.admission(self.edition)
             item = self.method_combo.model().item(self.method_combo.count() - 1)
             item.setEnabled(allowed)
             item.setToolTip(reason)
+        if not self.method_combo.count():
+            self.method_combo.addItem("Configure a vision model in Settings", None)
+            self.method_combo.model().item(0).setEnabled(False)
         index = self.method_combo.findData(selected)
         if index < 0 or not self.method_combo.model().item(index).isEnabled():
             index = next((i for i in range(self.method_combo.count()) if self.method_combo.model().item(i).isEnabled()), 0)
@@ -571,9 +570,19 @@ class MainWindow(QMainWindow):
         vision = str(self.method_combo.currentData()).startswith("vision:")
         self.compare_check.setEnabled(not vision and not self.worker)
         self.layout_combo.setEnabled(not vision and not self.worker)
+        if vision:
+            pack = next((p for p in self.packs if self.method_combo.currentData() == f"vision:{p.id}"), None)
+            if pack and self.language_combo.currentData() != pack.languages and pack.languages != "ara+eng":
+                self.language_combo.setCurrentIndex(self.language_combo.findData(pack.languages))
+        item = self.method_combo.model().item(self.method_combo.currentIndex())
+        self.recognize_button.setEnabled(self.source is not None and not self.worker and item is not None and item.isEnabled())
 
     def recognize(self) -> None:
         if self.source is None or self.worker or not self._confirm_replace():
+            return
+        method = self.method_combo.currentData()
+        if not method:
+            self._set_status("Add a local model in Settings before recognizing text.")
             return
         preview_pending = self.preview_timer.isActive()
         self.preview_timer.stop()

@@ -160,3 +160,19 @@ def test_settings_model_form_opens_without_a_configured_model(window, app):
     assert dialog.memory.value() == 2800
     assert dialog.list.count() == 0
     dialog.accept()
+
+
+def test_automatic_direction_is_independent_per_paragraph(window, app):
+    from ocready.core.types import OCRResult
+    text = "English text\nمرحبا بالعالم\n123 عربي"
+    window.editor.set_result(OCRResult(text))
+    first = window.editor.document().firstBlock()
+    assert first.blockFormat().layoutDirection() == Qt.LayoutDirection.LeftToRight
+    assert first.next().blockFormat().layoutDirection() == Qt.LayoutDirection.RightToLeft
+    assert first.next().next().blockFormat().layoutDirection() == Qt.LayoutDirection.RightToLeft
+    assert window.editor.toPlainText() == text
+    assert not window.editor.document().isModified()
+    app.processEvents()
+    cursor = window.editor.textCursor()
+    cursor.setPosition(first.next().position())
+    assert window.editor.cursorRect(cursor).x() > window.editor.viewport().width() / 2

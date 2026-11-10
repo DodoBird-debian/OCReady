@@ -1,0 +1,103 @@
+{
+  "sample_interval_ms": 10,
+  "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
+  "platform": "linux",
+  "python": "3.12.16",
+  "cpu_count": 12,
+  "binary": false,
+  "scenarios": [
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "sample",
+      "peak_rss_bytes": 495198208,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 4.4,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 4.286939439999514,
+        "peak_rss": 495198208,
+        "engine": "vision:smolvlm-256m",
+        "backend": "CPU",
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "dark",
+      "peak_rss_bytes": 495255552,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 3.888,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 3.7964974710002934,
+        "peak_rss": 495255552,
+        "engine": "vision:smolvlm-256m",
+        "backend": "CPU",
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "max-pixels",
+      "peak_rss_bytes": 561078272,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 8.915,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 8.73519695199957,
+        "peak_rss": 561078272,
+        "engine": "vision:smolvlm-256m",
+        "backend": "CPU",
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "gui-repeated",
+      "peak_rss_bytes": 847474688,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 35.58,
+      "exit_code": 0,
+      "details": {
+        "iterations": [
+          {
+            "characters": 21,
+            "elapsed": 9.443129020000015,
+            "worker_peak_rss": 786354176,
+            "idle_rss": 333516800
+          },
+          {
+            "characters": 21,
+            "elapsed": 9.375142576000144,
+            "worker_peak_rss": 839487488,
+            "idle_rss": 357535744
+          },
+          {
+            "characters": 21,
+            "elapsed": 7.94033697300074,
+            "worker_peak_rss": 847474688,
+            "idle_rss": 365531136
+          },
+          {
+            "characters": 21,
+            "elapsed": 7.850762933999249,
+            "worker_peak_rss": 837095424,
+            "idle_rss": 352616448
+          }
+        ]
+      },
+      "error": ""
+    }
+  ]
+}

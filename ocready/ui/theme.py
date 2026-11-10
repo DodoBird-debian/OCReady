@@ -29,7 +29,7 @@ QComboBox:hover { border-color: #bacbe2; }
 QComboBox:disabled { color: #9aa6b8; background: #f5f7fa; }
 QComboBox::drop-down { border: none; width: 24px; }
 QComboBox QAbstractItemView { background: #ffffff; border: 1px solid #dce3ed; selection-background-color: #e6efff; selection-color: #25344c; padding: 5px; }
-QPlainTextEdit { background: #ffffff; border: none; padding: 15px; selection-background-color: #d5e5ff; selection-color: #183d76; font-size: 16px; }
+QPlainTextEdit, QTextEdit { background: #ffffff; border: none; padding: 15px; selection-background-color: #d5e5ff; selection-color: #183d76; font-size: 16px; }
 QLineEdit, QSpinBox, QDoubleSpinBox { background: #ffffff; border: 1px solid #dce3ed; border-radius: 6px; padding: 7px; }
 QCheckBox { spacing: 7px; }
 QCheckBox::indicator { width: 15px; height: 15px; border: 1px solid #b7c5d8; border-radius: 4px; background: white; }

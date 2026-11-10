@@ -11,6 +11,8 @@ def main() -> None:
     directory = Path(sys.argv[1]).resolve()
     binary = next(p for p in directory.glob("OCReady-*") if p.is_file() and not p.name.endswith(".sha256"))
     root = Path(__file__).resolve().parents[1]
+    profile = json.loads((binary.parent / "build-manifest.json").read_text())
+    vision_only = not any(method.startswith("tesseract") for method in profile["methods"])
     env = {key: value for key, value in os.environ.items()
            if key not in {"OCREADY_RUNTIME", "OCREADY_TESSERACT", "TESSDATA_PREFIX", "PYTHONPATH", "VIRTUAL_ENV"}}
     with tempfile.TemporaryDirectory(prefix="ocready-smoke-") as directory:
@@ -18,20 +20,25 @@ def main() -> None:
         subprocess.run([str(binary), str(root / "assets" / "sample-bilingual.png"), "--json", "--layout", "sparse",
                         "--output", str(output)], cwd=directory, env=env, check=True, timeout=90)
         result = json.loads(output.read_text(encoding="utf-8"))
-        assert "مرحبا بالعالم" in result["text"], result["text"]
+        if not vision_only:
+            assert "مرحبا بالعالم" in result["text"], result["text"]
         assert "screenshots" in result["text"], result["text"]
-        assert result["words"], "No real word geometry"
+        assert bool(result["words"]) != vision_only, "Unexpected word geometry for this method"
         print(f"Compiled OCR passed: {len(result['words'])} words; sampled {result['peak_rss'] / 1e6:.1f} MB RSS")
         output = Path(directory) / "gui-result.json"
         env["QT_QPA_PLATFORM"] = "offscreen"
         env["XDG_CONFIG_HOME"] = str(Path(directory) / "config")
         env["APPDATA"] = str(Path(directory) / "config")
         subprocess.run([str(binary), str(root / "assets" / "sample-bilingual.png"),
-                        "--ui-smoke-output", str(output)], cwd=directory, env=env, check=True, timeout=60)
+                        "--ui-smoke-output", str(output)], cwd=directory, env=env, check=True, timeout=150)
         gui = json.loads(output.read_text(encoding="utf-8"))
         assert not gui["error"], gui
-        assert gui["linked"] and gui["words"] >= 25, gui
-        assert "مرحبا بالعالم" in gui["text"], gui["text"]
+        if vision_only:
+            assert not gui["linked"] and gui["words"] == 0, gui
+            assert "screenshots" in gui["text"], gui["text"]
+        else:
+            assert gui["linked"] and gui["words"] >= 25, gui
+            assert "مرحبا بالعالم" in gui["text"], gui["text"]
         print(f"Compiled native GUI passed: {gui['words']} linked words; {gui['rss'] / 1e6:.1f} MB idle RSS")
     if "--benchmark" in sys.argv:
         profile = json.loads((binary.parent / "build-manifest.json").read_text())
