@@ -318,6 +318,7 @@ class MainWindow(QMainWindow):
         self.image_info.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
         row.addWidget(self.image_info, 1)
         self.boxes = QCheckBox("Word boxes")
+        self.boxes.setEnabled(False)
         self.boxes.toggled.connect(self._boxes_toggled)
         row.addWidget(self.boxes)
         self.copy_selection = button("Copy selection", self.copy_image_selection, quiet=True)
@@ -409,14 +410,16 @@ class MainWindow(QMainWindow):
         if path:
             self.open_path(path)
 
-    def open_path(self, path: str) -> None:
-        if self.worker or not self._confirm_replace():
-            return
+    def open_path(self, path: str, *, replace_confirmed: bool = False) -> bool:
+        if self.worker or (not replace_confirmed and not self._confirm_replace()):
+            return False
         try:
             image = load_image(path, self.edition)
             self._set_source(image, Path(path).name)
+            return True
         except Exception as exc:
             self._set_status(str(exc), error=True)
+            return False
 
     def _set_source(self, image: Image.Image, name: str) -> None:
         self.job += 1
@@ -429,33 +432,34 @@ class MainWindow(QMainWindow):
         self._set_busy(False)
         self._set_status("Image ready. Choose Recognize text, or clean up the image first.")
 
-    def paste_image(self) -> None:
+    def paste_image(self, *, replace_confirmed: bool = False) -> bool:
         if self.worker:
-            return
+            return False
         clipboard = QApplication.clipboard()
         mime = clipboard.mimeData()
         if mime and mime.hasUrls():
             path = next((u.toLocalFile() for u in mime.urls() if u.isLocalFile()), None)
             if path:
-                self.open_path(path)
-                return
+                return self.open_path(path, replace_confirmed=replace_confirmed)
         image = clipboard.image()
         if image.isNull():
             self._set_status("No image on your clipboard. Copy a screenshot or image, then choose Paste image.")
-            return
+            return False
         if image.width() * image.height() > self.edition.max_pixels * 2:
             self._set_status(f"This clipboard image is too large for {self.edition.name}. Capture a smaller region or choose a larger edition.", error=True)
-            return
-        if not self._confirm_replace():
-            return
+            return False
+        if not replace_confirmed and not self._confirm_replace():
+            return False
         try:
             buffer = QBuffer()
             buffer.open(QIODevice.OpenModeFlag.WriteOnly)
             image.save(buffer, "PNG")
             source = load_image(bytes(buffer.data()), self.edition)
             self._set_source(source, "Clipboard image")
+            return True
         except Exception as exc:
             self._set_status(str(exc), error=True)
+            return False
 
     def load_example(self) -> None:
         self.open_path(str(resource_root() / "assets" / "sample-bilingual.png"))
@@ -642,6 +646,10 @@ class MainWindow(QMainWindow):
             self._set_status("Stopping recognition…")
 
     def escape(self) -> None:
+        capture = getattr(self, "capture_controller", None)
+        if capture:
+            capture.cancel()
+            return
         if self.worker:
             self.cancel_recognition()
         else:
@@ -662,7 +670,20 @@ class MainWindow(QMainWindow):
         self.copy_selection.setEnabled(bool(indices) and self.editor.linked)
 
     def _link_changed(self, linked: bool) -> None:
-        self.link_status.setText("Linked to image" if linked else ("Edited text" if self.editor.toPlainText() else ""))
+        text = self.editor.toPlainText()
+        if linked:
+            status = "Linked to image"
+        elif not text:
+            status = ""
+        elif self.editor.document().isModified():
+            status = "Edited text"
+        elif self.result and self.result.engine.startswith("vision"):
+            status = "AI transcription"
+        else:
+            status = "Source unlinked"
+        self.link_status.setText(status)
+        self.boxes.setEnabled(linked)
+        self.boxes.setToolTip("Show located words from Fast or Precision OCR. AI transcription has no word coordinates.")
         if not linked:
             self.canvas.set_words([])
             self.copy_selection.setEnabled(False)

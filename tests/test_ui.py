@@ -196,3 +196,121 @@ def test_original_image_keeps_located_word_selection_after_rotation(window, app)
     window.copy_image_selection()
     assert QApplication.clipboard().text() == "مرحبا"
     assert window.editor.linked
+
+
+def _windows_capture_for_test(window, monkeypatch):
+    from PySide6.QtGui import QDesktopServices
+
+    from ocready.ui.capture import CaptureController
+    monkeypatch.setattr(QDesktopServices, "openUrl", lambda _url: True)
+    controller = CaptureController(window)
+    controller.is_windows = True
+    controller.clipboard_sequence = lambda: 10
+    controller.capture_visible = lambda: None
+    window.capture_controller = controller
+    controller._launch()
+    return controller
+
+
+def test_capture_cancel_preserves_image_edits_and_maximized_state(window, app):
+    from ocready.ui.capture import CaptureController
+    window.load_example()
+    window.editor.insertPlainText("نسخة معدلة")
+    source = window.source
+    window.showMaximized()
+    app.processEvents()
+    controller = CaptureController(window)
+    window.capture_controller = controller
+    window.hide()
+    controller.cancel()
+    assert window.source is source
+    assert window.editor.toPlainText() == "نسخة معدلة"
+    assert window.editor.document().isModified()
+    assert window.windowState() & Qt.WindowState.WindowMaximized
+    assert not controller.path.exists()
+    assert window.capture_controller is None
+
+
+def test_spectacle_output_is_imported_then_deleted(window):
+    from PySide6.QtCore import QProcess
+
+    from ocready.ui.capture import CaptureController
+    controller = CaptureController(window)
+    window.capture_controller = controller
+    fixture = Path(__file__).resolve().parents[1] / "assets" / "sample-bilingual.png"
+    controller.path.write_bytes(fixture.read_bytes())
+    controller._spectacle_finished(0, QProcess.ExitStatus.NormalExit)
+    assert controller.done
+    assert window.source.size == (1100, 720)
+    assert window._source_name == "Captured region"
+    assert not controller.path.exists()
+
+
+def test_windows_capture_ignores_old_clipboard_generation(window, monkeypatch):
+    from PySide6.QtGui import QImage
+    image = QImage(20, 20, QImage.Format.Format_RGB32)
+    image.fill(Qt.GlobalColor.white)
+    QApplication.clipboard().setImage(image)
+    controller = _windows_capture_for_test(window, monkeypatch)
+    controller._clipboard_changed()
+    assert window.source is None
+    assert not controller.done
+    controller.clipboard_sequence = lambda: 11
+    controller._clipboard_changed()
+    assert controller.done
+    assert window.source.size == (20, 20)
+
+
+def test_failed_windows_snip_keeps_dirty_text_and_reports_import_error(window, monkeypatch):
+    from PySide6.QtGui import QImage
+    window.load_example()
+    window.editor.insertPlainText("Keep my edits")
+    source = window.source
+    controller = _windows_capture_for_test(window, monkeypatch)
+    controller.clipboard_sequence = lambda: 11
+    image = QImage(3000, 2000, QImage.Format.Format_RGB32)
+    image.fill(Qt.GlobalColor.white)
+    QApplication.clipboard().setImage(image)
+    assert controller.done
+    assert window.source is source
+    assert window.editor.toPlainText() == "Keep my edits"
+    assert window.editor.document().isModified()
+    assert "too large" in window.status.text()
+
+
+def test_windows_capture_returns_after_observed_host_closes(window, monkeypatch):
+    controller = _windows_capture_for_test(window, monkeypatch)
+    state = {"visible": True, "now": 0.0}
+    controller.capture_visible = lambda: state["visible"]
+    controller.clock = lambda: state["now"]
+    controller._poll_capture_host()
+    state["visible"] = False
+    controller._poll_capture_host()
+    state["now"] = 1.4
+    controller._poll_capture_host()
+    assert not controller.done
+    state["now"] = 1.6
+    controller._poll_capture_host()
+    assert controller.done
+    assert "cancelled" in window.status.text()
+
+
+def test_unknown_windows_capture_host_does_not_false_cancel(window, monkeypatch):
+    controller = _windows_capture_for_test(window, monkeypatch)
+    controller.capture_visible = lambda: False
+    controller.clock = lambda: 100.0
+    controller._poll_capture_host()
+    assert not controller.done
+    controller.cancel()
+
+
+def test_vision_text_can_be_copied_without_fabricating_source_boxes(window):
+    from ocready.core.types import OCRResult
+    window.load_example()
+    result = OCRResult("Read this text", engine="vision:example")
+    window._recognized(window.job, result, [result])
+    window.copy_all()
+    assert QApplication.clipboard().text() == "Read this text"
+    assert not window.editor.linked
+    assert not window.boxes.isEnabled()
+    assert window.link_status.text() == "AI transcription"

@@ -119,3 +119,13 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Added a real native regression that delays the observer after an OOM kill and still verifies the kernel event, plus an orphan-cleanup test with cgroup support deliberately unavailable.
 - Versioned the gate protocol in the runtime manifest so source/runtime mismatches safely retain RSS monitoring instead of invoking an incompatible helper.
 - Validation: 83 local tests and Ruff passed after rebuilding the runtime. Updated Linux/Windows CI still needs to verify the compatibility fix.
+
+## Iteration 11 — capture lifecycle and honest output state
+
+- Corrected Windows capture import so failed/oversized images keep the current picture, edited text, dirty flag, and actual error message. Successful import reuses the already-confirmed replacement without a second prompt.
+- Preserved maximized window state when returning from capture. Added clean cancellation through Escape and temporary-file preparation errors.
+- Isolated typed Windows clipboard-generation and foreground-host primitives. Added best-effort cancellation detection after an observed clipping host leaves, with a short grace period for delayed image delivery and a timeout fallback for unknown hosts.
+- Validated Spectacle file import/cleanup, cancellation with unsaved Arabic edits, stale clipboard rejection, successful new-generation import, oversized-image failure, and known/unknown host transitions using native Qt state and controlled platform callbacks. Actual interactive KDE/Windows 11 desktop round-trips remain open validation gates.
+- Unlocated AI output now says “AI transcription” and disables unavailable word-box controls while preserving whole-text copying. It no longer masquerades as manually edited text.
+- The cgroup compatibility fix from iteration 10 is now green in both Linux and Windows CI, including native allocation/descendant tests.
+- Validation: 90 local tests and Ruff passed. Next priorities are fresh packaged builds, embedded-model image headroom, release artifacts, and continued capture/accuracy review.
