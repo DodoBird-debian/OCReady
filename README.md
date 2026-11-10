@@ -50,6 +50,8 @@ No document content is uploaded. Vision inference is a local subprocess. Model i
 
 Budgets use decimal MB/GB. GPU VRAM is separate and must also be reported. Small-tier vision models require a measured complete inference footprint before admission. Arabic accuracy and Windows behavior are separate validation gates.
 
+See [measured memory workloads and limitations](docs/MEMORY.md). Linux source benchmarks and a compiled Pocket executable have been exercised; the compiled cap-sized GUI case is currently close to the Pocket ceiling and is being improved.
+
 ## License
 
 GPL-3.0-or-later. Qt/PySide and bundled OCR components retain their own notices. See [third-party notices](docs/THIRD_PARTY.md).

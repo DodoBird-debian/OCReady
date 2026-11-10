@@ -1386,8 +1386,8 @@ R-015: Highlight text from picture → M17 M21 M22; select and copy located Arab
 R-016: Primary copy-and-paste OCR → M01 M05 M21 M23 M37; validate familiar clipboard shortcuts.
 R-017: Arabic and English → M14 M15 M18 M19 M47; inspect shaping, logical order, recognition accuracy.
 R-018: Multimodal versatility → M24 M26 M27 M28; process actual image plus text prompt through a local VLM.
-R-019: Commit and push each iteration → M50; inspect public repository history and remote refs.
-R-020: Continue reviewing while the goal is active → M51; prioritize measured and user-visible improvements.
+R-019: Commit and push each iteration → M51; inspect public repository history and remote refs.
+R-020: Continue reviewing while the goal is active → M52; prioritize measured and user-visible improvements.
 
 ## Candidate VLM policy
 

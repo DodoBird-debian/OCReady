@@ -22,6 +22,17 @@ def main() -> None:
         assert "screenshots" in result["text"], result["text"]
         assert result["words"], "No real word geometry"
         print(f"Compiled OCR passed: {len(result['words'])} words; sampled {result['peak_rss'] / 1e6:.1f} MB RSS")
+        output = Path(directory) / "gui-result.json"
+        env["QT_QPA_PLATFORM"] = "offscreen"
+        env["XDG_CONFIG_HOME"] = str(Path(directory) / "config")
+        env["APPDATA"] = str(Path(directory) / "config")
+        subprocess.run([str(binary), str(root / "assets" / "sample-bilingual.png"),
+                        "--ui-smoke-output", str(output)], cwd=directory, env=env, check=True, timeout=60)
+        gui = json.loads(output.read_text(encoding="utf-8"))
+        assert not gui["error"], gui
+        assert gui["linked"] and gui["words"] >= 25, gui
+        assert "مرحبا بالعالم" in gui["text"], gui["text"]
+        print(f"Compiled native GUI passed: {gui['words']} linked words; {gui['rss'] / 1e6:.1f} MB idle RSS")
 
 
 if __name__ == "__main__":

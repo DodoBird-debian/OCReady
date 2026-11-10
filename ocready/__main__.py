@@ -44,6 +44,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--rotate", type=int, choices=(0, 90, 180, 270), default=0)
     parser.add_argument("--compare", action="store_true", help="Compare two layouts sequentially")
     parser.add_argument("--diagnostics", action="store_true")
+    parser.add_argument("--ui-smoke-output", type=Path, help=argparse.SUPPRESS)
     args = parser.parse_args(argv)
     try:
         if args.method not in profile["methods"] and (args.text or args.json):
@@ -67,7 +68,7 @@ def main(argv: list[str] | None = None) -> int:
             encoded = json.dumps(result.to_dict(), ensure_ascii=False, indent=2) if args.json else result.text
         else:
             from ocready.ui.app import run
-            return run(args.image, args.edition)
+            return run(args.image, args.edition, smoke_output=args.ui_smoke_output)
         if args.output:
             args.output.write_text(encoded + "\n", encoding="utf-8")
         else:

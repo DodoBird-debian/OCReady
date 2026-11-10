@@ -67,6 +67,7 @@ def main() -> None:
                f"--include-data-files={manifest}=build-manifest.json",
                f"--include-data-dir={ROOT / 'assets'}=assets",
                f"--include-data-dir={ROOT / 'docs'}=docs",
+               f"--include-data-files={ROOT / 'LICENSE'}=LICENSE",
                "--noinclude-qt-translations", "--nofollow-import-to=pytest,ruff,PySide6.QtTest",
                "--report=" + str(out / "compilation-report.xml")]
     if os.name == "nt":
