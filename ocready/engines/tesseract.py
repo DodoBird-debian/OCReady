@@ -73,6 +73,7 @@ def recognize(image: Path, edition: Edition, *, language: str = "ara+eng", layou
                           budget=edition.budget, cancel=cancel, env=runtime_env())
     result = parse_tsv(process.stdout, engine=f"tesseract-{quality}", language=language)
     result.elapsed, result.peak_rss = process.elapsed, process.peak_rss
+    result.containment, result.worker_limit, result.worker_peak = process.containment, process.worker_limit, process.worker_peak
     if not result.text:
         result.note = "No text found. Try a tighter crop, invert a dark background, or change the page layout."
     return result

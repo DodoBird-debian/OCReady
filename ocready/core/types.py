@@ -41,6 +41,9 @@ class OCRResult:
     backend: str = "CPU"
     recipe: str = "Original"
     note: str = ""
+    containment: str = "rss-monitor"
+    worker_limit: int = 0
+    worker_peak: int = 0
 
     @property
     def confidence(self) -> float | None:

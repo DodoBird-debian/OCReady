@@ -1,11 +1,10 @@
-import os
-import subprocess
 import tempfile
 import threading
 import time
 from dataclasses import dataclass
 from pathlib import Path
 
+from ocready.core.containment import start_worker
 from ocready.core.memory import stop_tree, tree_rss
 from ocready.core.types import BudgetExceeded, Cancelled, OCRError
 
@@ -18,6 +17,9 @@ class ProcessResult:
     stderr: str
     peak_rss: int
     elapsed: float
+    containment: str = "rss-monitor"
+    worker_limit: int = 0
+    worker_peak: int = 0
 
 
 def run_process(
@@ -32,16 +34,17 @@ def run_process(
     peak = tree_rss()
     if peak >= budget:
         raise BudgetExceeded("The application is already at this edition's RAM budget. Choose a larger edition or a smaller image.")
-    creationflags = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
     with tempfile.TemporaryFile() as stdout, tempfile.TemporaryFile() as stderr:
         try:
-            child = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr,
-                                     env=env, cwd=cwd, creationflags=creationflags)
+            child, guard = start_worker(command, budget=budget, resident=peak, stdout=stdout, stderr=stderr, env=env, cwd=cwd)
         except (OSError, ValueError) as exc:
             raise OCRError(f"Could not start the OCR engine: {exc}") from exc
         try:
             while True:
                 peak = max(peak, tree_rss())
+                guard.sample()
+                if guard.oom:
+                    raise BudgetExceeded("The operating system stopped the OCR worker at its memory allowance. Try a smaller crop or a larger edition.")
                 if cancel.is_set():
                     raise Cancelled("Recognition cancelled.")
                 if peak >= budget:
@@ -57,11 +60,16 @@ def run_process(
             stderr.seek(0)
             output = stdout.read(MAX_OUTPUT).decode("utf-8", errors="replace")
             error = stderr.read(MAX_OUTPUT).decode("utf-8", errors="replace")
+            guard.completed()
+            if guard.oom:
+                raise BudgetExceeded("The operating system stopped the OCR worker at its memory allowance. Try a smaller crop or a larger edition.")
             if child.returncode:
                 detail = error.strip()[-1600:] or f"exit code {child.returncode}"
                 raise OCRError(f"OCR engine failed: {detail}")
-            return ProcessResult(output, error, peak, time.monotonic() - started)
+            return ProcessResult(output, error, peak, time.monotonic() - started,
+                                 guard.mode, guard.limit_bytes, guard.peak_bytes)
         finally:
             if child.poll() is None:
                 stop_tree(child.pid)
             child.wait()
+            guard.close()

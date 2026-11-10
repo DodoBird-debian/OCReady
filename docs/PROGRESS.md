@@ -90,3 +90,14 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Validation: 43 tests and Ruff passed; real embedded-vision CLI/GUI checks passed; tiny-model source memory workloads passed. Native CUDA inference was exercised on real hardware.
 - Windows Pocket's encoding-corrected rerun is now green, including compiled CLI, GUI and cap-sized memory scenarios. The latest feature changes still need an updated full-platform build matrix.
 - Remaining: embedded-vision large-image headroom, broader bilingual accuracy corpora and real desktop snip interactions, cross-platform GPU validation, strict OS memory containment, packaging provenance refinements, and continued usability review.
+
+## Iteration 8 — native worker allocation containment
+
+- Added Linux workers that wait in a tiny native execution gate until their own user-managed cgroup v2 scope is active. Applied a page-aligned memory allowance, zero worker swap, and group OOM behavior where permitted.
+- Added suspended Windows worker launch, job-wide committed-memory limits, and kill-on-close Job Objects. Windows validation is pending source CI at this commit.
+- Kept whole-application RSS monitoring, including the launcher, because OS allocation counters have different ownership and mapping semantics. Result metadata now names both the containment mode and its distinct worker counters.
+- Verified on the real Linux desktop that the kernel stopped a 320 MB allocation under an approximately 96 MB worker allowance and kept the parent alive. Verified cleanup of an orphaned grandchild after its immediate worker parent exited.
+- Real bilingual Tesseract OCR completed in a cgroup worker; observed charged worker peak was about 35 MB. No transient worker scopes remained after the test suite.
+- Corrected controller compatibility with systemd 257 and page-rounded `memory.max` readback during implementation.
+- Validation: Ruff and 46 local tests passed, including the three native containment cases. The previous iteration's full six-build matrix is now green, including real packaged GUI and memory checks on both platforms.
+- Remaining: Windows native worker validation, packaged containment smoke checks, model-specific memory/preview headroom, original-image geometry linking after transformations, capture lifecycle validation, and full application containment/certification.

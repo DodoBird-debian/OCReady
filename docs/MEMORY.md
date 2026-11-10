@@ -34,10 +34,20 @@ uv run python scripts/benchmark.py --edition pocket \
 
 The benchmark emits a nonzero exit code if an observed budget is exceeded or an OCR process fails. It runs each scenario in a fresh subprocess. The GUI case opens four cap-sized tiled bilingual documents, waits for each OCR job, and reports both idle memory and worker peaks.
 
-## Guardrails versus strict containment
+## Whole-tree monitoring and worker containment
 
 The recognition runner samples process-tree RSS every 40 ms, including the resident onefile launcher when present, stops a job that exceeds its edition's budget, and always cleans up the child process. The image decoder, processing pixel limits, sequential engine loading, one OpenMP thread, bounded context/output, and model admission reduce the chance of exceeding a budget. VLM images are also fitted within 1600 × 1600 before inference, in addition to the runner's image-token limit.
 
-Sampling cannot prevent or observe every brief allocation spike. It is **not an OS-enforced absolute RAM ceiling**. Linux `RLIMIT_AS` limits virtual address space, not RSS, and is unsuitable as a substitute for this requirement. Strong containment needs delegated cgroup v2 memory limits on Linux, and memory-aware Job Objects on Windows, combined with a reserve for the UI and launcher. Those hard-limit integrations and cross-platform memory certification remain open release gates.
+Workers now also receive an OS allocation allowance: edition budget minus the application's observed resident memory and a 16 MB reserve, rounded down to a page boundary. Jobs are refused before launch if fewer than 16 MB remain.
+
+On a delegated Linux desktop, a small native gate waits while the user systemd manager attaches it to its own transient cgroup v2 scope. Only then does it exec the OCR engine. The scope sets `memory.max`, disables worker swap, and applies group OOM behavior when the kernel permits it. The parent never changes another application's scope or system memory policy. Worker descendants inherit the scope; disposing it also removes grandchildren after their immediate parent exits. On this Debian desktop, a real 320 MB allocation was stopped under a roughly 96 MB worker allowance, without killing the app. Real bilingual OCR also completed inside a worker scope. Headless systems without a delegated user bus retain whole-tree RSS monitoring.
+
+On Windows, the worker starts suspended, enters a Job Object with a job-wide committed-memory limit and kill-on-close behavior, and is then resumed. The Windows implementation and native allocation/descendant tests run in source CI; platform results are recorded in PROGRESS.md.
+
+Result JSON reports `containment`, `worker_limit`, and `worker_peak`. The peak is the OS worker counter: cgroup charged memory on Linux or job committed memory on Windows. It must not be relabeled as RSS.
+
+Sampling cannot prevent or observe every brief allocation spike. Worker containment strengthens allocation safety but is **not an OS-enforced absolute RSS ceiling for the complete application**. Linux charges a memory area to the cgroup that first instantiated it; moving a process does not move earlier charges, and shared file-cache pages may be charged elsewhere. The gate therefore joins before engine exec, minimizing earlier allocation, while the whole-tree monitor still counts mapped resident pages. Windows Job Object limits constrain committed memory rather than all resident DLL/file mappings. The UI and onefile launcher remain under whole-tree monitoring and admission limits, not the worker's OS limit. [Linux memory ownership](https://cdn.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html), [Windows job memory semantics](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-jobobject_extended_limit_information).
+
+Linux `RLIMIT_AS` limits virtual address space, not RSS, and is unsuitable as a substitute. Full application containment from before onefile extraction and cross-platform certification remain open release gates.
 
 Until those gates pass, these editions are measured target budgets for the documented workloads, rather than universal promises for every image, desktop, driver, or user-supplied model.

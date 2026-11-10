@@ -62,6 +62,9 @@ def main() -> None:
                 archive.add(path, arcname=str(path.relative_to(runtime)), recursive=False)
         if (runtime / "manifest.json").exists():
             archive.add(runtime / "manifest.json", arcname="manifest.json", recursive=False)
+        gate = runtime / "bin" / "ocready-exec-gate"
+        if not {"fast", "best"}.intersection(methods) and gate.is_file():
+            archive.add(gate, arcname="bin/ocready-exec-gate", recursive=False)
         embedded = [bundle_pack(archive, pack) for pack in packs]
     editions = [args.edition]
     profile = {"edition": args.edition, "available_editions": editions,

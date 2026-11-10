@@ -57,6 +57,10 @@ def linux_runtime() -> Path:
 
 
 def collect_linux(program: Path) -> None:
+    compiler = shutil.which("cc") or shutil.which("gcc")
+    if compiler:
+        subprocess.run([compiler, "-O2", "-std=c11", str(ROOT / "native" / "exec_gate.c"),
+                        "-o", str(RUNTIME / "bin" / "ocready-exec-gate")], check=True)
     target = RUNTIME / "bin" / "tesseract"
     if program.resolve() != target.resolve():
         shutil.copy2(program, target)

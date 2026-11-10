@@ -169,7 +169,7 @@ def main() -> int:
                 # Preserve evidence without copying all recognized document contents into reports.
                 if "text" in result["details"]:
                     details = result["details"].get("result", result["details"])
-                    result["details"] = {key: details[key] for key in ("elapsed", "peak_rss", "engine", "backend")}
+                    result["details"] = {key: details[key] for key in ("elapsed", "peak_rss", "engine", "backend", "containment", "worker_limit", "worker_peak") if key in details}
                     result["details"]["words"] = len(details.get("words", []))
                 records.append(result)
                 print(f"{edition:9} {scenario:12} {result['peak_rss_bytes'] / 1e6:7.1f} MB  {'PASS' if result['below_budget'] and not result['exit_code'] else 'FAIL'}", flush=True)
