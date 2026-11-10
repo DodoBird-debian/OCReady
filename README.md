@@ -26,6 +26,18 @@ python -m ocready --diagnostics
 
 Open/paste/capture an image, choose **Recognize text**, and copy. Click or drag over the picture to select located words. Selecting editor text highlights its source; manual edits invalidate source linking until the next recognition. Image cleanup is reversible. Use F1 for shortcuts.
 
+Studio supports local vision-language models through llama.cpp. Configure one or more packs under **Settings → Vision models**; see [setup and measured results](docs/VISION.md). CPU inference and a real CUDA-failure-to-CPU fallback have been exercised. Vision output has no invented source boxes or confidence.
+
+## Compiling a single executable
+
+```sh
+uv run python scripts/prepare_runtime.py --best
+uv run python scripts/build.py --edition pocket
+uv run python scripts/smoke_binary.py dist/pocket
+```
+
+Use `everyday` or `studio` for the other editions. A onefile build embeds Qt, the OCR executable, its runtime libraries, and Arabic/English model data, then extracts a private payload at startup. Optional vision packs are local external files in the current build tooling. GitHub Actions builds Linux and Windows separately; these are prerelease artifacts until their platform and resource gates pass.
+
 No document content is uploaded. Vision inference is a local subprocess. Model installation is explicit.
 
 ## Editions

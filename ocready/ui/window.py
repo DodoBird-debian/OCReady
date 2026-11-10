@@ -8,14 +8,12 @@ from PySide6.QtWidgets import (
     QApplication,
     QCheckBox,
     QComboBox,
-    QDialog,
     QFileDialog,
     QFrame,
     QHBoxLayout,
     QLabel,
     QMainWindow,
     QMessageBox,
-    QPlainTextEdit,
     QProgressBar,
     QPushButton,
     QSizePolicy,
@@ -29,7 +27,8 @@ from PySide6.QtWidgets import (
 from ocready.core.editions import EDITIONS, edition_for
 from ocready.core.images import load_image
 from ocready.core.memory import tree_rss
-from ocready.core.paths import resource_root
+from ocready.core.models import load_packs
+from ocready.core.paths import build_profile, resource_root
 from ocready.core.pipeline import Request
 from ocready.core.preprocess import Recipe, preprocess
 from ocready.core.settings import load_settings, save_settings
@@ -77,6 +76,9 @@ class MainWindow(QMainWindow):
         self.resize(1320, 900)
         self.setAcceptDrops(True)
         self.preferences = load_settings()
+        self.profile = build_profile()
+        self.packs = load_packs()
+        self.vision_backend = self.preferences.get("vision_backend", "auto")
         self.source: Image.Image | None = None
         self.preview: Image.Image | None = None
         self.recipe = Recipe()
@@ -121,7 +123,8 @@ class MainWindow(QMainWindow):
         self.edition_combo = QComboBox()
         self.edition_combo.setAccessibleName("Memory edition")
         for key, value in EDITIONS.items():
-            self.edition_combo.addItem(f"{value.name} · {value.budget_label}", key)
+            if key in self.profile["available_editions"]:
+                self.edition_combo.addItem(f"{value.name} · {value.budget_label}", key)
         self.edition_combo.setCurrentIndex(self.edition_combo.findData(edition))
         self.edition_combo.setToolTip("RAM budget for the application and its OCR children. Sampled guardrail, not a hard OS limit.")
         self.edition_combo.currentIndexChanged.connect(self._edition_changed)
@@ -178,6 +181,7 @@ class MainWindow(QMainWindow):
         self.method_combo.addItem("Fast OCR", "tesseract-fast")
         self.method_combo.addItem("Precision OCR", "tesseract-best")
         self.method_combo.setToolTip("Fast: compact offline models. Precision: larger language data in Everyday or Studio.")
+        self.method_combo.currentIndexChanged.connect(self._method_changed)
         options.addWidget(self.method_combo)
         self.layout_combo = QComboBox()
         self.layout_combo.setAccessibleName("Page layout")
@@ -384,6 +388,8 @@ class MainWindow(QMainWindow):
                         self.compare_check):
             control.setEnabled(not busy)
         self.recognize_button.setEnabled(self.source is not None and not busy)
+        if not busy:
+            self._method_changed()
         self._update_text_stats()
 
     def _confirm_replace(self) -> bool:
@@ -531,18 +537,50 @@ class MainWindow(QMainWindow):
         self.method_combo.model().item(1).setEnabled(enabled)
         if not enabled and self.method_combo.currentData() == "tesseract-best":
             self.method_combo.setCurrentIndex(0)
+        self.refresh_methods()
         if self.source is not None:
             self._apply_recipe()
         if hasattr(self, "memory"):
             self._update_memory()
+
+    def refresh_methods(self) -> None:
+        selected = self.method_combo.currentData()
+        self.method_combo.blockSignals(True)
+        self.method_combo.clear()
+        self.method_combo.addItem("Fast OCR", "tesseract-fast")
+        self.method_combo.addItem("Precision OCR", "tesseract-best")
+        self.method_combo.model().item(0).setEnabled("tesseract-fast" in self.profile["methods"])
+        self.method_combo.model().item(1).setEnabled(self.edition.best_data and "tesseract-best" in self.profile["methods"])
+        for pack in self.packs if "vision" in self.profile["methods"] else []:
+            self.method_combo.addItem(f"{pack.name} · AI", f"vision:{pack.id}")
+            allowed, reason = pack.admission(self.edition)
+            item = self.method_combo.model().item(self.method_combo.count() - 1)
+            item.setEnabled(allowed)
+            item.setToolTip(reason)
+        index = self.method_combo.findData(selected)
+        if index < 0 or not self.method_combo.model().item(index).isEnabled():
+            index = next((i for i in range(self.method_combo.count()) if self.method_combo.model().item(i).isEnabled()), 0)
+        self.method_combo.setCurrentIndex(index)
+        self.method_combo.blockSignals(False)
+        self._method_changed()
+
+    def _method_changed(self, *_args) -> None:
+        if not hasattr(self, "compare_check"):
+            return
+        vision = str(self.method_combo.currentData()).startswith("vision:")
+        self.compare_check.setEnabled(not vision and not self.worker)
+        self.layout_combo.setEnabled(not vision and not self.worker)
 
     def recognize(self) -> None:
         if self.source is None or self.worker or not self._confirm_replace():
             return
         self.preview_timer.stop()
         self.job += 1
-        request = Request(self.edition, self.language_combo.currentData(), self.method_combo.currentData(),
-                          self.layout_combo.currentData(), self.recipe, self.compare_check.isChecked())
+        method = self.method_combo.currentData()
+        pack = next((p for p in self.packs if method == f"vision:{p.id}"), None)
+        request = Request(self.edition, self.language_combo.currentData(), method,
+                          self.layout_combo.currentData(), self.recipe, self.compare_check.isChecked(),
+                          model_pack=pack, backend=self.vision_backend)
         self.worker = RecognitionWorker(self.job, self.source, request, self)
         self.worker.resultReady.connect(self._recognized)
         self.worker.failed.connect(self._recognition_failed)
@@ -564,7 +602,8 @@ class MainWindow(QMainWindow):
         self.canvas.set_words(result.words)
         if result.text:
             confidence = f" · {result.confidence:.0f}% OCR confidence" if result.confidence is not None else ""
-            self._set_status(f"Ready to copy · {result.elapsed:.1f}s · {result.backend}{confidence}")
+            suffix = " · AI transcription; verify against the image" if result.engine.startswith("vision:") else ""
+            self._set_status(f"Ready to copy · {result.elapsed:.1f}s · {result.backend}{confidence}{suffix}")
         else:
             self._set_status(result.note or "No text found. Try a tighter crop or another layout.")
 
@@ -671,21 +710,8 @@ class MainWindow(QMainWindow):
         QMessageBox.information(self, "A few shortcuts to your words", "1. Open, paste, or capture an image.\n2. Choose Recognize text.\n3. Edit, select, and copy.\n\nClick a word in the picture, or drag over a sentence.\nSelecting text also highlights its source. Manual edits turn off source linking until you recognize again.\n\nCtrl+O  Open image\nCtrl+Shift+V  Paste image\nCtrl+Shift+S  Capture region\nCtrl+Enter  Recognize\nCtrl+Shift+C  Copy all\nCtrl+S  Save text\nEscape  Cancel or clear selection\n\nMouse wheel  Zoom image\nMiddle mouse drag  Pan image\n\nPocket: fast OCR, 350 MB budget\nEveryday: fast + precision OCR, 1 GB budget\nStudio: OCR + optional local vision models, 4 GB budget\n\nRAM is sampled, not an OS-enforced hard ceiling. Nothing is uploaded.")
 
     def show_settings(self) -> None:
-        import json
-
-        from ocready.__main__ import diagnostics
-        dialog = QDialog(self)
-        dialog.setWindowTitle("OCReady settings & diagnostics")
-        dialog.resize(650, 450)
-        layout = QVBoxLayout(dialog)
-        layout.addWidget(label("Everything stays on your device.", "PaneTitle"))
-        layout.addWidget(label("Offline OCR runtime and memory policy"))
-        details = QPlainTextEdit()
-        details.setReadOnly(True)
-        details.setPlainText(json.dumps(diagnostics(), ensure_ascii=False, indent=2))
-        layout.addWidget(details)
-        layout.addWidget(button("Done", dialog.accept, primary=True))
-        dialog.exec()
+        from ocready.ui.settings import SettingsDialog
+        SettingsDialog(self).exec()
 
     def dragEnterEvent(self, event: QDragEnterEvent) -> None:
         if event.mimeData().hasUrls() and not self.worker:
@@ -712,7 +738,8 @@ class MainWindow(QMainWindow):
             event.ignore()
             return
         try:
-            save_settings({"edition": self.edition.id, "language": self.language_combo.currentData()})
+            save_settings({"edition": self.edition.id, "language": self.language_combo.currentData(),
+                           "vision_backend": self.vision_backend})
         except OSError:
             pass
         event.accept()
