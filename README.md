@@ -6,6 +6,8 @@ A local-first desktop workspace for turning Arabic and English screenshots into 
 
 The application uses a native Qt split view, offline Tesseract OCR, optional local vision-language models, reversible image cleanup, source-word highlighting, and KDE / Windows screenshot integration. Linux and Windows builds target one-file executables using Nuitka (compiled application and embedded runtime, extracted on launch).
 
+![Native bilingual OCR workspace](docs/images/workspace.png)
+
 ## Development
 
 ```sh
@@ -14,6 +16,15 @@ uv run python scripts/prepare_runtime.py
 uv run python -m ocready
 uv run pytest
 ```
+
+The same commands work with a normal virtual environment: install `.[dev]`, then use `python` directly. Debian runtime preparation extracts packages without requiring root. Windows preparation uses an existing Tesseract installation.
+
+```sh
+python -m ocready assets/sample-bilingual.png --json --layout sparse
+python -m ocready --diagnostics
+```
+
+Open/paste/capture an image, choose **Recognize text**, and copy. Click or drag over the picture to select located words. Selecting editor text highlights its source; manual edits invalidate source linking until the next recognition. Image cleanup is reversible. Use F1 for shortcuts.
 
 No document content is uploaded. Vision inference is a local subprocess. Model installation is explicit.
 
