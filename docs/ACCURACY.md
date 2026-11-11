@@ -29,6 +29,10 @@ These are weighted error rates on this synthetic corpus, not overall product acc
 
 Raw case-by-case references, output and scoring: [Screenshot layout](accuracy/linux-sparse.json), [Automatic plus comparison](accuracy/linux-compare.json).
 
+The desktop now exposes both comparison reads, rather than discarding the alternative selected against by the confidence heuristic. This real Kufi example shows the complete Screenshot reading chosen manually and an Arabic word linked to its source:
+
+![Choosing a retained reading and selecting its real source word](images/compare-reads.png)
+
 This small synthetic corpus does not establish real-world accuracy. It lacks camera perspective, handwriting, complex tables and many font/print conditions. Adding representative, redistribution-safe examples and auditing reading order remain ongoing work. Do not describe `1 - CER` as a universal product accuracy percentage.
 
 Regeneration requires Qt and the named DejaVu/Noto Arabic font families:

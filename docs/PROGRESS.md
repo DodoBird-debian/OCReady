@@ -204,3 +204,11 @@ The plan describes both the implementation sequence and release gates. Pending i
 - All six tag builds and the release verification/publishing job passed. The first public prerelease, `v0.1.0-preview.1` at `ffc654b`, contains 27 assets including six native executables and their evidence. Development continues beyond that tagged snapshot.
 - Verified the public release's downloaded evidence index and notes against its published aggregate checksums. All six listed workload peaks remained below their respective budgets.
 - The expanded GUI suite initially retained extra closed test windows and exhausted a Pocket worker allowance. Test teardown now disposes all windows created by each test and flushes deferred Qt deletion. All 119 tests and Ruff then passed. The runtime guard correctly refused the overfilled test process without killing it.
+
+## Iteration 21 — inspect and choose OCR alternatives
+
+- Exposed retained comparison readings in a native selector with their engine, actual layout, character count and clearly labeled OCR score. Confidence-based initial selection remains a convenience; users can now choose another read without running inference again.
+- Switching readings installs that reading's exact text and boxes, clears stale selection, protects unsaved edits through the existing replacement confirmation, and stays disabled while recognition is active.
+- Image/source changes discard stale alternatives. Single-read workflows keep the comparison bar hidden. Added real layout provenance to result JSON.
+- Replayed the real Arabic Kufi corpus failure: automatic confidence selected an incomplete read; choosing the retained Screenshot reading recovered the complete reference. Inspected the native split view and clicked a real Arabic source word after switching. Saved the rendered comparison workspace.
+- Validation: all 121 tests and Ruff passed, including a real background comparison, source geometry switching, edit protection, source replacement and selector lifecycle. Cross-platform source CI follows this push.

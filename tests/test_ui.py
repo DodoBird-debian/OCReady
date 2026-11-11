@@ -445,6 +445,67 @@ def test_vision_text_can_be_copied_without_fabricating_source_boxes(window):
     assert window.link_status.text() == "AI transcription"
 
 
+def test_alternative_reads_update_text_geometry_and_preserve_unsaved_edits(window, monkeypatch):
+    from ocready.core.types import Box, OCRResult, Word
+    window.load_example()
+    shorter = OCRResult("مرحبا", [Word("مرحبا", Box(20, 30, 80, 40), 97, 0, 5)], layout="auto")
+    complete = OCRResult("مرحبا بالعالم", [Word("مرحبا", Box(40, 50, 80, 40), 91, 0, 5),
+                                          Word("بالعالم", Box(130, 50, 100, 40), 90, 6, 13)], layout="sparse")
+    window._recognized(window.job, shorter, [shorter, complete])
+    assert window.alternatives_bar.isVisible()
+    assert window.alternatives_combo.count() == 2
+    window.canvas.set_selection({0})
+    window._image_selected({0})
+    window.alternatives_combo.setCurrentIndex(1)
+    assert window.result is complete
+    assert window.editor.toPlainText() == complete.text
+    assert window.canvas.words == complete.words
+    assert not window.canvas.selected
+    assert not window.copy_selection.isEnabled()
+    assert not window.editor.extraSelections()
+    window.copy_all()
+    assert QApplication.clipboard().text() == complete.text
+    window.editor.insertPlainText("edited")
+    edited = window.editor.toPlainText()
+    monkeypatch.setattr(window, "_confirm_replace", lambda: False)
+    window.alternatives_combo.setCurrentIndex(0)
+    assert window.alternatives_combo.currentIndex() == 1
+    assert window.editor.toPlainText() == edited
+    assert window.editor.document().isModified()
+    monkeypatch.setattr(window, "_confirm_replace", lambda: True)
+    window.alternatives_combo.setCurrentIndex(0)
+    assert window.editor.toPlainText() == shorter.text
+    window.rotate_image()
+    assert not window.alternatives_bar.isVisible()
+    assert not window.alternatives
+    assert window.alternatives_combo.count() == 0
+
+
+def test_worker_exposes_real_layout_alternatives_without_restarting_inference(window, app):
+    if not readiness()[0]:
+        pytest.skip("Prepare OCR runtime to test comparison readings")
+    window.load_example()
+    window.compare_check.setChecked(True)
+    window.recognize()
+    assert not window.alternatives_combo.isEnabled()
+    deadline = time.monotonic() + 10
+    while window.worker and time.monotonic() < deadline:
+        app.processEvents()
+        time.sleep(.01)
+    assert window.worker is None
+    assert {result.layout for result in window.alternatives} == {"sparse", "block"}
+    assert window.alternatives_combo.count() == 2
+    index = 1 - window.alternatives_combo.currentIndex()
+    chosen = window.alternatives[index]
+    window.alternatives_combo.setCurrentIndex(index)
+    assert window.result is chosen
+    assert window.editor.toPlainText() == chosen.text
+    assert window.worker is None
+    window.editor.document().setModified(False)
+    window.load_example()
+    assert not window.alternatives_bar.isVisible()
+
+
 def test_vision_preview_matches_engine_input_and_preserves_original(window, monkeypatch):
     from PIL import Image
 

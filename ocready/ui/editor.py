@@ -30,6 +30,7 @@ class TextEditor(QTextEdit):
 
     def set_result(self, result: OCRResult) -> None:
         self._setting = True
+        self.setExtraSelections([])
         self.result = result
         self.setPlainText(result.text)
         self.set_direction(self.direction)

@@ -358,6 +358,20 @@ class MainWindow(QMainWindow):
         row.addWidget(self.copy_all_button)
         outer.addLayout(row)
         outer.addWidget(divider())
+        self.alternatives_bar = QWidget()
+        reads = QHBoxLayout(self.alternatives_bar)
+        reads.setContentsMargins(14, 8, 14, 8)
+        reads.addWidget(label("Compare reads"))
+        self.alternatives_combo = QComboBox()
+        self.alternatives_combo.setAccessibleName("Choose another OCR reading")
+        self.alternatives_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+        self.alternatives_combo.setMinimumContentsLength(20)
+        self.alternatives_combo.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.alternatives_combo.setToolTip("Compare each reading with the picture. A higher OCR confidence can still omit text. Switching reads replaces the text.")
+        self.alternatives_combo.currentIndexChanged.connect(self._alternative_changed)
+        reads.addWidget(self.alternatives_combo, 1)
+        outer.addWidget(self.alternatives_bar)
+        self.alternatives_bar.hide()
         self.editor = TextEditor()
         self.editor.sourceSelection.connect(self._editor_selected)
         self.editor.linkChanged.connect(self._link_changed)
@@ -402,7 +416,7 @@ class MainWindow(QMainWindow):
         self.progress.setVisible(busy)
         for control in (self.open_button, self.paste_button, self.capture_button, self.edition_combo,
                         self.method_combo, self.language_combo, self.layout_combo, self.cleanup,
-                        self.compare_check, self.settings_button, self.join_lines_button):
+                        self.compare_check, self.settings_button, self.join_lines_button, self.alternatives_combo):
             control.setEnabled(not busy)
         self.view_original.setEnabled(not busy and self.source is not None and self.preview is not None and
                                       (self.recipe != Recipe() or self.preview.size != self.source.size))
@@ -519,6 +533,11 @@ class MainWindow(QMainWindow):
             self.canvas.set_image(self.preview)
             self.image_info.setText(f"{self.preview.width} × {self.preview.height} · {self._source_name}")
             self.image_info.setToolTip(self.recipe.label + (" · AI preview is reduced to reserve model memory. Crop the original for small text." if str(self.method_combo.currentData()).startswith("vision:") else ""))
+            self.alternatives = []
+            self.alternatives_combo.blockSignals(True)
+            self.alternatives_combo.clear()
+            self.alternatives_combo.blockSignals(False)
+            self.alternatives_bar.hide()
             if self.result:
                 self.editor.invalidate_link()
                 self.result = None
@@ -657,13 +676,47 @@ class MainWindow(QMainWindow):
     def _recognized(self, job: int, result: OCRResult, alternatives: list[OCRResult]) -> None:
         if job != self.job:
             return
-        self.result, self.alternatives = result, alternatives
+        self.alternatives = list(alternatives)
+        if not any(candidate is result for candidate in self.alternatives):
+            self.alternatives.insert(0, result)
+        self.alternatives_combo.blockSignals(True)
+        self.alternatives_combo.clear()
+        selected = 0
+        for index, candidate in enumerate(self.alternatives):
+            name = LAYOUTS.get(candidate.layout, (None, "AI transcription" if candidate.engine.startswith("vision:") else "OCR read"))[1]
+            engine = {"tesseract-fast": "Fast", "tesseract-best": "Precision"}.get(candidate.engine, "AI")
+            confidence = f" · {candidate.confidence:.0f}% OCR score" if candidate.confidence is not None else ""
+            self.alternatives_combo.addItem(f"{engine} · {name} · {len(candidate.text)} characters{confidence}", index)
+            if candidate is result:
+                selected = index
+        self.alternatives_combo.setCurrentIndex(selected)
+        self.alternatives_combo.blockSignals(False)
+        self.alternatives_bar.setVisible(len(self.alternatives) > 1)
+        self._display_result(result)
+
+    def _alternative_changed(self, index: int) -> None:
+        if not 0 <= index < len(self.alternatives):
+            return
+        chosen = self.alternatives[index]
+        if chosen is self.result:
+            return
+        if self.worker or not self._confirm_replace():
+            current = next((i for i, candidate in enumerate(self.alternatives) if candidate is self.result), 0)
+            self.alternatives_combo.blockSignals(True)
+            self.alternatives_combo.setCurrentIndex(current)
+            self.alternatives_combo.blockSignals(False)
+            return
+        self._display_result(chosen)
+
+    def _display_result(self, result: OCRResult) -> None:
+        self.result = result
         self.editor.set_result(result)
         self.view_original.setChecked(False)
         self.view_original.setText("Show original")
         if self.preview is not None:
             self.canvas.set_image(self.preview)
         self.canvas.set_words(result.words)
+        self.copy_selection.setEnabled(False)
         if result.text:
             confidence = f" · {result.confidence:.0f}% OCR confidence" if result.confidence is not None else ""
             suffix = " · AI transcription; verify against the image" if result.engine.startswith("vision:") else ""

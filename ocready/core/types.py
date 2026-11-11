@@ -44,6 +44,7 @@ class OCRResult:
     containment: str = "rss-monitor"
     worker_limit: int = 0
     worker_peak: int = 0
+    layout: str = ""
 
     @property
     def confidence(self) -> float | None:
