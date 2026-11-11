@@ -1618,3 +1618,15 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M63.V2: Rerun genuine Windows source/compiled classical inference after a demonstrated fix.
 - M63.V3: Retain successful partial-method evidence without publishing a failed multi-method composition.
 - Release gate: Every embedded worker succeeds with Arabic runtime/input paths and all native resource scenarios; diagnostic hypotheses alone are insufficient.
+
+## M64 — reproducible hosted dependency transport
+
+- Responsibility: Separate hosted mirror outages from application and compiler failures.
+- M64.T1: Share Ubuntu dependency installation across source/default/model build workflows.
+- M64.T2: Use task-private official archive sources and package indexes with normal signature verification.
+- M64.T3: Retain the supported Ubuntu release and existing package/model identities.
+- M64.T4: Bound retries and fail index refresh errors before using incomplete dependency state.
+- M64.T5: Remove temporary apt state and refuse execution outside disposable CI.
+- M64.V1: Validate shell syntax and local refusal without changing the user's package manager.
+- M64.V2: Require actual hosted dependency/test/build success before publishing new platform claims.
+- Release gate: Successful signed dependency preparation followed by unchanged source, native GUI, accuracy and RAM gates.
