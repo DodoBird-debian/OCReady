@@ -67,6 +67,23 @@ def test_runtime_archive_preserves_safe_shared_library_aliases(tmp_path, monkeyp
     assert (result / "lib/engine.so").read_bytes() == b"shared library"
 
 
+def test_late_unsafe_runtime_entry_removes_partial_staging(tmp_path, monkeypatch):
+    monkeypatch.delenv("OCREADY_RUNTIME", raising=False)
+    monkeypatch.setattr(paths, "resource_root", lambda: tmp_path)
+    with tarfile.open(tmp_path / "runtime-bundle.tar.gz", "w:gz") as archive:
+        info = tarfile.TarInfo("lib/valid.so")
+        info.size = 4
+        archive.addfile(info, io.BytesIO(b"safe"))
+        unsafe = tarfile.TarInfo("escape")
+        unsafe.type, unsafe.linkname = tarfile.SYMTYPE, "../../outside"
+        archive.addfile(unsafe)
+    with pytest.raises(RuntimeError, match="Unsafe link"):
+        paths.runtime_root()
+    assert not (tmp_path / "runtime").exists()
+    assert not (tmp_path / "runtime-extract").exists()
+    assert not (tmp_path.parent / "outside").exists()
+
+
 def test_vision_only_method_registry_can_be_selected(tmp_path, monkeypatch):
     profile = {"edition": "studio", "available_editions": ["studio"], "methods": ["vision"]}
     (tmp_path / "build-manifest.json").write_text(json.dumps(profile))

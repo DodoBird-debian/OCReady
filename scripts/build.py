@@ -97,6 +97,9 @@ def main() -> None:
                "runtime_bundle_sha256": file_sha256(bundle),
                "source": source, "built_at_utc": datetime.now(UTC).isoformat(),
                "dependencies": {name: importlib.metadata.version(name) for name in ("Nuitka", "Pillow", "psutil", "PySide6-Essentials")},
+               "onefile_compression": {"policy": "none" if args.standalone else "Nuitka low-memory",
+                                       "level": 3 if not args.standalone and importlib.metadata.version("Nuitka") == "4.3.5" else None,
+                                       "compiler_version": importlib.metadata.version("Nuitka")},
                "memory_certification": "Uncertified; see docs/PROGRESS.md and benchmark evidence"}
     manifest = stage / "build-manifest.json"
     manifest.write_text(json.dumps(profile, indent=2) + "\n")
@@ -105,7 +108,7 @@ def main() -> None:
     command = [sys.executable, "-m", "nuitka", str(ROOT / "launch.py"),
                "--mode=" + ("standalone" if args.standalone else "onefile"),
                "--enable-plugin=pyside6", "--include-qt-plugins=sensible,platforms,imageformats",
-               "--assume-yes-for-downloads", "--lto=no", f"--jobs={args.jobs}",
+               "--assume-yes-for-downloads", "--lto=no", "--low-memory", f"--jobs={args.jobs}",
                f"--output-dir={out}", f"--output-filename={name}" + (".exe" if os.name == "nt" else ""),
                f"--include-data-files={bundle}=runtime-bundle.tar.gz",
                f"--include-data-files={manifest}=build-manifest.json",

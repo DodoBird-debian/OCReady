@@ -347,3 +347,10 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Created an archive using the production declared-distribution bundler, extracted it to another directory and performed actual SmolVLM inference from the relocated manifest. Nested native dependencies resolved without referring to the original worker directory.
 - Published raw functional outputs and both worker source identities. These probes are distinct from complete outer onefile resource or Windows GPU certification. All 185 tests and Ruff passed at the preceding implementation checkpoint.
 - Studio's first packaged resource scenarios include its cold 2 GB launcher and remain below 4 GB. Startup is noticeably dominated by archive extraction; the next packaging iteration addresses the measured extra traversal without changing model behavior.
+
+## Iteration 39 — one-pass staged runtime extraction
+
+- Replaced the full gzip member-list scan followed by extraction with one forward validation/extraction pass. Every member/link remains checked, partial staging is removed on failure/interruption, and only a complete runtime is atomically published. Existing internal library aliases remain supported.
+- Added a late-invalid-member regression check that confirms earlier staged files are removed and no runtime is published. All 186 tests and Ruff passed, including the existing extraction/alias and real native containment suite.
+- Selected Nuitka's supported low-memory build flag rather than adding another compiler patch. In pinned 4.3.5 this also selects level-3 onefile compression; the requested policy/compiler and known level are recorded in provenance. Standalone builds do not claim onefile compression. Full compiled memory/startup checks follow this checkpoint.
+- The already-frozen `3d2adb7` Studio executable continues its original packaged measurements independently; its first neural CLI/GUI and all four resource scenarios passed at roughly 2.20 GB cold tree RSS. Later startup changes are not retroactively attributed to those results.

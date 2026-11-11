@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import tarfile
 import threading
@@ -23,17 +24,24 @@ def runtime_root() -> Path:
             if not target.exists():
                 staging = target.with_name("runtime-extract")
                 staging.mkdir(parents=True, exist_ok=True)
-                with tarfile.open(bundle, "r:gz") as archive:
-                    for member in archive.getmembers():
-                        path = Path(member.name)
-                        if path.is_absolute() or ".." in path.parts or not (member.isfile() or member.isdir() or member.islnk() or member.issym()):
-                            raise RuntimeError("Unsafe path in bundled OCR runtime.")
-                        if member.islnk() or member.issym():
-                            link = Path(member.linkname)
-                            if link.is_absolute() or ".." in link.parts:
-                                raise RuntimeError("Unsafe link in bundled OCR runtime.")
-                    archive.extractall(staging, filter="data")
-                staging.rename(target)
+                try:
+                    # A full member-list scan would decompress large model
+                    # archives once before decompressing them again to extract.
+                    # Publish only after every streamed member has been checked.
+                    with tarfile.open(bundle, "r|gz", bufsize=1024 * 1024) as archive:
+                        for member in archive:
+                            path = Path(member.name)
+                            if path.is_absolute() or ".." in path.parts or not (member.isfile() or member.isdir() or member.islnk() or member.issym()):
+                                raise RuntimeError("Unsafe path in bundled OCR runtime.")
+                            if member.islnk() or member.issym():
+                                link = Path(member.linkname)
+                                if link.is_absolute() or ".." in link.parts:
+                                    raise RuntimeError("Unsafe link in bundled OCR runtime.")
+                            archive.extract(member, staging, filter="data")
+                    staging.rename(target)
+                except BaseException:
+                    shutil.rmtree(staging, ignore_errors=True)
+                    raise
     return target
 
 
