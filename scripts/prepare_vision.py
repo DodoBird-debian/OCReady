@@ -8,6 +8,7 @@ import json
 import os
 import platform
 import shutil
+import subprocess
 import tarfile
 import tempfile
 import urllib.request
@@ -15,6 +16,7 @@ import zipfile
 from pathlib import Path, PurePosixPath
 
 from ocready.core.models import ModelPack
+from ocready.engines.vision_adapters import local_environment
 from scripts.provenance import file_sha256
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -111,12 +113,32 @@ def prepare_runner(lock: dict, runtime: Path) -> Path:
     return destination / relative
 
 
+def quantize_model(derived: dict, folder: Path, quantizer: Path | None) -> Path:
+    output = folder / derived["file"]
+    if output.is_file() and output.stat().st_size == derived["bytes"] and file_sha256(output) == derived["sha256"]:
+        return output
+    if not quantizer or not quantizer.is_file():
+        raise RuntimeError("This preset needs the pinned CPU release's llama-quantize tool; supply --quantizer if using another worker.")
+    with tempfile.TemporaryDirectory(dir=folder, prefix=".vision-quantize-") as temporary:
+        staged = Path(temporary) / output.name
+        subprocess.run([str(quantizer), "--allow-requantize", str(folder / derived["input"]), str(staged), derived["quantization"]],
+                       env=local_environment(str(quantizer)), check=True, timeout=300)
+        actual_size = staged.stat().st_size if staged.is_file() else 0
+        actual_hash = file_sha256(staged) if staged.is_file() else "missing"
+        if actual_size != derived["bytes"] or actual_hash != derived["sha256"]:
+            raise RuntimeError(f"Derived vision weights differ from the locked output: {actual_size} bytes, SHA256 {actual_hash}; no model was published.")
+        staged.replace(output)
+    return output
+
+
 def prepare_pack(preset: dict, runner: Path, folder: Path, cuda_runner: Path | None = None,
-                 adapter: str = "llama.cpp") -> Path:
+                 adapter: str = "llama.cpp", quantizer: Path | None = None) -> Path:
     folder.mkdir(parents=True, exist_ok=True)
     for record in preset["files"]:
         fetch(record, folder / record["file"])
     model, projector = [folder / record["file"] for record in preset["files"][:2]]
+    if preset.get("derived_model"):
+        model = quantize_model(preset["derived_model"], folder, quantizer)
     pack = ModelPack(preset["id"], preset["name"], str(runner.resolve()), str(model.resolve()),
                      str(projector.resolve()), cuda_runner=str(cuda_runner.resolve()) if cuda_runner else "",
                      memory_mb=preset["memory_mb"], tokens=preset["tokens"], prompt=preset["prompt"],
@@ -133,26 +155,29 @@ def prepare_pack(preset: dict, runner: Path, folder: Path, cuda_runner: Path | N
         f"Model: {preset['repo']} @ {preset['revision']}\nLicense: {preset['license']}\n"
         f"{preset['limitations']}\n\n"
         + "\n".join(f"{item['file']}: SHA256 {item['sha256']}\n{item['url']}" for item in preset["files"])
+        + ("\nDerived model: " + json.dumps(preset["derived_model"], sort_keys=True) if preset.get("derived_model") else "")
         + "\n", encoding="utf-8")
     return manifest
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--preset", action="append", choices=("smol", "glm", "qwen3"), required=True,
+    parser.add_argument("--preset", action="append", choices=("smol", "smol-q4", "glm", "qwen3"), required=True,
                         help="Repeat to prepare multiple choices; GLM and Qwen3 require Studio.")
     parser.add_argument("--runtime-dir", type=Path, default=ROOT / "runtime/vision-cpu")
     parser.add_argument("--model-dir", type=Path, default=ROOT / "models/vision")
     parser.add_argument("--cuda-runner", type=Path, help="Optional separately provisioned compatible CUDA runner")
     parser.add_argument("--runner", type=Path, help="Use an existing compatible CPU worker instead of provisioning the CPU CLI")
     parser.add_argument("--adapter", choices=("llama.cpp", "json-cli-v1"), default="llama.cpp")
+    parser.add_argument("--quantizer", type=Path, help="Optional explicit llama-quantize for derived compact presets")
     args = parser.parse_args()
     lock = json.loads((ROOT / "assets/vision-lock.json").read_text(encoding="utf-8"))
     if args.adapter != "llama.cpp" and not args.runner:
         parser.error("Supply --runner for the selected adapter; see scripts.build_vision_bridge.")
     runner = args.runner.resolve() if args.runner else prepare_runner(lock["runner"], args.runtime_dir.resolve())
+    quantizer = args.quantizer.resolve() if args.quantizer else runner.with_name("llama-quantize.exe" if os.name == "nt" else "llama-quantize")
     for name in dict.fromkeys(args.preset):
-        print(prepare_pack(lock["packs"][name], runner, args.model_dir.resolve() / name, args.cuda_runner, args.adapter))
+        print(prepare_pack(lock["packs"][name], runner, args.model_dir.resolve() / name, args.cuda_runner, args.adapter, quantizer))
 
 
 if __name__ == "__main__":

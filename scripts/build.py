@@ -130,6 +130,13 @@ def main() -> None:
     extension = ".exe" if os.name == "nt" else ""
     artifact = out / (name + extension)
     if artifact.exists():
+        if os.name == "nt":
+            from scripts.pe_layout import inspect_pe
+            layout = inspect_pe(artifact)
+            (out / "pe-layout.json").write_text(json.dumps(layout, indent=2) + "\n", encoding="utf-8")
+            print(f"Windows PE: machine={layout['machine']} file={layout['file_bytes']} mapped image={layout['image_bytes']}", flush=True)
+            if layout["machine"] != "0x8664" or not layout["pe32_plus_under_2gib"]:
+                raise RuntimeError("The Windows image exceeds the supported x64 PE32+ layout. Use smaller quantized packs.")
         digest = file_sha256(artifact)
         artifact.with_suffix(artifact.suffix + ".sha256").write_text(f"{digest}  {artifact.name}\n")
         print(f"Built {artifact} ({artifact.stat().st_size / 1_000_000:.1f} MB)")

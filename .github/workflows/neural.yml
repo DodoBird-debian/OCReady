@@ -75,6 +75,17 @@ jobs:
         run: uv run python -m scripts.build_variant --edition ${{ inputs.edition }} --variant ${{ inputs.variant }} --jobs 2
       - name: Verify complete executable and memory workloads
         run: uv run python -m scripts.smoke_binary dist/${{ inputs.edition }}-${{ inputs.variant }} --all-methods --benchmark
+      - name: Retain failed-build layout diagnostics
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: OCReady-${{ inputs.edition }}-${{ inputs.variant }}-${{ runner.os }}-diagnostics
+          path: |
+            dist/${{ inputs.edition }}-${{ inputs.variant }}/pe-layout.json
+            dist/${{ inputs.edition }}-${{ inputs.variant }}/compilation-report.xml
+            build/${{ inputs.edition }}-${{ inputs.variant }}/payload/build-manifest.json
+            test-output/packaged-*.json
+          if-no-files-found: warn
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: success()
         with:
@@ -82,6 +93,7 @@ jobs:
           path: |
             dist/${{ inputs.edition }}-${{ inputs.variant }}/OCReady-*
             dist/${{ inputs.edition }}-${{ inputs.variant }}/build-manifest.json
+            dist/${{ inputs.edition }}-${{ inputs.variant }}/pe-layout.json
             test-output/packaged-${{ inputs.edition }}-${{ inputs.variant }}-*.json
             test-output/neural-accuracy.json
           if-no-files-found: error

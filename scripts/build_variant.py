@@ -20,7 +20,7 @@ def main() -> None:
     command = [sys.executable, "-m", "scripts.build", "--edition", args.edition, "--methods", methods,
                "--neural-pack", str(ROOT / "models/ppocr-v5/pack.json"), "--variant", args.variant, "--jobs", str(args.jobs)]
     if args.variant == "multimodal":
-        presets = ["smol"] + (["qwen3"] if args.edition == "studio" else [])
+        presets = ["smol-q4", "qwen3"] if args.edition == "studio" else ["smol"]
         prepare = [sys.executable, "-m", "scripts.prepare_vision"]
         for preset in presets:
             prepare += ["--preset", preset]

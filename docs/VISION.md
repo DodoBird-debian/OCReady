@@ -45,10 +45,12 @@ Developer preparation can provision checksum-locked official GGUF files, matchin
 ```sh
 uv run python -m scripts.prepare_vision --preset smol
 # Studio can include multiple choices:
-uv run python -m scripts.prepare_vision --preset smol --preset qwen3
+uv run python -m scripts.prepare_vision --preset smol-q4 --preset qwen3
 ```
 
-The manifests are `models/vision/<preset>/pack.json`. Available presets are `smol`, `glm`, and `qwen3`. Repeat `--model-pack` when building to embed multiple choices. These downloads occur during explicit preparation, never at app startup. Every asset has a pinned revision, byte size and SHA256 in `assets/vision-lock.json`; archive extraction rejects escaping paths and links. Generated manifests use relative paths and include the upstream cards.
+The manifests are `models/vision/<preset>/pack.json`. Available presets are `smol`, `smol-q4`, `glm`, and `qwen3`. Repeat `--model-pack` when building to embed multiple choices. These downloads occur during explicit preparation, never at app startup. Every asset has a pinned revision, byte size and SHA256 in `assets/vision-lock.json`; archive extraction rejects escaping paths and links. Generated manifests use relative paths and include the upstream cards.
+
+The compact `smol-q4` preset derives a 107,777,728-byte Q4_0 model from the locked official Q8 input using the pinned CPU release's `llama-quantize --allow-requantize`. Both the input and the derived output are verified against exact size/SHA256 before publishing the pack; a differing platform output fails preparation. This is a local requantization with possible quality loss, not a separately released upstream model. The curated Studio multimodal build uses this smaller English model alongside bilingual Qwen; Everyday retains Q8. The changed Studio combination requires fresh platform/resource verification.
 
 SmolVLM and GLM presets expose English. SmolVLM declares English only. GLM-OCR's upstream card lists eight languages but does not list Arabic; Arabic text occasionally read in experiments does not establish supported Arabic transcription. These presets supply CPU inference; `--cuda-runner` can add a separately provisioned compatible runner. A preset's disk size and memory estimate are not packaged resource certification.
 
