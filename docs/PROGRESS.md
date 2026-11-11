@@ -317,3 +317,10 @@ The plan describes both the implementation sequence and release gates. Pending i
 - All 174 tests and Ruff passed, including malformed protocol rejection, missing/unknown adapters, exact-image validation, CPU-only enforcement, fallback reporting, cancellation/budget exclusions, native settings swap and opaque-file embedding.
 - Replayed actual SmolVLM CPU and Qwen CUDA inference through the refactored default adapter. Both retained expected sample text and backend identity; Qwen preserved the full Arabic/English sample. The JSON interface is protocol-tested; a separately compiled real reference worker remains its next validation step.
 - A complete Studio binary with classical/neural OCR plus both SmolVLM and Qwen is compiling independently from clean `3d2adb7`; its packaged resource evidence remains pending.
+
+## Iteration 35 — verified reuse of the isolated numerical worker
+
+- Added the builder digest to worker provenance and a dedicated reuse verifier for current worker/builder input hashes, exact Python/dependency versions, clean worker source state, protocol and every declared distribution-file hash. Incompatible inputs and escaping paths fail validation.
+- Wired an exact-key, platform-specific Actions cache for only the compiled worker distribution. No prefix restore is used. Fresh/reused workers are verified and run against the corpus before caching; outer executables still require full per-method platform/resource verification before publication.
+- Pinned the official cache action's verified v5 commit. Reusing the independent worker is intended to avoid recompiling numerical libraries for UI/model-pack changes; no cache-hit timing improvement is claimed before the new workflow exercises it.
+- All 182 tests and Ruff passed, including modified executable/library content, entrypoint/builder changes, dependency/Python/protocol mismatches, unclean source state and escaping inventory paths.

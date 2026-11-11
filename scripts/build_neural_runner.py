@@ -12,6 +12,7 @@ from pathlib import Path
 from scripts.provenance import file_sha256, require_unchanged, source_record
 
 ROOT = Path(__file__).resolve().parents[1]
+WORKER_PACKAGES = ("rapidocr", "onnxruntime", "opencv-python-headless", "numpy", "python-bidi", "Pillow", "shapely", "pyclipper", "omegaconf", "PyYAML")
 
 
 def collect_notices(distribution: Path, packages) -> None:
@@ -44,7 +45,7 @@ def main() -> None:
     parser.add_argument("--jobs", type=int, default=2)
     args = parser.parse_args()
     source = source_record(ROOT)
-    packages = ("rapidocr", "onnxruntime", "opencv-python-headless", "numpy", "python-bidi", "Pillow", "shapely", "pyclipper", "omegaconf", "PyYAML")
+    packages = WORKER_PACKAGES
     versions = {name: importlib.metadata.version(name) for name in packages}
     entrypoint = ROOT / "native/neural_runner.py"
     digest = file_sha256(entrypoint)
@@ -69,6 +70,7 @@ def main() -> None:
     collect_notices(distribution, packages)
     require_unchanged(ROOT, source)
     metadata = {"source": source, "entrypoint_sha256": digest, "dependencies": versions,
+                "builder_sha256": file_sha256(Path(__file__)),
                 "protocol": 1, "model_family": "PP-OCRv5", "python": sys.version.split()[0],
                 "files": {file.relative_to(distribution).as_posix(): file_sha256(file) for file in sorted(distribution.rglob("*"))
                           if file.is_file() and file.relative_to(distribution).as_posix() != "neural-build.json"}}

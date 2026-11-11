@@ -55,6 +55,8 @@ The locked sources are [the official mobile detector](https://huggingface.co/Pad
 
 The worker refuses automatic model/font downloads and disables ONNX Runtime telemetry. Embedding copies only declared, hash-verified files from the standalone worker manifest, rather than unrelated files beside an arbitrary executable. Model, runtime and Python notices travel with the pack.
 
+The platform workflow can reuse a compiled worker only for an exact OS/architecture, Python version, lockfile, worker source and builder/verification policy key. Reused distributions are checked against current entrypoint/builder digests, dependency versions, protocol and declared file hashes before execution. Their original worker source identity remains in the worker manifest; the outer application's source identity is separate. Real corpus evaluation still runs before saving the reusable worker and before compiling/releasing the application. Resource/accuracy gates for complete executables are never satisfied by a cache hit alone.
+
 ## Accuracy and memory checks
 
 ```sh
