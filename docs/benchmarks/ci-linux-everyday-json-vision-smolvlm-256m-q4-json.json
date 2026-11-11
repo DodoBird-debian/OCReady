@@ -1,0 +1,173 @@
+{
+  "sample_interval_ms": 10,
+  "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
+  "platform": "linux",
+  "python": "3.12.16",
+  "cpu_count": 4,
+  "binary": true,
+  "scenarios": [
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "sample",
+      "peak_rss_bytes": 535085056,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 8.753,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 3.1675549990000036,
+        "peak_rss": 535085056,
+        "engine": "vision:smolvlm-256m-q4-json",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 924860416,
+        "worker_peak": 340725760,
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "dark",
+      "peak_rss_bytes": 534749184,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 8.719,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 3.2444896179999887,
+        "peak_rss": 534650880,
+        "engine": "vision:smolvlm-256m-q4-json",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 925179904,
+        "worker_peak": 340721664,
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "max-pixels",
+      "peak_rss_bytes": 579526656,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 10.823,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 5.293497869999953,
+        "peak_rss": 579526656,
+        "engine": "vision:smolvlm-256m-q4-json",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 888172544,
+        "worker_peak": 348454912,
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "gui-onefile",
+      "peak_rss_bytes": 658493440,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 11.424,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 5.141761270000018,
+        "peak_rss": 658493440,
+        "engine": "vision:smolvlm-256m-q4-json",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 809205760,
+        "worker_peak": 348643328,
+        "words": 0
+      },
+      "error": ""
+    }
+  ],
+  "source": {
+    "revision": "65f6b1fa8ad6c27956df53c6013fc7d5cf2e4c0c",
+    "dirty": false,
+    "tree_sha256": "c927436f5e1eb0b1dc1d5a1731eb37242718c3c8696a21f5629ffc642dfde71c"
+  },
+  "sources_changed_during_run": false,
+  "binary_sha256": "956b091267435287bdfee14ef8d63468ab28b9d6889a0a84c5c85a2d928c4412",
+  "binary_changed_during_run": false,
+  "build_profile": {
+    "edition": "everyday",
+    "available_editions": [
+      "everyday"
+    ],
+    "methods": [
+      "neural",
+      "tesseract-fast",
+      "tesseract-best",
+      "vision"
+    ],
+    "platform": "Linux-6.8.0-1070-azure-x86_64-with-glibc2.35",
+    "python": "3.12.16",
+    "embedded_models": [
+      {
+        "id": "smolvlm-256m-q4-json",
+        "name": "SmolVLM 256M Q4 · English (experimental)",
+        "source": "https://huggingface.co/ggml-org/SmolVLM-256M-Instruct-GGUF",
+        "license": "Apache-2.0",
+        "languages": "eng",
+        "adapter": "json-cli-v1",
+        "model_sha256": "0574eaffbb56eea1b7eaddd6ed61e0b93ad5832fe3e939d272747faac94f4277",
+        "projector_sha256": "7e943f7c53f0382a6fc41b6ee0c2def63ba4fded9ab8ed039cc9e2ab905e0edd"
+      }
+    ],
+    "default_model": "smolvlm-256m-q4-json",
+    "embedded_neural": [
+      {
+        "id": "ppocr-v5-arabic",
+        "name": "Arabic + English",
+        "source": "https://huggingface.co/PaddlePaddle/arabic_PP-OCRv5_mobile_rec_onnx",
+        "license": "Apache-2.0",
+        "languages": "ara+eng",
+        "geometry": "line",
+        "detector_sha256": "a431985659dc921974177a95adcfbb90fd9e51989a5e04d70d0b75f597b6e61d",
+        "recognizer_sha256": "799113ebf267fbe742deb99eb36e8d42c9ddc5291ceacf92add41b4d52a59110",
+        "dictionary_sha256": "7f92f7dbb9b75a4787a83bfb4f6d14a8ab515525130c9d40a9036f61cf6999e9"
+      }
+    ],
+    "default_neural": "ppocr-v5-arabic",
+    "variant": "multimodal-json",
+    "runtime_bundle_sha256": "5f22c468e91313c59c8815e7510e409d89777fd81a33777014a08f619ccfac54",
+    "source": {
+      "revision": "65f6b1fa8ad6c27956df53c6013fc7d5cf2e4c0c",
+      "dirty": false,
+      "tree_sha256": "c927436f5e1eb0b1dc1d5a1731eb37242718c3c8696a21f5629ffc642dfde71c"
+    },
+    "built_at_utc": "2026-11-11T11:35:09.171718+00:00",
+    "dependencies": {
+      "Nuitka": "4.3.5",
+      "Pillow": "12.3.0",
+      "psutil": "7.2.2",
+      "PySide6-Essentials": "6.8.3"
+    },
+    "onefile_compression": {
+      "policy": "Nuitka low-memory",
+      "level": 3,
+      "compiler_version": "4.3.5"
+    },
+    "memory_certification": "Uncertified; see docs/PROGRESS.md and benchmark evidence",
+    "payload_memory": {
+      "enabled": true,
+      "nuitka": "4.3.5",
+      "strategy": "drop-unused-launcher-pages-v1",
+      "original_bootstrap_sha256": "73e5da1368005fa1d8ac82c62269095bb26cf231604f260409533a8fb21eb827",
+      "helper_sha256": "c065722f1e62de5b6e6a3bdde8db51c90d58fa010b61a98297f44dee4e9fda7d",
+      "patched_bootstrap_sha256": "4108a89dd7633c1de00be0bc858022912fb83687ffa7b29bbf5dab5d27d573c1"
+    }
+  },
+  "requested_method": "vision",
+  "requested_pack_id": "smolvlm-256m-q4-json"
+}

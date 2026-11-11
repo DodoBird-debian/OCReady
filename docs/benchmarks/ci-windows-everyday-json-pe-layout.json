@@ -1,0 +1,63 @@
+{
+  "file_bytes": 426605056,
+  "machine": "0x8664",
+  "image_bytes": 426807296,
+  "sections": [
+    {
+      "name": ".text",
+      "virtual_size": 164320,
+      "virtual_address": 4096,
+      "raw_size": 164352,
+      "raw_offset": 1024
+    },
+    {
+      "name": ".rdata",
+      "virtual_size": 426384878,
+      "virtual_address": 172032,
+      "raw_size": 426384896,
+      "raw_offset": 165376
+    },
+    {
+      "name": ".data",
+      "virtual_size": 188376,
+      "virtual_address": 426557440,
+      "raw_size": 3072,
+      "raw_offset": 426550272
+    },
+    {
+      "name": ".pdata",
+      "virtual_size": 7656,
+      "virtual_address": 426745856,
+      "raw_size": 7680,
+      "raw_offset": 426553344
+    },
+    {
+      "name": ".fptable",
+      "virtual_size": 256,
+      "virtual_address": 426754048,
+      "raw_size": 512,
+      "raw_offset": 426561024
+    },
+    {
+      "name": ".rsrc",
+      "virtual_size": 41380,
+      "virtual_address": 426758144,
+      "raw_size": 41472,
+      "raw_offset": 426561536
+    },
+    {
+      "name": ".reloc",
+      "virtual_size": 1676,
+      "virtual_address": 426803200,
+      "raw_size": 2048,
+      "raw_offset": 426603008
+    }
+  ],
+  "pe32_plus_under_2gib": true,
+  "resource_types": [
+    3,
+    14,
+    16,
+    24
+  ]
+}

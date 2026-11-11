@@ -63,6 +63,8 @@ The reports retain exact executable hashes and unchanged clean-source identities
 
 The published four-method Everyday release at clean `3d2adb7` passed sixteen workloads per platform with 683.9 MB Linux and 622.6 MB Windows maximum observed RSS ([release evidence](benchmarks/everyday-multimodal-release.json)). Models are sequential and all embedded choices were exercised.
 
+The later published JSON-runtime composition at clean `65f6b1f` passed the same sixteen resource scenarios per platform with **658,493,440-byte Linux** and **561,381,376-byte Windows** maxima ([release evidence](benchmarks/everyday-json-release.json)). It includes the JSON bridge, compact Q4 vision weights, classical OCR and bilingual neural OCR. Different weights, runtime packaging, source and machines prevent attributing the change to a single optimization.
+
 A separate clean `af3baa9` Everyday Linux executable tests the alternate JSON vision interface end to end. It embeds the standalone JSON CPU worker, native descendant and compact English SmolVLM Q4 model/projector in a 295.4 MB onefile. All four resource workloads passed, with a 679,141,376-byte GUI maximum ([raw report](benchmarks/linux-json-smol-q4-onefile.json)). This is a single-method configuration and does not certify Windows, Arabic accuracy or another model combination.
 
 Clean `31d32ae` Studio CI completed all twenty Linux resource workloads across five choices. Qwen reached the largest observed tree RSS, 3,255,017,472 bytes ([raw report](benchmarks/ci-linux-packaged-studio-multimodal-vision-qwen3-vl-2b-q4.json)). The matched Windows executable failed before launch, so the workflow failed overall and produced no verified paired release.
