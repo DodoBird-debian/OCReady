@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import unicodedata
 from pathlib import Path
 
 from ocready.core.timeouts import observed_workload_timeout_seconds
@@ -20,6 +21,33 @@ def embedded_selections(profile: dict) -> list[tuple[str, str]]:
         else:
             selections.append((method, ""))
     return selections
+
+
+def sample_languages(profile: dict, method: str, pack_id: str) -> str:
+    if method not in {"vision", "neural"}:
+        return "ara+eng"
+    packs = profile.get("embedded_models" if method == "vision" else "embedded_neural", [])
+    selected = pack_id or profile.get("default_model" if method == "vision" else "default_neural")
+    pack = next((pack for pack in packs if pack["id"] == selected), None) if selected else next(iter(packs), None)
+    if not pack or pack.get("languages") not in {"ara+eng", "ara", "eng"}:
+        raise ValueError("The selected embedded pack needs a supported language declaration.")
+    return pack["languages"]
+
+
+def assert_sample_text(value: str, languages: str, *, vision: bool = False) -> None:
+    if languages not in {"ara+eng", "ara", "eng"}:
+        raise ValueError("Unsupported sample language declaration.")
+    # Tiny English packs must not gain an Arabic claim. A bilingual VLM must
+    # actually read Arabic too; harmless optional marks are ignored only for
+    # this basic presence probe, separately from corpus CER/WER evaluation.
+    arabic = value
+    if vision:
+        arabic = "".join(c for c in unicodedata.normalize("NFKC", value) if unicodedata.category(c) != "Mn" and c != "\u0640")
+    arabic_phrases = ("مرحبا بالعالم", "اللغة العربية واللغة الإنجليزية") if vision else ("مرحبا بالعالم",)
+    if "ara" in languages and not any(phrase in arabic for phrase in arabic_phrases):
+        raise AssertionError("The declared Arabic method did not read an expected Arabic sample phrase.")
+    if "eng" in languages and "screenshots" not in value:
+        raise AssertionError("The declared English method did not read the English sample phrase.")
 
 
 def run_checked(command: list[str], *, timeout: float | None = None, diagnostic: Path | None = None, **kwargs) -> None:
@@ -67,6 +95,7 @@ def main() -> None:
     for method, pack_id in selections:
         vision = method == "vision"
         neural = method == "neural"
+        languages = sample_languages(profile, method, pack_id)
         selection = ["--method", method]
         if pack_id:
             selection += ["--pack-id", pack_id]
@@ -84,9 +113,8 @@ def main() -> None:
             result = json.loads(output.read_text(encoding="utf-8"))
             assert not result.get("error"), result
             assert result["engine"] == (f"{method}:{pack_id}" if pack_id else method) or not pack_id and result["engine"].startswith(method), result
-            if not vision:
-                assert "مرحبا بالعالم" in result["text"], result["text"]
-            assert "screenshots" in result["text"], result["text"]
+            assert result.get("language") == languages, result
+            assert_sample_text(result["text"], languages, vision=vision)
             assert bool(result["words"]) != vision, "Unexpected geometry for this method"
             if neural:
                 assert result["geometry"] == "line", result
@@ -109,13 +137,13 @@ def main() -> None:
             if profile.get("validation_policy", {}).get("clipboard_image_input"):
                 assert gui.get("input_route") == "clipboard", gui
             assert gui["result"]["engine"] == result["engine"], gui
+            assert gui["result"].get("language") == languages, gui
+            assert_sample_text(gui["text"], languages, vision=vision)
             if vision:
                 assert not gui["linked"] and gui["words"] == 0, gui
-                assert "screenshots" in gui["text"], gui["text"]
             else:
                 assert gui.get("source_selection_verified") is True, gui
                 assert gui["linked"] and gui["words"] >= (1 if neural else 25), gui
-                assert "مرحبا بالعالم" in gui["text"], gui["text"]
             gui["build_profile"] = profile
             gui["requested_method"], gui["requested_pack_id"] = method, pack_id
             output.write_text(json.dumps(gui, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

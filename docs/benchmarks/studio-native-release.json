@@ -1,0 +1,108 @@
+{
+  "source_revision": "dac37a91dc11649ab7fa328f20cb177e44819506",
+  "workflow_run_id": 43051280875,
+  "edition": "studio",
+  "variant": "multimodal",
+  "corpus_content_sha256": "f2c0e972d023b685362f87376ae941accc2c2167a634728fc1cc157cf8537fbd",
+  "embedded_assets": [
+    {
+      "method": "neural",
+      "id": "ppocr-v5-arabic",
+      "languages": "ara+eng",
+      "geometry": "line",
+      "detector_sha256": "a431985659dc921974177a95adcfbb90fd9e51989a5e04d70d0b75f597b6e61d",
+      "recognizer_sha256": "799113ebf267fbe742deb99eb36e8d42c9ddc5291ceacf92add41b4d52a59110",
+      "dictionary_sha256": "7f92f7dbb9b75a4787a83bfb4f6d14a8ab515525130c9d40a9036f61cf6999e9"
+    },
+    {
+      "method": "vision",
+      "id": "qwen3-vl-2b-q4",
+      "languages": "ara+eng",
+      "adapter": "llama.cpp",
+      "model_sha256": "089d75c52f4b7ffc56ba998ffc50aae89fcafc755f9e7208aacca281dca6c2ae",
+      "projector_sha256": "f9a68fabba69c3b81e153367b2c7521030b0fa8bb0de400c9599c8e6725f9c82"
+    },
+    {
+      "method": "vision",
+      "id": "smolvlm-256m-q4",
+      "languages": "eng",
+      "adapter": "llama.cpp",
+      "model_sha256": "0574eaffbb56eea1b7eaddd6ed61e0b93ad5832fe3e939d272747faac94f4277",
+      "projector_sha256": "7e943f7c53f0382a6fc41b6ee0c2def63ba4fded9ab8ed039cc9e2ab905e0edd"
+    }
+  ],
+  "artifacts": [
+    {
+      "platform": "Linux",
+      "sha256": "7f8d906e5fe3bde47899b562a5af282bd001608efeeb29514ee735febdacf122",
+      "peak_rss_bytes": 3275939840,
+      "budget_bytes": 4000000000,
+      "neural_accuracy": {
+        "completed": 11,
+        "cer": 0.03855421686746988,
+        "wer": 0.075,
+        "skipped": 0,
+        "errors": 0
+      },
+      "filename": "OCReady-studio-multimodal-linux-x86_64",
+      "choices": [
+        [
+          "neural",
+          "ppocr-v5-arabic"
+        ],
+        [
+          "tesseract-best",
+          ""
+        ],
+        [
+          "tesseract-fast",
+          ""
+        ],
+        [
+          "vision",
+          "qwen3-vl-2b-q4"
+        ],
+        [
+          "vision",
+          "smolvlm-256m-q4"
+        ]
+      ]
+    },
+    {
+      "platform": "Windows",
+      "sha256": "0eee3bcdcbf16d5163581049035596009462e84403c9c561c900c4a78a3ba1db",
+      "peak_rss_bytes": 3202158592,
+      "budget_bytes": 4000000000,
+      "neural_accuracy": {
+        "completed": 11,
+        "cer": 0.03855421686746988,
+        "wer": 0.075,
+        "skipped": 0,
+        "errors": 0
+      },
+      "filename": "OCReady-studio-multimodal-windows-amd64.exe",
+      "choices": [
+        [
+          "neural",
+          "ppocr-v5-arabic"
+        ],
+        [
+          "tesseract-best",
+          ""
+        ],
+        [
+          "tesseract-fast",
+          ""
+        ],
+        [
+          "vision",
+          "qwen3-vl-2b-q4"
+        ],
+        [
+          "vision",
+          "smolvlm-256m-q4"
+        ]
+      ]
+    }
+  ]
+}

@@ -1669,3 +1669,15 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M67.V1: Require clean Linux/Windows CLI, native clipboard GUI and cap-sized process-tree measurements below 350,000,000 bytes.
 - M67.V2: Evaluate actual supported-language accuracy and failure/fallback behavior before adding an enabled Pocket model choice.
 - Release gate: Measured complete configurations, otherwise retain the verified classical Pocket default and document the results.
+
+## M68 — native language capability and per-model accuracy
+
+- Responsibility: Bind each declared language to actual native OCR output while preserving honest accuracy scope.
+- M68.T1: Derive smoke expectations from the selected embedded model's language declaration.
+- M68.T2: Require expected Arabic and English text for bilingual VLMs rather than checking only English.
+- M68.T3: Keep basic phrase-presence normalization separate from corpus CER/WER normalization.
+- M68.T4: Preserve observed word/digit/diacritic errors instead of changing ground truth to match predictions.
+- M68.T5: Evaluate complete supported-language corpora through each actual packaged model/backend.
+- M68.V1: Reject missing declared-language output and unavailable/invalid selected-pack metadata.
+- M68.V2: Audit native Linux/Windows sample differences even when shared model hashes match.
+- Release gate: Explicit language-capability proof, with full accuracy claims only for the actual evaluated configuration/corpus.

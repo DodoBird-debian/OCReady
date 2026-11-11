@@ -46,3 +46,13 @@ uv run python -m scripts.accuracy generate
 Inspect the rendered images after regeneration and review ground truth/image digests together. Never change expected text to match a wrong recognition result.
 
 Reports retain `corpus_sha256` for the exact manifest bytes and `corpus_content_sha256` for canonical JSON content. The latter is stable across Git's LF/CRLF checkout formatting and JSON key/whitespace formatting; it still includes exact expected Unicode, image hashes and preprocessing recipes. No OCR-text normalization is applied to this identity. Release verification also checks every case's ID, language, expected text and actual model identity against the committed corpus and embedded choices.
+
+## Compiled bilingual VLM samples
+
+The Studio native release at clean `dac37a9` uses matching Qwen model/projector hashes on Linux and Windows. Its actual GUI sample records contain Arabic and English on both platforms: [Linux text and GUI record](benchmarks/native-studio-qwen-linux-sample.json), [Windows text and GUI record](benchmarks/native-studio-qwen-windows-sample.json).
+
+Linux read the first Arabic line as expected: `مرحبا بالعالم`. Windows instead produced `مربح بالعالم`; both read the second Arabic sentence `اللغة العربية واللغة الإنجليزية` correctly. This observed word error remains in the raw evidence. Matching model assets do not establish identical transcription across native backends, and resource passes are separate from text accuracy.
+
+New compiled smoke checks follow each selected pack's declared languages. Bilingual VLMs must read English and at least one expected Arabic phrase; English-only packs gain no Arabic claim, and Arabic-only packs need no English output. The VLM presence probe allows optional diacritics/elongation marks and compatibility forms. Full corpus CER/WER normalization and ground truth remain unchanged. A phrase-presence probe establishes basic capability, not perfect transcription or a full platform VLM accuracy certification.
+
+The small-corpus 3.9% CER / 7.5% WER release figures refer to the neural method, not Qwen. The application keeps bilingual neural OCR as the curated default and exposes generative transcription as an experimental alternative with no fabricated word locations or confidence.

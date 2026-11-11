@@ -1,0 +1,117 @@
+{
+  "text": "A little less typing.\nTurn your screenshots into something useful.\nSelect a word. Copy a sentence. Keep going.\nمربح بالعالم\nاللغة العربية واللغة الإنجليزية\nOCReady / Local. Private. Ready to copy.",
+  "words": 0,
+  "linked": false,
+  "rss": 117288960,
+  "error": "",
+  "deadline_seconds": 650,
+  "qt_platform": "windows",
+  "clipboard_copy_verified": true,
+  "ui_font_family": "Segoe UI",
+  "editor_font_family": "Segoe UI",
+  "source_selection_verified": null,
+  "result": {
+    "text": "A little less typing.\r\nTurn your screenshots into something useful.\r\nSelect a word. Copy a sentence. Keep going.\r\nمربح بالعالم\r\nاللغة العربية واللغة الإنجليزية\r\nOCReady / Local. Private. Ready to copy.",
+    "words": [],
+    "engine": "vision:qwen3-vl-2b-q4",
+    "language": "ara+eng",
+    "elapsed": 40.827999999999975,
+    "peak_rss": 3096268800,
+    "backend": "CPU",
+    "recipe": "Original",
+    "note": "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR.",
+    "containment": "windows-job",
+    "worker_limit": 3867521024,
+    "worker_peak": 2190528512,
+    "layout": "",
+    "geometry": "none",
+    "runtime": "llama.cpp",
+    "confidence": null
+  },
+  "build_profile": {
+    "edition": "studio",
+    "available_editions": [
+      "studio"
+    ],
+    "methods": [
+      "neural",
+      "tesseract-fast",
+      "tesseract-best",
+      "vision"
+    ],
+    "platform": "Windows-2025Server-10.0.26100-SP0",
+    "python": "3.12.10",
+    "embedded_models": [
+      {
+        "id": "smolvlm-256m-q4",
+        "name": "SmolVLM 256M Q4 · English (experimental)",
+        "source": "https://huggingface.co/ggml-org/SmolVLM-256M-Instruct-GGUF",
+        "license": "Apache-2.0",
+        "languages": "eng",
+        "adapter": "llama.cpp",
+        "model_sha256": "0574eaffbb56eea1b7eaddd6ed61e0b93ad5832fe3e939d272747faac94f4277",
+        "projector_sha256": "7e943f7c53f0382a6fc41b6ee0c2def63ba4fded9ab8ed039cc9e2ab905e0edd"
+      },
+      {
+        "id": "qwen3-vl-2b-q4",
+        "name": "Qwen3-VL 2B (experimental)",
+        "source": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct-GGUF",
+        "license": "Apache-2.0",
+        "languages": "ara+eng",
+        "adapter": "llama.cpp",
+        "model_sha256": "089d75c52f4b7ffc56ba998ffc50aae89fcafc755f9e7208aacca281dca6c2ae",
+        "projector_sha256": "f9a68fabba69c3b81e153367b2c7521030b0fa8bb0de400c9599c8e6725f9c82"
+      }
+    ],
+    "default_model": "smolvlm-256m-q4",
+    "embedded_neural": [
+      {
+        "id": "ppocr-v5-arabic",
+        "name": "Arabic + English",
+        "source": "https://huggingface.co/PaddlePaddle/arabic_PP-OCRv5_mobile_rec_onnx",
+        "license": "Apache-2.0",
+        "languages": "ara+eng",
+        "geometry": "line",
+        "detector_sha256": "a431985659dc921974177a95adcfbb90fd9e51989a5e04d70d0b75f597b6e61d",
+        "recognizer_sha256": "799113ebf267fbe742deb99eb36e8d42c9ddc5291ceacf92add41b4d52a59110",
+        "dictionary_sha256": "7f92f7dbb9b75a4787a83bfb4f6d14a8ab515525130c9d40a9036f61cf6999e9"
+      }
+    ],
+    "default_neural": "ppocr-v5-arabic",
+    "variant": "multimodal",
+    "runtime_bundle_sha256": "f868ba51fe2f39677b33117e27b238c6a58cbfc5969db25cbfe669e117eb9be1",
+    "source": {
+      "revision": "dac37a91dc11649ab7fa328f20cb177e44819506",
+      "dirty": false,
+      "tree_sha256": "7efec856480da0b27dca7090549f2d311f2a9e41c0354b024f706a5f9687dd5a"
+    },
+    "built_at_utc": "2026-11-11T15:47:51.070678+00:00",
+    "dependencies": {
+      "Nuitka": "4.3.5",
+      "Pillow": "12.3.0",
+      "psutil": "7.2.2",
+      "PySide6-Essentials": "6.8.3"
+    },
+    "onefile_compression": {
+      "policy": "Nuitka low-memory",
+      "level": 3,
+      "compiler_version": "4.3.5"
+    },
+    "memory_certification": "Uncertified; see docs/PROGRESS.md and benchmark evidence",
+    "validation_policy": {
+      "portable_runtime_environment": 1,
+      "native_gui_backend": true,
+      "unicode_paths": true
+    },
+    "payload_memory": {
+      "enabled": true,
+      "nuitka": "4.3.5",
+      "strategy": "drop-unused-launcher-pages-v1",
+      "original_bootstrap_sha256": "73e5da1368005fa1d8ac82c62269095bb26cf231604f260409533a8fb21eb827",
+      "helper_sha256": "eba94369550127fd2a5a43070420df2d041e5691f623b3895401f6dce67a3643",
+      "patched_bootstrap_sha256": "8460dcfb5676b9bd1cc74a06dfa369df1c67b1d12e7eb9b3fdd7e48751855364"
+    }
+  },
+  "requested_method": "vision",
+  "requested_pack_id": "qwen3-vl-2b-q4"
+}
