@@ -25,6 +25,16 @@ An Everyday vision-only onefile build from clean source `e9cdf23` contains the C
 
 Raw reports: [source scenarios](benchmarks/linux-source.json), [Pocket onefile scenarios](benchmarks/linux-pocket-onefile.json). Recognition text is omitted from benchmark reports.
 
+## Releasing unused launcher pages
+
+Nuitka 4.3.5's onefile launcher retains its linked, file-backed payload after extraction. New builds use a private compiler overlay to release unused launcher residency once extraction and decompressor cleanup finish. Linux applies `MADV_DONTNEED` only to whole pages inside the linked const blob; Windows requests a one-time trim of the launcher's own working set. Neither path changes another process or imposes a memory limit. The installed Nuitka package remains unchanged, including after build failure.
+
+A controlled Linux onefile experiment used the same 48 MiB incompressible payload and verified its SHA256 after extraction. Steady launcher RSS fell from **62.4 MB to 2.0 MB**; launcher plus child fell from 90.0 MB to 29.5 MB. [Raw residency probe](benchmarks/linux-payload-residency-probe.json). These are steady-state probe measurements, not full-app or cold-start peaks. Full application and Windows builds require their own packaged checks.
+
+The optimization does not promise that file-cache pages disappear from system RAM. It releases unused process residency; the OS may retain reclaimable cache. Unsupported or denied OS operations leave ordinary memory monitoring/admission in place. [Linux mapping semantics](https://man7.org/linux/man-pages/man2/madvise.2.html), [Windows working-set trim](https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-setprocessworkingsetsize).
+
+The overlay is version-checked against the locked compiler and records original/patched bootstrap and helper digests in the build manifest. `--no-payload-trim` provides an unmodified diagnostic build. An unknown compiler/bootstrap layout requires explicit review rather than a blind patch.
+
 ## Reproducing the measurements
 
 ```sh

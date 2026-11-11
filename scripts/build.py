@@ -11,6 +11,7 @@ import tarfile
 from datetime import UTC, datetime
 from pathlib import Path
 
+from scripts.payload_memory import compiler_overlay, overlay_environment
 from scripts.provenance import file_sha256, included_runtime_manifest, require_unchanged, source_record
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,6 +23,7 @@ def main() -> None:
     parser.add_argument("--methods", help="Comma-separated fast,best,vision; defaults depend on edition")
     parser.add_argument("--model-pack", type=Path, action="append", default=[], help="Embed a local model manifest and its runner/weights; repeat for multiple packs")
     parser.add_argument("--standalone", action="store_true", help="Diagnostic directory build instead of onefile")
+    parser.add_argument("--no-payload-trim", action="store_true", help="Diagnostic build without releasing unused launcher pages")
     parser.add_argument("--jobs", type=int, default=4)
     args = parser.parse_args()
     source = source_record(ROOT)
@@ -103,7 +105,10 @@ def main() -> None:
                     "--file-version=0.1.0.0", "--product-version=0.1.0.0"]
     env = os.environ.copy()
     env["PATH"] = str(Path(sys.executable).parent) + os.pathsep + env.get("PATH", "")
-    subprocess.run(command, cwd=ROOT, env=env, check=True)
+    with compiler_overlay(stage.parent, enabled=not args.standalone and not args.no_payload_trim) as (overlay, metadata):
+        profile["payload_memory"] = metadata
+        manifest.write_text(json.dumps(profile, indent=2) + "\n", encoding="utf-8")
+        subprocess.run(command, cwd=ROOT, env=overlay_environment(env, overlay), check=True)
     require_unchanged(ROOT, source)
     extension = ".exe" if os.name == "nt" else ""
     artifact = out / (name + extension)

@@ -4,7 +4,7 @@ A local-first desktop workspace for turning Arabic and English screenshots into 
 
 **Under construction.** See [the modular implementation plan](docs/PLAN.md) and [iteration log](docs/PROGRESS.md). Memory tiers are engineering budgets until benchmarked; no vision model is claimed to fit a tier based on parameter count alone.
 
-[Download the experimental Linux and Windows prerelease](https://github.com/DodoBird-debian/OCReady/releases/tag/v0.1.0-preview.1). It includes all three editions, checksums, build manifests, and measured resource reports. Development continues beyond that tagged snapshot.
+[Download experimental Linux and Windows prereleases](https://github.com/DodoBird-debian/OCReady/releases). They include all three editions, checksums, build manifests, and measured resource reports. Development continues beyond each tagged snapshot.
 
 The application uses a native Qt split view, offline Tesseract OCR, optional local vision-language models, reversible image cleanup, source-word highlighting, and KDE / Windows screenshot integration. Linux and Windows builds target one-file executables using Nuitka (compiled application and embedded runtime, extracted on launch).
 

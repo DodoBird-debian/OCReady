@@ -1,0 +1,29 @@
+[
+  {
+    "trimmed": false,
+    "steady_launcher_rss_bytes": 62361600,
+    "steady_tree_rss_bytes": 89980928,
+    "payload_bytes": 50331648,
+    "payload_sha256": "4ccd6177a742f231397214cc05a70e28ed415e5079ae5d80095b1e9bddcae2f9",
+    "binary_sha256": "9451a54750ee776cec63fef418fad41a5e94cd88f8742e753dd6ee1ce8e4f3c9",
+    "patch": {
+      "enabled": false
+    }
+  },
+  {
+    "trimmed": true,
+    "steady_launcher_rss_bytes": 1986560,
+    "steady_tree_rss_bytes": 29503488,
+    "payload_bytes": 50331648,
+    "payload_sha256": "4ccd6177a742f231397214cc05a70e28ed415e5079ae5d80095b1e9bddcae2f9",
+    "binary_sha256": "08ccbdd8d6dafdb4cf436d37e70bf40a6093e96070c5e2bc42f50dbc3a8913f1",
+    "patch": {
+      "enabled": true,
+      "nuitka": "4.3.5",
+      "strategy": "drop-unused-launcher-pages-v1",
+      "original_bootstrap_sha256": "73e5da1368005fa1d8ac82c62269095bb26cf231604f260409533a8fb21eb827",
+      "helper_sha256": "c065722f1e62de5b6e6a3bdde8db51c90d58fa010b61a98297f44dee4e9fda7d",
+      "patched_bootstrap_sha256": "4108a89dd7633c1de00be0bc858022912fb83687ffa7b29bbf5dab5d27d573c1"
+    }
+  }
+]

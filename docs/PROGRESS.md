@@ -212,3 +212,12 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Image/source changes discard stale alternatives. Single-read workflows keep the comparison bar hidden. Added real layout provenance to result JSON.
 - Replayed the real Arabic Kufi corpus failure: automatic confidence selected an incomplete read; choosing the retained Screenshot reading recovered the complete reference. Inspected the native split view and clicked a real Arabic source word after switching. Saved the rendered comparison workspace.
 - Validation: all 121 tests and Ruff passed, including a real background comparison, source geometry switching, edit protection, source replacement and selector lifecycle. Cross-platform source CI follows this push.
+
+## Iteration 22 — release dormant onefile payload residency
+
+- Identified retained file-backed payload pages in Nuitka 4.3.5's launcher after extraction. Added a version-checked private compiler overlay and native post-extraction helper; the installed compiler is never modified.
+- Linux releases only inward-aligned payload pages. Windows trims only the launcher's own working set after decompressor cleanup. Failures retain ordinary admission/monitoring; this optimization is not a memory limit or a claim about global file-cache ownership.
+- Built two controlled onefile probes with identical 48 MiB data. Verified extracted SHA256, child completion and launcher identity. Steady launcher RSS changed from 62.4 MB to 2.0 MB; total steady tree RSS changed from 90.0 MB to 29.5 MB. Cold-start/full-app peaks remain separate measurements.
+- Added native file-mapping preservation/RSS tests, overlay isolation/failure cleanup, and unknown compiler/layout rejection. All 124 tests and Ruff passed. Full Pocket, embedded vision and Windows builds are the next verification gates.
+- Separately evaluated official PP-OCRv5 mobile detection/Arabic recognition models in an isolated CPU harness: eleven fixtures in about three seconds, 6.3% CER and 230 MB observed tree peak including the harness. Mixed-direction copy order needs explicit handling before integration. The prototype is not a shipped method or a GUI memory result.
+- Preview 2 at `a46aeb6` passed all six platform/edition builds and publication verification; it includes remembered choices and visible OCR alternatives. Later launcher/engine work is outside that tagged snapshot.
