@@ -1,0 +1,147 @@
+{
+  "sample_interval_ms": 10,
+  "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
+  "platform": "win32",
+  "python": "3.12.10",
+  "cpu_count": 4,
+  "binary": true,
+  "scenarios": [
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "sample",
+      "peak_rss_bytes": 94322688,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 4.969,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 3.046999999999912,
+        "peak_rss": 94326784,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "windows-job",
+        "worker_limit": 295530496,
+        "worker_peak": 37920768,
+        "words": 31
+      },
+      "error": ""
+    },
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "dark",
+      "peak_rss_bytes": 94371840,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 4.047,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 2.905999999999949,
+        "peak_rss": 93396992,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "windows-job",
+        "worker_limit": 295358464,
+        "worker_peak": 37924864,
+        "words": 31
+      },
+      "error": ""
+    },
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "max-pixels",
+      "peak_rss_bytes": 112418816,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 5.312,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 4.140999999999963,
+        "peak_rss": 112308224,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "windows-job",
+        "worker_limit": 290983936,
+        "worker_peak": 51331072,
+        "words": 92
+      },
+      "error": ""
+    },
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "gui-onefile",
+      "peak_rss_bytes": 172695552,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 5.375,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 3.625,
+        "peak_rss": 172720128,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "windows-job",
+        "worker_limit": 229920768,
+        "worker_peak": 51417088,
+        "words": 92
+      },
+      "error": ""
+    }
+  ],
+  "source": {
+    "revision": "31d32aefe36f963cea7b94b86e5a0b701104f565",
+    "dirty": false,
+    "tree_sha256": "3dc98014bb77158f236c687d2286cfd4470723c5c2e3faffed045beb79ea0840"
+  },
+  "sources_changed_during_run": false,
+  "binary_sha256": "94b689a5e188f33b549e50ee205cb7eb6a829f89185371520b30e6813e433b22",
+  "binary_changed_during_run": false,
+  "build_profile": {
+    "edition": "pocket",
+    "available_editions": [
+      "pocket"
+    ],
+    "methods": [
+      "tesseract-fast"
+    ],
+    "platform": "Windows-2025Server-10.0.26100-SP0",
+    "python": "3.12.10",
+    "embedded_models": [],
+    "default_model": "",
+    "embedded_neural": [],
+    "default_neural": "",
+    "variant": "",
+    "runtime_bundle_sha256": "99abd520337b7c4fd291e4e5645b93c6ef23187e742e401fa029865a21cf9f72",
+    "source": {
+      "revision": "31d32aefe36f963cea7b94b86e5a0b701104f565",
+      "dirty": false,
+      "tree_sha256": "3dc98014bb77158f236c687d2286cfd4470723c5c2e3faffed045beb79ea0840"
+    },
+    "built_at_utc": "2026-11-11T10:30:38.383022+00:00",
+    "dependencies": {
+      "Nuitka": "4.3.5",
+      "Pillow": "12.3.0",
+      "psutil": "7.2.2",
+      "PySide6-Essentials": "6.8.3"
+    },
+    "onefile_compression": {
+      "policy": "Nuitka low-memory",
+      "level": 3,
+      "compiler_version": "4.3.5"
+    },
+    "memory_certification": "Uncertified; see docs/PROGRESS.md and benchmark evidence",
+    "payload_memory": {
+      "enabled": true,
+      "nuitka": "4.3.5",
+      "strategy": "drop-unused-launcher-pages-v1",
+      "original_bootstrap_sha256": "73e5da1368005fa1d8ac82c62269095bb26cf231604f260409533a8fb21eb827",
+      "helper_sha256": "eba94369550127fd2a5a43070420df2d041e5691f623b3895401f6dce67a3643",
+      "patched_bootstrap_sha256": "8460dcfb5676b9bd1cc74a06dfa369df1c67b1d12e7eb9b3fdd7e48751855364"
+    }
+  },
+  "requested_method": "tesseract-fast",
+  "requested_pack_id": null
+}

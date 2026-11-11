@@ -1,0 +1,72 @@
+{
+  "source_revision": "3d2adb7ee2772d1977ca34479050ed706671b8ad",
+  "workflow_run_id": 42998895423,
+  "edition": "everyday",
+  "variant": "multimodal",
+  "artifacts": [
+    {
+      "platform": "Linux",
+      "sha256": "dc47638063b49fa5cae3a36fdc96016f236739837a214cea542919626558a657",
+      "peak_rss_bytes": 683921408,
+      "budget_bytes": 1000000000,
+      "neural_accuracy": {
+        "completed": 11,
+        "cer": 0.03855421686746988,
+        "wer": 0.075,
+        "skipped": 0,
+        "errors": 0
+      },
+      "filename": "OCReady-everyday-multimodal-linux-x86_64",
+      "choices": [
+        [
+          "neural",
+          "ppocr-v5-arabic"
+        ],
+        [
+          "tesseract-best",
+          ""
+        ],
+        [
+          "tesseract-fast",
+          ""
+        ],
+        [
+          "vision",
+          "smolvlm-256m-q8"
+        ]
+      ]
+    },
+    {
+      "platform": "Windows",
+      "sha256": "ce724a2ae4e0488356703021e5270b67c04b3010b8de0e3f7fafbe89f50791bc",
+      "peak_rss_bytes": 622592000,
+      "budget_bytes": 1000000000,
+      "neural_accuracy": {
+        "completed": 11,
+        "cer": 0.03855421686746988,
+        "wer": 0.075,
+        "skipped": 0,
+        "errors": 0
+      },
+      "filename": "OCReady-everyday-multimodal-windows-amd64.exe",
+      "choices": [
+        [
+          "neural",
+          "ppocr-v5-arabic"
+        ],
+        [
+          "tesseract-best",
+          ""
+        ],
+        [
+          "tesseract-fast",
+          ""
+        ],
+        [
+          "vision",
+          "smolvlm-256m-q8"
+        ]
+      ]
+    }
+  ]
+}

@@ -1489,3 +1489,21 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M55.V4: Re-measure cold startup RSS for each RAM edition; model disk size is not memory certification.
 - M55.V5: Investigate persistent caching only with per-build identities, private storage, atomic publication and explicit cache lifecycle.
 - Release gate: Measured complete-package startup/resource evidence with preserved safety and portability checks.
+
+## M56 — portable multi-model executable composition
+
+- Responsibility: Preserve freely swappable OCR choices while producing executable layouts accepted by each platform loader.
+- M56.T1: Keep disk size, mapped executable image size, extraction footprint and inference RAM as separate measurements.
+- M56.T2: Record PE architecture, mapped image size and section bounds for Windows x64 builds.
+- M56.T3: Fail incompatible output layouts before checksum/success metadata and retain small failure diagnostics.
+- M56.T4: Offer explicitly named compact derived models with exact input, tool recipe and output digests.
+- M56.T5: Keep original model choices available for external packs and alternative compositions.
+- M56.T6: Avoid silently dropping a requested model when a combination cannot be packaged.
+- M56.T7: Match model weights, projectors, recognition dictionaries, language capabilities and adapter identities across platform releases.
+- M56.T8: Preserve platform-specific worker identities; Windows and Linux executable hashes are expected to differ.
+- M56.V1: Reject malformed/truncated PE headers and sections outside file/image bounds.
+- M56.V2: Test actual executable startup after layout changes; plausible file size is insufficient.
+- M56.V3: Verify derived weights independently on Linux and Windows before embedding them.
+- M56.V4: Exercise every embedded model using CLI, native GUI and complete-process memory workloads.
+- M56.V5: Reject release pairs with matching model IDs but differing weights, dictionaries or runtime adapters.
+- Release gate: Both native launchers work, every requested choice is retained and paired platform evidence identifies the same model assets.

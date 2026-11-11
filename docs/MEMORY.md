@@ -48,6 +48,25 @@ These peaks include cold startup, the launcher and all OCR descendants. Pocket's
 
 A separate **source GUI** soak completed 100 cap-sized Pocket image loads/recognitions in one window. Its peak was 231.6 MB; mean idle RSS was 160.5 MB over the first ten jobs and 158.4 MB over the last ten. This is evidence of stable memory over that workload, not a proof of unlimited-session behavior or a compiled 100-job test. [Raw 100-job source soak](benchmarks/linux-pocket-soak-100.json).
 
+## Streaming startup and current platform evidence
+
+Clean `31d32ae` uses one-pass runtime extraction and Nuitka's supported low-memory build policy (level-3 compression in pinned 4.3.5). Both Pocket CI binaries passed CLI/native GUI smoke checks and all four packaged resource scenarios:
+
+| Packaged workload | Linux | Windows |
+| --- | ---: | ---: |
+| Sample | 98.0 MB | 94.3 MB |
+| Inverted sample | 97.6 MB | 94.4 MB |
+| Cap-sized headless | 128.2 MB | 112.4 MB |
+| Cap-sized GUI | 226.7 MB | 172.7 MB |
+
+The reports retain exact executable hashes and unchanged clean-source identities: [Linux CI](benchmarks/ci-linux-pocket-stream.json), [Windows CI](benchmarks/ci-win32-pocket-stream.json). The separate local Linux binary from that revision peaked at 248.2 MB ([local report](benchmarks/linux-pocket-stream.json)); machine/build differences remain visible. Workloads include launcher residency. These are measured budget passes, not an absolute allocation ceiling.
+
+The published four-method Everyday release at clean `3d2adb7` passed sixteen workloads per platform with 683.9 MB Linux and 622.6 MB Windows maximum observed RSS ([release evidence](benchmarks/everyday-multimodal-release.json)). Models are sequential and all embedded choices were exercised.
+
+Clean `31d32ae` Studio CI completed all twenty Linux resource workloads across five choices. Qwen reached the largest observed tree RSS, 3,255,017,472 bytes ([raw report](benchmarks/ci-linux-packaged-studio-multimodal-vision-qwen3-vl-2b-q4.json)). The matched Windows executable failed before launch, so the workflow failed overall and produced no verified paired release.
+
+A local complete Studio binary at `3d2adb7` passed twenty workloads across classical, neural, SmolVLM Q8 and Qwen3 choices; its maximum observed RSS was 3,268.1 MB ([Qwen report](benchmarks/development-linux-packaged-studio-multimodal-vision-qwen3-vl-2b-q4.json)). Its source record is explicitly **dirty** because the build worktree's runtime symlink was untracked; source content and binary stayed unchanged throughout testing. This remains development evidence. It must not be substituted for clean CI or Windows validation. The initial Windows Studio build failed before launch with WinError 193; the smaller Q4 combination and PE layout diagnostics require fresh platform checks.
+
 ## Reproducing the measurements
 
 ```sh

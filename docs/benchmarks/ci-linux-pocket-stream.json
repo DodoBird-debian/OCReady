@@ -1,0 +1,147 @@
+{
+  "sample_interval_ms": 10,
+  "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
+  "platform": "linux",
+  "python": "3.12.16",
+  "cpu_count": 4,
+  "binary": true,
+  "scenarios": [
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "sample",
+      "peak_rss_bytes": 98021376,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 1.44,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 0.9548587150000003,
+        "peak_rss": 95916032,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 289431552,
+        "worker_peak": 40226816,
+        "words": 31
+      },
+      "error": ""
+    },
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "dark",
+      "peak_rss_bytes": 97599488,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 1.494,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 1.0167453809999643,
+        "peak_rss": 97599488,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 289669120,
+        "worker_peak": 40210432,
+        "words": 31
+      },
+      "error": ""
+    },
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "max-pixels",
+      "peak_rss_bytes": 128204800,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 1.794,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 1.2830736939999952,
+        "peak_rss": 128204800,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 272011264,
+        "worker_peak": 53170176,
+        "words": 92
+      },
+      "error": ""
+    },
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "gui-onefile",
+      "peak_rss_bytes": 226672640,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 2.352,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 1.3133085770000434,
+        "peak_rss": 226672640,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 173613056,
+        "worker_peak": 53125120,
+        "words": 92
+      },
+      "error": ""
+    }
+  ],
+  "source": {
+    "revision": "31d32aefe36f963cea7b94b86e5a0b701104f565",
+    "dirty": false,
+    "tree_sha256": "13d64651b1e6b6e968be2f15f2829ca23386d7d643a8e96b3f56d8555f976727"
+  },
+  "sources_changed_during_run": false,
+  "binary_sha256": "0199327d9ddd316f77810a836119f44367bc02897e3e58c35bedcd51ddef32fc",
+  "binary_changed_during_run": false,
+  "build_profile": {
+    "edition": "pocket",
+    "available_editions": [
+      "pocket"
+    ],
+    "methods": [
+      "tesseract-fast"
+    ],
+    "platform": "Linux-6.8.0-1070-azure-x86_64-with-glibc2.35",
+    "python": "3.12.16",
+    "embedded_models": [],
+    "default_model": "",
+    "embedded_neural": [],
+    "default_neural": "",
+    "variant": "",
+    "runtime_bundle_sha256": "063d1fde5ad4fb89406908ea2c313cb5011325c5021d673e43eb28d7ef816405",
+    "source": {
+      "revision": "31d32aefe36f963cea7b94b86e5a0b701104f565",
+      "dirty": false,
+      "tree_sha256": "13d64651b1e6b6e968be2f15f2829ca23386d7d643a8e96b3f56d8555f976727"
+    },
+    "built_at_utc": "2026-11-11T10:30:17.634356+00:00",
+    "dependencies": {
+      "Nuitka": "4.3.5",
+      "Pillow": "12.3.0",
+      "psutil": "7.2.2",
+      "PySide6-Essentials": "6.8.3"
+    },
+    "onefile_compression": {
+      "policy": "Nuitka low-memory",
+      "level": 3,
+      "compiler_version": "4.3.5"
+    },
+    "memory_certification": "Uncertified; see docs/PROGRESS.md and benchmark evidence",
+    "payload_memory": {
+      "enabled": true,
+      "nuitka": "4.3.5",
+      "strategy": "drop-unused-launcher-pages-v1",
+      "original_bootstrap_sha256": "73e5da1368005fa1d8ac82c62269095bb26cf231604f260409533a8fb21eb827",
+      "helper_sha256": "c065722f1e62de5b6e6a3bdde8db51c90d58fa010b61a98297f44dee4e9fda7d",
+      "patched_bootstrap_sha256": "4108a89dd7633c1de00be0bc858022912fb83687ffa7b29bbf5dab5d27d573c1"
+    }
+  },
+  "requested_method": "tesseract-fast",
+  "requested_pack_id": null
+}

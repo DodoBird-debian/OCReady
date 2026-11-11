@@ -39,9 +39,11 @@ uv run python -m scripts.build_variant --edition everyday --variant multimodal
 uv run python -m scripts.smoke_binary dist/everyday-multimodal --all-methods --benchmark
 ```
 
-`neural` embeds only the bilingual neural method; `combined` adds classical engines; `multimodal` also provisions the locked English SmolVLM preset, plus the experimental bilingual Qwen3-VL preset in Studio. The latter downloads large model files during explicit preparation. It does not yet imply a published, validated combined executable. The all-methods smoke check runs actual CLI, native GUI and four resource workloads for each embedded choice, preserving separate variant/method reports.
+`neural` embeds only the bilingual neural method; `combined` adds classical engines; `multimodal` also provisions the locked English SmolVLM preset, plus the experimental bilingual Qwen3-VL preset in Studio. Studio uses the compact Q4 SmolVLM derivation; Everyday uses Q8. The latter downloads large model files during explicit preparation. Each combination requires independent platform validation. The all-methods smoke check runs actual CLI, native GUI and four resource workloads for each embedded choice, preserving separate variant/method reports.
 
 New curated variants default to the bundled bilingual neural engine. Fast and Precision remain available for individual-word selection. Existing saved choices still take precedence in the GUI. The clean `602cc5b` Linux Everyday multimodal build (530.3 MB) passed all sixteen packaged resource scenarios across Fast, Precision, SmolVLM and neural OCR; its largest observed tree peak was 666.7 MB. Raw per-method reports are under [benchmarks](benchmarks/). That snapshot predates the later curated-default change.
+
+The [published Everyday multimodal preview](https://github.com/DodoBird-debian/OCReady/releases/tag/v0.1.0-everyday-multimodal-preview.3) at clean `3d2adb7` includes all four choices. Both Linux and Windows passed their sixteen per-method packaged workloads and eleven-image neural corpus; largest observed peaks were 683.9 MB and 622.6 MB respectively. Its [release evidence](benchmarks/everyday-multimodal-release.json) identifies both binaries and choices; the release attaches every raw resource/accuracy report, manifests and checksums. Studio remains a separate release gate.
 
 Both CLI and GUI accept an explicit installed choice, for example `--method vision --pack-id smolvlm-256m-q8`. A missing or inadmissible choice fails rather than silently testing another model. Normal GUI launches preserve the saved method.
 

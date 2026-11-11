@@ -1,0 +1,147 @@
+{
+  "sample_interval_ms": 10,
+  "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
+  "platform": "linux",
+  "python": "3.12.16",
+  "cpu_count": 12,
+  "binary": true,
+  "scenarios": [
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "sample",
+      "peak_rss_bytes": 105979904,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 1.114,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 0.7216453539949725,
+        "peak_rss": 105512960,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 280702976,
+        "worker_peak": 34951168,
+        "words": 31
+      },
+      "error": ""
+    },
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "dark",
+      "peak_rss_bytes": 107094016,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 1.19,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 0.8011447789976955,
+        "peak_rss": 106201088,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 279494656,
+        "worker_peak": 34607104,
+        "words": 31
+      },
+      "error": ""
+    },
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "max-pixels",
+      "peak_rss_bytes": 130674688,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 1.463,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 1.0537963329988997,
+        "peak_rss": 130674688,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 269127680,
+        "worker_peak": 47947776,
+        "words": 95
+      },
+      "error": ""
+    },
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "gui-onefile",
+      "peak_rss_bytes": 248242176,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 2.043,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 1.0539882399971248,
+        "peak_rss": 248242176,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 151715840,
+        "worker_peak": 47788032,
+        "words": 95
+      },
+      "error": ""
+    }
+  ],
+  "source": {
+    "revision": "31d32aefe36f963cea7b94b86e5a0b701104f565",
+    "dirty": false,
+    "tree_sha256": "13d64651b1e6b6e968be2f15f2829ca23386d7d643a8e96b3f56d8555f976727"
+  },
+  "sources_changed_during_run": false,
+  "binary_sha256": "f00e68facd2a268116048abe1f21596bc2af0d1420ddcf9554d49e017fe4d995",
+  "binary_changed_during_run": false,
+  "build_profile": {
+    "edition": "pocket",
+    "available_editions": [
+      "pocket"
+    ],
+    "methods": [
+      "tesseract-fast"
+    ],
+    "platform": "Linux-6.12.113+deb13-amd64-x86_64-with-glibc2.41",
+    "python": "3.12.16",
+    "embedded_models": [],
+    "default_model": "",
+    "embedded_neural": [],
+    "default_neural": "",
+    "variant": "stream",
+    "runtime_bundle_sha256": "352775ad1323f2cd3cbeb561242c5fe948652b10b63b12bf901e8e24e15832d8",
+    "source": {
+      "revision": "31d32aefe36f963cea7b94b86e5a0b701104f565",
+      "dirty": false,
+      "tree_sha256": "13d64651b1e6b6e968be2f15f2829ca23386d7d643a8e96b3f56d8555f976727"
+    },
+    "built_at_utc": "2026-11-11T10:28:13.451887+00:00",
+    "dependencies": {
+      "Nuitka": "4.3.5",
+      "Pillow": "12.3.0",
+      "psutil": "7.2.2",
+      "PySide6-Essentials": "6.8.3"
+    },
+    "onefile_compression": {
+      "policy": "Nuitka low-memory",
+      "level": 3,
+      "compiler_version": "4.3.5"
+    },
+    "memory_certification": "Uncertified; see docs/PROGRESS.md and benchmark evidence",
+    "payload_memory": {
+      "enabled": true,
+      "nuitka": "4.3.5",
+      "strategy": "drop-unused-launcher-pages-v1",
+      "original_bootstrap_sha256": "73e5da1368005fa1d8ac82c62269095bb26cf231604f260409533a8fb21eb827",
+      "helper_sha256": "c065722f1e62de5b6e6a3bdde8db51c90d58fa010b61a98297f44dee4e9fda7d",
+      "patched_bootstrap_sha256": "4108a89dd7633c1de00be0bc858022912fb83687ffa7b29bbf5dab5d27d573c1"
+    }
+  },
+  "requested_method": "tesseract-fast",
+  "requested_pack_id": null
+}

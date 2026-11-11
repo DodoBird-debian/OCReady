@@ -316,7 +316,7 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Added native runtime selection for external packs, immutable bundled runtime identity, format-preserving embedding, adapter provenance/diagnostics and result runtime identity. Documented the worker contract and backward-compatible pack format.
 - All 174 tests and Ruff passed, including malformed protocol rejection, missing/unknown adapters, exact-image validation, CPU-only enforcement, fallback reporting, cancellation/budget exclusions, native settings swap and opaque-file embedding.
 - Replayed actual SmolVLM CPU and Qwen CUDA inference through the refactored default adapter. Both retained expected sample text and backend identity; Qwen preserved the full Arabic/English sample. The JSON interface is protocol-tested; a separately compiled real reference worker remains its next validation step.
-- A complete Studio binary with classical/neural OCR plus both SmolVLM and Qwen is compiling independently from clean `3d2adb7`; its packaged resource evidence remains pending.
+- A complete local Studio binary with classical/neural OCR plus both SmolVLM and Qwen is compiling independently at `3d2adb7`; its packaged resource evidence remains pending. See iteration 42 for the later provenance audit.
 
 ## Iteration 35 — verified reuse of the isolated numerical worker
 
@@ -338,7 +338,7 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Compiled the JSON reference worker from clean `edfd7db`, including its own Python runtime and native llama.cpp descendant. Prepared the official SmolVLM pack for `json-cli-v1` and ran actual CPU inference through shared orchestration.
 - The result retained the expected English sample text and explicitly reported runtime `json-cli-v1`, CPU backend and cgroup-v2 containment. Observed development-run tree peak was 522.5 MB in 4.3 seconds; this is a source/client probe, not a complete outer onefile resource certification.
 - Runtime copying now preserves shared-library aliases as hard links where supported, with a copy fallback. This prevents needless duplication of large native GPU libraries in worker distributions and their onefile archives. Existing stale-runtime cleanup and nested-file hash verification remain in place.
-- The complete clean `3d2adb7` Studio binary built at 2062.8 MB. It has begun real per-method CLI/GUI and resource validation on disk-backed temporary storage. First neural CLI recognition returned six real linked lines; full evidence remains pending.
+- The complete local `3d2adb7` Studio binary built at 2062.8 MB. It has begun real per-method CLI/GUI and resource validation on disk-backed temporary storage. First neural CLI recognition returned six real linked lines; full evidence remains pending. Later audit found its provenance correctly marked dirty due to the untracked runtime symlink; it is development evidence, not a clean build.
 
 ## Iteration 38 — actual CUDA and relocation through the second interface
 
@@ -369,3 +369,11 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Added a compact SmolVLM Q4_0 preset derived from the pinned official Q8 weights with the pinned native quantizer. Exact input/output size and SHA256 are required; mismatches never publish partial model weights. Studio retains both the small English model and bilingual Qwen; Everyday keeps its existing Q8 choice.
 - Real Linux preparation reproduced the locked Q4 digest and CPU inference retained the expected English sample. This functional probe is distinct from clean packaged resource or corpus accuracy evidence. The smaller Windows combination remains unverified until the next build actually launches and completes its workloads.
 - All 192 tests and Ruff passed before two additional malformed mapped-image cases were added; the focused final validation follows before commit.
+
+## Iteration 42 — preserve complete measurements and update downloads
+
+- Published Everyday multimodal workflow `42998895423` at clean `3d2adb7` succeeded on Linux and Windows and automatically released both native binaries. All sixteen per-method resource scenarios passed on each platform; maxima were 683,921,408 and 622,592,000 bytes. Both neural corpus evaluations completed all eleven fixtures at 3.9% CER / 7.5% WER. Added the unchanged public evidence index and direct four-method download links.
+- Clean `31d32ae` Pocket workflow `43003993770` compiled and verified both platform binaries; its other edition jobs ran source checks without compilation. All eight Pocket resource scenarios passed, with Linux/Windows GUI peaks of 226,672,640 / 172,695,552 bytes. Preserved both CI raw reports and the separate local Linux four-case report (248,242,176-byte maximum).
+- The frozen local Studio Q8/Qwen combination finished every CLI/GUI check and twenty resource scenarios, with a 3,268,141,056-byte maximum. Retained the raw reports with their dirty-source flag intact and corrected the earlier clean-build wording. The runtime symlink explains the flag; it is not erased or excused into a release certification.
+- Independently retrieved all five clean Linux Studio resource reports from workflow `43003987676` at `31d32ae`. All twenty scenarios passed with a 3,255,017,472-byte maximum. Retained exact report/model/binary/source identities. The workflow's Windows launch failure remains the reason this pair cannot be released.
+- Iteration 41's final eight focused preparation/PE checks and Ruff passed before commit. Its new dual-model Studio CI run is in progress; the failed previous Windows launch is not counted as passed.

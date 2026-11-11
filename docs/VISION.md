@@ -62,6 +62,8 @@ On the bilingual example, this quantized model transcribed all visible Arabic an
 
 All four clean `423a1b3` CPU source resource workloads subsequently passed. The largest observed tree RSS was **3.45 GB** in the repeated 16 MP GUI case, which completed four recognitions in 178 seconds. Each recognition used the pack's bounded preview/encoder input. [Complete source report](benchmarks/linux-qwen3-cpu.json). The earlier fixed-deadline run remains [recorded as failed](benchmarks/linux-qwen3-cpu-first.json). The passing source result does not include a complete Studio onefile launcher, nor prove a universal 4 GB ceiling.
 
+The complete Linux Studio multimodal executable at clean `31d32ae` subsequently passed all twenty packaged resource workloads across neural, Fast, Precision, SmolVLM Q8 and Qwen3. Qwen's largest observed complete-tree peak was **3.255 GB**, including cold launch/extraction and the native GUI ([packaged Qwen report](benchmarks/ci-linux-packaged-studio-multimodal-vision-qwen3-vl-2b-q4.json)). Its matched Windows build failed before launch with WinError 193, so this combination was not released as a verified platform pair. The compact Q4 SmolVLM composition is a subsequent build and requires its own measurements.
+
 ## Building a compatible CUDA runner
 
 For a Linux driver that cannot run newer upstream PTX, an optional developer tool builds pinned llama.cpp with native kernels and NVIDIA's checksum-verified CUDA 12.4 redistributables:
