@@ -94,6 +94,14 @@ def collect_windows() -> Path:
         raise RuntimeError("Install Tesseract first: choco install tesseract -y")
     for path in [source, *source.parent.glob("*.dll")]:
         shutil.copy2(path, RUNTIME / "bin" / path.name)
+    from scripts.windows_utf8 import enable_utf8_paths
+    manifests = enable_utf8_paths(RUNTIME / "bin" / "tesseract.exe")
+    for index, manifest in enumerate(manifests):
+        (RUNTIME / "notices" / f"tesseract-utf8-manifest-{index}.xml").write_bytes(manifest)
+    (RUNTIME / "notices" / "tesseract-ocready-modification.txt").write_text(
+        "OCReady modifies only its private copied tesseract.exe manifest to request the Windows UTF-8 process code page.\n"
+        "The installed Tesseract executable is unchanged. Other resource entries and existing manifest settings are retained.\n"
+        "Requires Windows 10 version 1903 or newer; OCReady targets Windows 11.\n", encoding="utf-8")
     for pattern in ("LICENSE*", "COPYING*", "AUTHORS*", "*copyright*"):
         for path in source.parent.glob(pattern):
             if path.is_file():

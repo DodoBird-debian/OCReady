@@ -1,0 +1,198 @@
+{
+  "sample_interval_ms": 10,
+  "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
+  "platform": "win32",
+  "python": "3.12.10",
+  "cpu_count": 4,
+  "binary": true,
+  "scenarios": [
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "sample",
+      "peak_rss_bytes": 437063680,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 25.219,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 4.937000000000012,
+        "peak_rss": 214118400,
+        "engine": "neural:ppocr-v5-arabic",
+        "backend": "CPU",
+        "containment": "windows-job",
+        "worker_limit": 944214016,
+        "worker_peak": 264970240,
+        "words": 6
+      },
+      "error": "",
+      "timeout_seconds": 390,
+      "timed_out": false
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "dark",
+      "peak_rss_bytes": 437096448,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 40.25,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 18.139999999999986,
+        "peak_rss": 240328704,
+        "engine": "neural:ppocr-v5-arabic",
+        "backend": "CPU",
+        "containment": "windows-job",
+        "worker_limit": 944857088,
+        "worker_peak": 265773056,
+        "words": 6
+      },
+      "error": "",
+      "timeout_seconds": 390,
+      "timed_out": false
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "max-pixels",
+      "peak_rss_bytes": 436649984,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 32.641,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 8.890999999999963,
+        "peak_rss": 273616896,
+        "engine": "neural:ppocr-v5-arabic",
+        "backend": "CPU",
+        "containment": "windows-job",
+        "worker_limit": 916344832,
+        "worker_peak": 281501696,
+        "words": 60
+      },
+      "error": "",
+      "timeout_seconds": 390,
+      "timed_out": false
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "gui-onefile",
+      "peak_rss_bytes": 437051392,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 32.063,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 9.327999999999975,
+        "peak_rss": 408399872,
+        "engine": "neural:ppocr-v5-arabic",
+        "backend": "CPU",
+        "containment": "windows-job",
+        "worker_limit": 794800128,
+        "worker_peak": 282710016,
+        "words": 60,
+        "qt_platform": "windows",
+        "clipboard_copy_verified": true,
+        "source_selection_verified": true,
+        "deadline_seconds": 270
+      },
+      "error": "",
+      "timeout_seconds": 390,
+      "timed_out": false
+    }
+  ],
+  "execution_environment": {
+    "policy": "isolated-runtime-v1",
+    "path_scope": "OS system directories",
+    "unicode_runtime_temp": true,
+    "private_configuration": true,
+    "development_overrides_removed": true,
+    "gui_platform": "windows"
+  },
+  "source": {
+    "revision": "a1e4441b3496232f030839d4d67ee60ec3e2d9cd",
+    "dirty": false,
+    "tree_sha256": "3b5b89cb2f686b350dfcd9a47ffceda1cac419223135dbe23d20b466c964917c"
+  },
+  "sources_changed_during_run": false,
+  "binary_sha256": "21a809c671d2af113d37cb1b6ba6279b919293fd772adac8b0437e5aa6154ea6",
+  "binary_changed_during_run": false,
+  "build_profile": {
+    "edition": "everyday",
+    "available_editions": [
+      "everyday"
+    ],
+    "methods": [
+      "neural",
+      "tesseract-fast",
+      "tesseract-best",
+      "vision"
+    ],
+    "platform": "Windows-2025Server-10.0.26100-SP0",
+    "python": "3.12.10",
+    "embedded_models": [
+      {
+        "id": "smolvlm-256m-q4-json",
+        "name": "SmolVLM 256M Q4 · English (experimental)",
+        "source": "https://huggingface.co/ggml-org/SmolVLM-256M-Instruct-GGUF",
+        "license": "Apache-2.0",
+        "languages": "eng",
+        "adapter": "json-cli-v1",
+        "model_sha256": "0574eaffbb56eea1b7eaddd6ed61e0b93ad5832fe3e939d272747faac94f4277",
+        "projector_sha256": "7e943f7c53f0382a6fc41b6ee0c2def63ba4fded9ab8ed039cc9e2ab905e0edd"
+      }
+    ],
+    "default_model": "smolvlm-256m-q4-json",
+    "embedded_neural": [
+      {
+        "id": "ppocr-v5-arabic",
+        "name": "Arabic + English",
+        "source": "https://huggingface.co/PaddlePaddle/arabic_PP-OCRv5_mobile_rec_onnx",
+        "license": "Apache-2.0",
+        "languages": "ara+eng",
+        "geometry": "line",
+        "detector_sha256": "a431985659dc921974177a95adcfbb90fd9e51989a5e04d70d0b75f597b6e61d",
+        "recognizer_sha256": "799113ebf267fbe742deb99eb36e8d42c9ddc5291ceacf92add41b4d52a59110",
+        "dictionary_sha256": "7f92f7dbb9b75a4787a83bfb4f6d14a8ab515525130c9d40a9036f61cf6999e9"
+      }
+    ],
+    "default_neural": "ppocr-v5-arabic",
+    "variant": "multimodal-json",
+    "runtime_bundle_sha256": "5a313fc41d716ae32edf354460dc784d9a21b4cd3ad9d8fe7b26c2139151569f",
+    "source": {
+      "revision": "a1e4441b3496232f030839d4d67ee60ec3e2d9cd",
+      "dirty": false,
+      "tree_sha256": "3b5b89cb2f686b350dfcd9a47ffceda1cac419223135dbe23d20b466c964917c"
+    },
+    "built_at_utc": "2026-11-11T15:15:10.450082+00:00",
+    "dependencies": {
+      "Nuitka": "4.3.5",
+      "Pillow": "12.3.0",
+      "psutil": "7.2.2",
+      "PySide6-Essentials": "6.8.3"
+    },
+    "onefile_compression": {
+      "policy": "Nuitka low-memory",
+      "level": 3,
+      "compiler_version": "4.3.5"
+    },
+    "memory_certification": "Uncertified; see docs/PROGRESS.md and benchmark evidence",
+    "validation_policy": {
+      "portable_runtime_environment": 1,
+      "native_gui_backend": true,
+      "unicode_paths": true
+    },
+    "payload_memory": {
+      "enabled": true,
+      "nuitka": "4.3.5",
+      "strategy": "drop-unused-launcher-pages-v1",
+      "original_bootstrap_sha256": "73e5da1368005fa1d8ac82c62269095bb26cf231604f260409533a8fb21eb827",
+      "helper_sha256": "eba94369550127fd2a5a43070420df2d041e5691f623b3895401f6dce67a3643",
+      "patched_bootstrap_sha256": "8460dcfb5676b9bd1cc74a06dfa369df1c67b1d12e7eb9b3fdd7e48751855364"
+    }
+  },
+  "requested_method": "neural",
+  "requested_pack_id": "ppocr-v5-arabic"
+}

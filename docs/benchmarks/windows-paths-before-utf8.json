@@ -1,0 +1,38 @@
+{
+  "source": {
+    "revision": "a671ae07ded047a59a0b3f71b62fcd60634f7409",
+    "dirty": false,
+    "tree_sha256": "fa6da574de6ace40c225a12fa4d07a0eab10222f689400ebab6d5678784b9155"
+  },
+  "platform": "win32",
+  "windows_ansi_code_page": 1252,
+  "probe": "source-worker-paths-v1",
+  "cases": [
+    {
+      "case": "ascii",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "engine": "tesseract-fast",
+      "bilingual_text_verified": true
+    },
+    {
+      "case": "arabic-temp",
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "OCReady: OCR engine failed: Error, cannot read input file C:\\Users\\runneradmin\\AppData\\Local\\Temp\\ocready-path-probe-63jz6p7p\\arabic-temp\\????\\ocready-ocr-mg0flaj_\\image.png: Invalid argument\r\r\nError during processing.\r\n"
+    },
+    {
+      "case": "arabic-runtime",
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "OCReady: OCR engine failed: Error opening data file C:\\Users\\runneradmin\\AppData\\Local\\Temp\\ocready-path-probe-63jz6p7p\\????-???????\\tessdata\\fast/ara.traineddata\r\r\nPlease make sure the TESSDATA_PREFIX environment variable is set to your \"tessdata\" directory.\r\r\nFailed loading language 'ara'\r\r\nError opening data file C:\\Users\\runneradmin\\AppData\\Local\\Temp\\ocready-path-probe-63jz6p7p\\????-???????\\tessdata\\fast/eng.traineddata\r\r\nPlease make sure the TESSDATA_PREFIX environment variable is set to your \"tessdata\" directory.\r\r\nFailed loading language 'eng'\r\r\nTesseract couldn't load any languages!\r\r\nCould not initialize tesseract.\r\n"
+    },
+    {
+      "case": "arabic-both",
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "OCReady: OCR engine failed: Error opening data file C:\\Users\\runneradmin\\AppData\\Local\\Temp\\ocready-path-probe-63jz6p7p\\????-???????\\tessdata\\fast/ara.traineddata\r\r\nPlease make sure the TESSDATA_PREFIX environment variable is set to your \"tessdata\" directory.\r\r\nFailed loading language 'ara'\r\r\nError opening data file C:\\Users\\runneradmin\\AppData\\Local\\Temp\\ocready-path-probe-63jz6p7p\\????-???????\\tessdata\\fast/eng.traineddata\r\r\nPlease make sure the TESSDATA_PREFIX environment variable is set to your \"tessdata\" directory.\r\r\nFailed loading language 'eng'\r\r\nTesseract couldn't load any languages!\r\r\nCould not initialize tesseract.\r\n"
+    }
+  ]
+}
