@@ -476,3 +476,9 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Invalid launch windows are disposed without saving partially applied preferences. Regression coverage verifies unchanged configuration bytes after a selected English model rejects an Arabic launch request.
 - Both external model families were exercised without installation. A real native-Qt source OCR workflow read an inverted, rotated Arabic-named image with the requested cleanup, retained Arabic/English text and source links, and reset cleanly. A separate offscreen GUI smoke verified real located selection and Qt clipboard copying; its screenshot was visually reviewed. This is source/offscreen evidence, not a new packaged/native-platform certification.
 - All 242 tests and Ruff passed. Iteration 53's exact-source default, JSON Everyday and Studio platform builds remain active independently; no running build checkout was changed.
+
+## Iteration 55 — prevent loader checks borrowing developer libraries
+
+- Tightened the Linux X11 loader preflight to remove developer `LD_LIBRARY_PATH` / `LD_PRELOAD` overrides and force stable C-locale diagnostics. A desktop language or developer library directory must not conceal an unresolved packaged dependency.
+- Extended the actual shared-library regression by moving its dependency into a developer-only directory, putting that directory on `LD_LIBRARY_PATH` and requesting an Arabic locale. The preflight still rejects the unresolved deployment dependency and retains its exact name. The focused native test and Ruff passed; application behavior is unchanged.
+- Added local private-X11 validation to the next verification step: download/extract Xvfb into the ignored diagnostic directory without installing system packages or interacting with the user's desktop. Native-window results remain pending at this clean checkpoint.

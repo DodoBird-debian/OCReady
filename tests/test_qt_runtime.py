@@ -9,7 +9,7 @@ from scripts.qt_runtime import inspect_x11, require_x11
 
 
 @pytest.mark.skipif(sys.platform != "linux" or not shutil.which("cc"), reason="Native Linux loader check")
-def test_loader_preflight_rejects_a_real_missing_shared_library(tmp_path):
+def test_loader_preflight_rejects_a_real_missing_shared_library(tmp_path, monkeypatch):
     library_source = tmp_path / "dependency.c"
     library_source.write_text("int dependency(void) { return 7; }\n")
     dependency = tmp_path / "libocready-test-dependency.so"
@@ -21,7 +21,12 @@ def test_loader_preflight_rejects_a_real_missing_shared_library(tmp_path):
     subprocess.run(["cc", "-shared", "-fPIC", str(plugin_source), "-o", str(plugin),
                     "-L" + str(tmp_path), "-locready-test-dependency", "-Wl,-rpath," + str(tmp_path)], check=True)
     assert inspect_x11(tmp_path)["passed"]
-    dependency.unlink()
+    # A developer-only search path must not hide a missing deployment library.
+    hidden = tmp_path / "developer-only"
+    hidden.mkdir()
+    dependency.rename(hidden / dependency.name)
+    monkeypatch.setenv("LD_LIBRARY_PATH", str(hidden))
+    monkeypatch.setenv("LC_ALL", "ar_IQ.UTF-8")
     output = tmp_path / "diagnostic.json"
     with pytest.raises(RuntimeError, match="libocready-test-dependency.so => not found"):
         require_x11(tmp_path, output=output)

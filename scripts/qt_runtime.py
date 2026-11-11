@@ -1,6 +1,7 @@
 """Fail early on unresolved Linux X11 plugin dependencies, without a display."""
 import argparse
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -14,7 +15,9 @@ def inspect_x11(directory: Path | None = None) -> dict:
         plugin = directory / "PySide6/qt-plugins/platforms/libqxcb.so"
     if not plugin.is_file():
         return {"plugin": str(plugin), "passed": False, "error": "X11 platform plugin is missing"}
-    completed = subprocess.run(["ldd", str(plugin.resolve())], capture_output=True, text=True, timeout=30)
+    env = {key: value for key, value in os.environ.items() if key not in {"LD_LIBRARY_PATH", "LD_PRELOAD"}}
+    env["LC_ALL"] = "C"
+    completed = subprocess.run(["ldd", str(plugin.resolve())], capture_output=True, text=True, timeout=30, env=env)
     output = completed.stdout + completed.stderr
     missing = sorted({line.strip().split()[0] for line in output.splitlines() if "=> not found" in line})
     return {"plugin": str(plugin), "passed": completed.returncode == 0 and not missing,

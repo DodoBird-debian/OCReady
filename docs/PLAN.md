@@ -1585,6 +1585,7 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M61.V2: Exercise report reading under an emulated Windows legacy default encoding.
 - M61.V3: Preserve failed tags and historical evidence; publish corrections under new identities.
 - M61.V4: Rerun every selected model/resource/native clipboard workflow after dependency corrections.
+- M61.V5: Remove developer loader overrides and normalize diagnostic locale so they cannot hide unresolved libraries.
 - Release gate: Resolved plugin dependencies and passing native-platform workflows, with edition downloads bound to their actual published revisions.
 
 ## M62 — explicit launch choices and session model imports
