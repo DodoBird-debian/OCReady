@@ -43,8 +43,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--pack-id", help="Select an installed vision/neural pack by ID, together with --method")
     parser.add_argument("--model-pack", type=Path, help="Local vision model JSON manifest")
     parser.add_argument("--neural-pack", type=Path, help="Local neural OCR JSON manifest")
-    parser.add_argument("--backend", choices=("auto", "cpu", "cuda"), default="auto")
-    parser.add_argument("--layout", choices=("auto", "block", "sparse"), default="auto")
+    parser.add_argument("--backend", choices=("auto", "cpu", "cuda"), help="Compute choice; GUI otherwise restores its saved choice")
+    parser.add_argument("--layout", choices=("auto", "block", "sparse"), help="Page layout; GUI otherwise restores its saved choice")
     output = parser.add_mutually_exclusive_group()
     output.add_argument("--json", action="store_true", help="Recognize and emit JSON without opening a window")
     output.add_argument("--text", action="store_true", help="Recognize and emit plain text without opening a window")
@@ -59,11 +59,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--ui-smoke-output", type=Path, help=argparse.SUPPRESS)
     args = parser.parse_args(argv)
     try:
-        method = args.method or profile["methods"][0]
+        method = args.method or ("vision" if args.model_pack else "neural" if args.neural_pack else profile["methods"][0])
+        if args.model_pack and (args.neural_pack or method != "vision") or args.neural_pack and method != "neural":
+            raise OCRError("Use one external pack with its matching vision or neural method.")
         if args.pack_id and (args.method not in {"vision", "neural"} or args.model_pack or args.neural_pack):
             raise OCRError("Use --pack-id with --method vision or neural, without an external pack path.")
         if method not in profile["methods"]:
             raise OCRError("This OCR method is not included in this build.")
+        from ocready.core.preprocess import Recipe
+        recipe = Recipe(invert=args.invert, grayscale=args.grayscale, autocontrast=args.autocontrast,
+                        threshold=args.threshold, rotation=args.rotate)
         if args.diagnostics:
             encoded = json.dumps(diagnostics(), ensure_ascii=False, indent=2)
         elif args.json or args.text:
@@ -71,11 +76,8 @@ def main(argv: list[str] | None = None) -> int:
                 parser.error("an image is required for headless recognition")
             from ocready.core.images import load_image
             from ocready.core.pipeline import Request, recognize_image
-            from ocready.core.preprocess import Recipe
             edition = edition_for(args.edition or profile["edition"])
             source = load_image(args.image, edition)
-            recipe = Recipe(invert=args.invert, grayscale=args.grayscale, autocontrast=args.autocontrast,
-                            threshold=args.threshold, rotation=args.rotate)
             from ocready.core.models import load_pack, load_packs
             pack = load_pack(args.model_pack) if args.model_pack else None
             if method == "vision" and not pack:
@@ -96,12 +98,17 @@ def main(argv: list[str] | None = None) -> int:
                     raise OCRError(f"No installed neural pack has ID {args.pack_id}.")
                 if neural_pack and not args.language:
                     language = neural_pack.languages
-            result, _ = recognize_image(source, Request(edition, language, method, args.layout,
-                                                        recipe, args.compare, pack, args.backend, neural_pack))
+            result, _ = recognize_image(source, Request(edition, language, method, args.layout or "auto",
+                                                        recipe, args.compare, pack, args.backend or "auto", neural_pack))
             encoded = json.dumps(result.to_dict(), ensure_ascii=False, indent=2) if args.json else result.text
         else:
-            from ocready.ui.app import run
-            return run(args.image, args.edition, smoke_output=args.ui_smoke_output, method=args.method, pack_id=args.pack_id)
+            if recipe != Recipe() and not args.image and not args.ui_smoke_output:
+                raise OCRError("Image cleanup launch options require an image path.")
+            from ocready.ui.app import LaunchOptions, run
+            options = LaunchOptions(args.language, args.backend, args.layout, args.model_pack, args.neural_pack, args.compare, recipe)
+            return run(args.image, args.edition, smoke_output=args.ui_smoke_output,
+                       method=method if args.method or args.model_pack or args.neural_pack else None,
+                       pack_id=args.pack_id, options=options)
         if args.output:
             args.output.write_text(encoded + "\n", encoding="utf-8")
         else:

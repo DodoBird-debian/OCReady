@@ -7,10 +7,11 @@ from PySide6.QtGui import QGuiApplication, QMouseEvent
 from PySide6.QtWidgets import QApplication
 
 from ocready.core.memory import tree_rss
+from ocready.core.preprocess import Recipe
 from ocready.core.timeouts import gui_workload_timeout_seconds
 
 
-def attach_smoke_run(app, window, image: str | None, output: Path) -> None:
+def attach_smoke_run(app, window, image: str | None, output: Path, *, recipe: Recipe | None = None) -> None:
     started = False
     deadline = gui_workload_timeout_seconds(str(window.method_combo.currentData()), backend=window.vision_backend,
                                            compare=window.compare_check.isChecked())
@@ -21,6 +22,8 @@ def attach_smoke_run(app, window, image: str | None, output: Path) -> None:
             window.open_path(image)
         else:
             window.load_example()
+        if recipe is not None and window.source is not None:
+            window.set_recipe(recipe)
         window.recognize()
         started = True
 

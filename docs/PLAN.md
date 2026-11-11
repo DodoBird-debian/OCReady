@@ -1586,3 +1586,19 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M61.V3: Preserve failed tags and historical evidence; publish corrections under new identities.
 - M61.V4: Rerun every selected model/resource/native clipboard workflow after dependency corrections.
 - Release gate: Resolved plugin dependencies and passing native-platform workflows, with edition downloads bound to their actual published revisions.
+
+## M62 — explicit launch choices and session model imports
+
+- Responsibility: Make command-line GUI launches reflect the requested workspace without erasing saved defaults accidentally.
+- M62.T1: Distinguish omitted language/backend/layout choices from explicit overrides.
+- M62.T2: Preserve existing headless defaults independently of remembered GUI choices.
+- M62.T3: Infer the matching method from a single external manifest and reject conflicting method/pack requests.
+- M62.T4: Load and validate explicit packs for the session without writing the model installation registry.
+- M62.T5: Reject a language unsupported by the selected pack before opening the workspace.
+- M62.T6: Apply image cleanup after successful image loading, synchronizing the recipe, controls and preview.
+- M62.T7: Keep reset/undoable cleanup behavior consistent for launch-time and interactive operations.
+- M62.T8: Dispose rejected launch windows without saving partially applied preferences.
+- M62.V1: Exercise Arabic filenames and an inverted/rotated image through actual GUI OCR and linked copying.
+- M62.V2: Verify both external model families resolve relative assets without installing them.
+- M62.V3: Preserve configuration bytes after an invalid model/language launch.
+- Release gate: Explicit GUI choices reach inference; omitted choices retain user preferences and invalid requests remain actionable.

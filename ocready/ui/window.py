@@ -523,13 +523,24 @@ class MainWindow(QMainWindow):
         self.preview_timer.start(140)
 
     def reset_recipe(self) -> None:
-        self.recipe = Recipe()
+        self.set_recipe(Recipe())
+
+    def set_recipe(self, recipe: Recipe) -> None:
+        """Keep controls and the immutable processing recipe in agreement."""
+        self.preview_timer.stop()
+        self.recipe = recipe
         self._loading_controls = True
-        for control in (self.invert, self.gray, self.auto_contrast, self.threshold):
-            control.setChecked(False)
-        self.crop_button.setChecked(False)
-        self.canvas.crop_mode = False
-        self._loading_controls = False
+        try:
+            self.invert.setChecked(recipe.invert)
+            self.gray.setChecked(recipe.grayscale)
+            self.auto_contrast.setChecked(recipe.autocontrast)
+            self.threshold.setChecked(recipe.threshold is not None)
+            if recipe.threshold is not None:
+                self.threshold_slider.setValue(recipe.threshold)
+            self.crop_button.setChecked(False)
+            self.canvas.crop_mode = False
+        finally:
+            self._loading_controls = False
         self.view_original.setChecked(False)
         self._apply_recipe()
 

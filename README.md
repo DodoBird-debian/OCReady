@@ -52,6 +52,8 @@ An additional [local neural OCR method](docs/NEURAL.md) uses PP-OCRv5 detection 
 
 Fresh default Everyday/Studio GUI sessions prefer Precision for bilingual text; curated model-rich variants prefer their bundled bilingual neural engine. Your method choice is remembered separately for each edition, along with the last available edition, layout, language, and compute backend. An explicit `--edition` overrides the saved GUI edition; headless defaults remain the build's default.
 
+Explicit launch options also configure the GUI: `--language eng --backend cpu --layout block` overrides those saved choices. Opening an image with `--invert`, `--grayscale`, `--autocontrast`, `--threshold` or `--rotate` shows that reversible cleanup in the workspace before recognition. An external `--model-pack` or `--neural-pack` selects its matching method for the session; use Settings to install it permanently. Unsupported language/model combinations report an error instead of silently changing the request.
+
 ## Compiling a single executable
 
 ```sh

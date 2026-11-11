@@ -217,6 +217,113 @@ def test_cli_pack_selection_never_silently_uses_another_model(window, monkeypatc
     assert main(["--method", "tesseract-fast", "--pack-id", "available"]) == 2
 
 
+def test_gui_entrypoint_forwards_only_explicit_launch_choices(window, monkeypatch):
+    from ocready.__main__ import main
+    calls = []
+    monkeypatch.setattr("ocready.ui.app.run", lambda *_args, **kwargs: calls.append(kwargs) or 0)
+    assert main([]) == 0
+    assert calls[-1]["options"].backend is None and calls[-1]["options"].layout is None
+    assert calls[-1]["method"] is None
+    assert main(["image.png", "--language", "eng", "--backend", "cpu", "--layout", "block",
+                 "--model-pack", "model.json", "--invert", "--rotate", "90", "--threshold", "120"]) == 0
+    options = calls[-1]["options"]
+    assert calls[-1]["method"] == "vision"
+    assert (options.language, options.backend, options.layout) == ("eng", "cpu", "block")
+    assert options.recipe == Recipe(invert=True, rotation=90, threshold=120)
+    assert options.model_pack == Path("model.json")
+    assert main(["--neural-pack", "neural.json"]) == 0
+    assert calls[-1]["method"] == "neural"
+    before = len(calls)
+    for arguments in (["--model-pack", "a", "--neural-pack", "b"],
+                      ["--method", "tesseract-fast", "--model-pack", "a"],
+                      ["--method", "vision", "--neural-pack", "a"], ["--invert"]):
+        assert main(arguments) == 2
+    assert len(calls) == before
+
+
+@pytest.mark.parametrize("kind", ["vision", "neural"])
+def test_gui_launch_imports_external_pack_without_installing_it(window, tmp_path, kind):
+    import json
+
+    from ocready.core.models import ModelPack
+    from ocready.core.neural_packs import NeuralPack
+    from ocready.core.paths import config_root
+    from ocready.core.types import OCRError
+    from ocready.ui.app import LaunchOptions, configure_launch
+
+    window.edition_combo.setCurrentIndex(window.edition_combo.findData("everyday"))
+    for name in ("runner", "model", "projector", "detector", "recognizer", "dictionary"):
+        (tmp_path / name).write_bytes(b"GGUF\n")
+    if kind == "vision":
+        pack = ModelPack("session", "Session English", "runner", "model", "projector", languages="eng", memory_mb=500)
+    else:
+        pack = NeuralPack("session", "Session English", "runner", "detector", "recognizer", "dictionary", languages="eng")
+    manifest = tmp_path / "session.json"
+    manifest.write_text(json.dumps(pack.to_dict()), encoding="utf-8")
+    options = LaunchOptions(language="eng", backend="cpu", layout="block", **{
+        "model_pack" if kind == "vision" else "neural_pack": manifest})
+    configure_launch(window, options, kind)
+    assert window.method_combo.currentData() == kind + ":session"
+    assert window.language_combo.currentData() == "eng"
+    assert window.layout_combo.currentData() == "block" and window.vision_backend == "cpu"
+    loaded = next(p for p in (window.packs if kind == "vision" else window.neural_packs) if p.id == "session")
+    assert loaded.runner == str((tmp_path / "runner").resolve())
+    assert not (config_root() / ("models.json" if kind == "vision" else "neural-models.json")).exists()
+    with pytest.raises(OCRError, match="unsupported"):
+        configure_launch(window, LaunchOptions(language="ara"), kind, "session")
+
+
+def test_gui_launch_cleanup_reaches_real_recognition_and_reset(window, app, tmp_path):
+    from PIL import ImageOps
+
+    from ocready.core.paths import resource_root
+    from ocready.ui.app import LaunchOptions, configure_launch, open_launch_image
+
+    if not readiness()[0]:
+        pytest.skip("Prepare OCR runtime for real launch workflow")
+    from PIL import Image
+    with Image.open(resource_root() / "assets/sample-bilingual.png") as original:
+        dark = ImageOps.invert(original.convert("RGB")).transpose(Image.Transpose.ROTATE_180)
+    image = tmp_path / "لقطة.png"
+    dark.save(image)
+    recipe = Recipe(invert=True, grayscale=True, autocontrast=True, rotation=180)
+    configure_launch(window, LaunchOptions(language="ara+eng", backend="cpu", layout="sparse"), "tesseract-fast")
+    open_launch_image(window, str(image), recipe)
+    assert window.recipe == recipe and window.invert.isChecked() and window.gray.isChecked()
+    assert window.auto_contrast.isChecked() and window.cleanup_button.isChecked()
+    window.recognize()
+    assert window.worker.request.recipe == recipe
+    until = time.monotonic() + 10
+    while window.worker and time.monotonic() < until:
+        app.processEvents()
+        time.sleep(.01)
+    assert window.result and "مرحبا بالعالم" in window.result.text
+    assert "screenshots" in window.editor.toPlainText()
+    assert window.editor.linked
+    window.reset_recipe()
+    assert window.recipe == Recipe() and not window.invert.isChecked() and not window.gray.isChecked()
+    assert not window.editor.linked and window.result is None
+
+
+def test_rejected_gui_launch_does_not_overwrite_saved_preferences(window, app, monkeypatch):
+    from ocready.core.models import ModelPack
+    from ocready.core.paths import config_root
+    from ocready.core.settings import save_settings
+    from ocready.core.types import OCRError
+    from ocready.ui.app import LaunchOptions, run
+
+    save_settings({"edition": "studio", "language": "ara", "vision_backend": "cuda", "layout": "block"})
+    settings = config_root() / "settings.json"
+    before = settings.read_bytes()
+    pack = ModelPack("english", "English", "runner", "model", "projector", languages="eng", memory_mb=500)
+    monkeypatch.setattr("ocready.ui.window.load_packs", lambda: [pack])
+    with pytest.raises(OCRError, match="unsupported"):
+        run(edition="everyday", method="vision", pack_id="english", options=LaunchOptions(language="ara"))
+    QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
+    app.processEvents()
+    assert settings.read_bytes() == before
+
+
 def test_clicking_arabic_source_word_copies_logical_text(recognized, app):
     window = recognized
     index = next(i for i, word in enumerate(window.result.words) if word.text == "مرحبا")
