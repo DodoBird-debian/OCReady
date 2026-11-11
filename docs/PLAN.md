@@ -1507,3 +1507,22 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M56.V4: Exercise every embedded model using CLI, native GUI and complete-process memory workloads.
 - M56.V5: Reject release pairs with matching model IDs but differing weights, dictionaries or runtime adapters.
 - Release gate: Both native launchers work, every requested choice is retained and paired platform evidence identifies the same model assets.
+
+## M57 — repeat-launch runtime caching
+
+- Responsibility: Reduce repeated unpacking without compromising portable single-executable startup or concurrent launches.
+- M57.T1: Measure compiler-level temporary/cached extraction with identical synthetic assets before changing application defaults.
+- M57.T2: Separate wall-clock startup, recognition time, resident memory and disk-cache footprint.
+- M57.T3: Use supported cached archive controls and retain the compiler's existing file checksums.
+- M57.T4: Derive per-user cache namespaces from complete build/runtime identities.
+- M57.T5: Coordinate native first extraction and application runtime extraction across processes.
+- M57.T6: Stage atomically and recover interrupted/partially corrupt caches.
+- M57.T7: Retain Windows DLL/executable locking semantics during repair and cleanup.
+- M57.T8: Keep user documents, clipboard data and OCR outputs out of cached application assets.
+- M57.T9: Bound cache generations and disk use; expose clearing with clear busy-state feedback.
+- M57.V1: Verify cold and repeated warm starts using full payload hashes.
+- M57.V2: Repair a changed cached byte and detect missing/truncated files.
+- M57.V3: Run simultaneous first launches and repeated launches while another window is open.
+- M57.V4: Exercise interrupted extraction and locked-file repair on both operating systems.
+- M57.V5: Re-measure complete binaries, including every model and RAM workload.
+- Release gate: Real cold/warm/concurrent/repair evidence and safe cache lifecycle on Linux and Windows.

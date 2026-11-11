@@ -393,3 +393,10 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Reset stale hover indices when replacing image/word geometry, preventing a hover from a previous view/result being painted over unrelated text.
 - Extended the real rotated Arabic source-click test and added text-driven word/line selection cases. All three cases failed before the fix and passed afterward; the complete 217-test suite and Ruff passed.
 - Reviewed the native workspace at 960 × 700 with cleanup open; the split view and primary copy/recognition controls remained usable. Startup caching remains research: the supported compiler cache has per-file checksums, but first-run concurrency and interrupted runtime extraction require explicit engineering before enabling it for users.
+
+## Iteration 45 — isolate startup-cache experiments
+
+- Added a reproducible, disposable native probe for supported compiler temporary streaming versus cached archive extraction, with an identical incompressible payload, full SHA256 verification, cold/warm wall times, changed-byte repair and simultaneous cold-launch pairs. Reports preserve binary, asset, source/compiler and trim-overlay identities.
+- Kept caching out of application defaults. Reviewed pinned compiler code and official guidance: cached archive entries can skip decompression after checksum validation, but there is no first-extraction inter-process serialization. OCReady's current runtime extraction also needs additional process coordination before sharing a persistent directory.
+- Added a modular implementation/release gate covering build identities, private storage, atomic stages, interruption/repair, Windows locks, document separation, bounded disk lifecycle and full platform/RAM validation. Documented existing observed startup/recognition times without calling their difference a pure extraction measurement.
+- Probe CLI and Ruff passed. Actual native measurements follow this clean checkpoint; no performance improvement or cache safety is claimed from implementing a benchmark wrapper.
