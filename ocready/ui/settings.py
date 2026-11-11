@@ -25,6 +25,7 @@ from PySide6.QtWidgets import (
 
 from ocready.__main__ import diagnostics
 from ocready.core.models import TRANSCRIPTION_PROMPT, ModelPack, load_pack, load_packs, save_packs
+from ocready.engines.vision_adapters import ADAPTERS
 from ocready.ui.neural_settings import NeuralSettings
 
 
@@ -55,7 +56,7 @@ class SettingsDialog(QDialog):
         tabs.addTab(runtime, "Offline OCR & diagnostics")
         models = QWidget()
         layout = QVBoxLayout(models)
-        intro = QLabel("Add a local vision model for difficult images. Everyday admits compact packs; Studio admits larger ones.\nSelect a llama-mtmd-cli runner, GGUF model, and matching vision projector. Nothing is uploaded.")
+        intro = QLabel("Add or swap local vision models. Everyday admits compact packs; Studio admits larger ones.\nChoose the runner's runtime and compatible model files. llama.cpp uses GGUF weights and a matching projector. Nothing is uploaded.")
         intro.setWordWrap(True)
         layout.addWidget(intro)
         row = QHBoxLayout()
@@ -74,9 +75,15 @@ class SettingsDialog(QDialog):
         self.name = QLineEdit()
         self.name.setPlaceholderText("e.g. GLM-OCR · local")
         form.addRow("Display name", self.name)
+        self.adapter = QComboBox()
+        self.adapter.setAccessibleName("Vision inference runtime")
+        for adapter in ADAPTERS.values():
+            self.adapter.addItem(adapter.name, adapter.id)
+        self.adapter.setToolTip("Match the runner's interface. Existing GGUF packs use llama.cpp. Custom offline workers can implement OCReady JSON v1.")
+        form.addRow("Inference runtime", self.adapter)
         self.fields = {}
         self.browse_buttons = {}
-        for key, title in (("runner", "CPU runner"), ("model", "Model GGUF"), ("projector", "Vision projector"), ("cuda_runner", "CUDA runner (optional)")):
+        for key, title in (("runner", "CPU runner"), ("model", "Model file"), ("projector", "Vision projector"), ("cuda_runner", "CUDA runner (optional)")):
             row = QHBoxLayout()
             field = QLineEdit()
             field.setAccessibleName(title)
@@ -182,6 +189,9 @@ class SettingsDialog(QDialog):
         self.pixels.setValue(1000)
         self.edge.setValue(1600)
         self.prompt.setPlainText(TRANSCRIPTION_PROMPT)
+        self.adapter.setEnabled(True)
+        self.adapter.setCurrentIndex(self.adapter.findData("llama.cpp"))
+        self.languages.setCurrentIndex(0)
 
     def select_pack(self, row: int) -> None:
         if row < 0 or row >= len(self.packs):
@@ -189,6 +199,8 @@ class SettingsDialog(QDialog):
         pack = self.packs[row]
         self.pack_id = pack.id
         self.name.setText(pack.name)
+        self.adapter.setCurrentIndex(self.adapter.findData(pack.adapter))
+        self.adapter.setEnabled(not pack.bundled)
         for key, field in self.fields.items():
             field.setText(getattr(pack, key))
             field.setReadOnly(pack.bundled)
@@ -202,7 +214,7 @@ class SettingsDialog(QDialog):
         self.languages.setCurrentIndex(self.languages.findData(pack.languages))
 
     def browse(self, key: str) -> None:
-        file_filter = "GGUF models (*.gguf);;All files (*)" if key in {"model", "projector"} else "All files (*)"
+        file_filter = "GGUF models (*.gguf);;All files (*)" if key in {"model", "projector"} and self.adapter.currentData() == "llama.cpp" else "All files (*)"
         path, _ = QFileDialog.getOpenFileName(self, "Choose a local file", self.fields[key].text(), file_filter)
         if path:
             self.fields[key].setText(path)
@@ -214,7 +226,7 @@ class SettingsDialog(QDialog):
             pack = dataclasses.replace(base, name=self.name.text().strip(),
                                        **{key: str(Path(field.text()).expanduser().resolve()) if field.text().strip() else "" for key, field in self.fields.items()},
                                        memory_mb=self.memory.value(), tokens=self.tokens.value(), prompt=self.prompt.toPlainText(),
-                                       languages=self.languages.currentData())
+                                       languages=self.languages.currentData(), adapter=self.adapter.currentData())
             pack = dataclasses.replace(pack, max_pixels=self.pixels.value() * 1000, max_edge=self.edge.value())
             pack.validate()
             self._persist([p for p in self.packs if p.id != pack.id] + [pack])

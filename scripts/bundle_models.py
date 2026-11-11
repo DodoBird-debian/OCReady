@@ -22,8 +22,10 @@ def bundle_pack(archive: tarfile.TarFile, pack: ModelPack) -> dict:
     prefix = Path("vision") / pack.id
     values = pack.to_dict()
     for key in ("model", "projector"):
+        if not getattr(pack, key):
+            continue
         source = Path(getattr(pack, key)).expanduser().resolve()
-        name = key + ".gguf"
+        name = key + (".gguf" if pack.adapter == "llama.cpp" else source.suffix or ".bin")
         archive.add(source, arcname=(prefix / name).as_posix(), recursive=False)
         values[key] = name
     for key in ("runner", "cuda_runner"):
@@ -57,8 +59,8 @@ def bundle_pack(archive: tarfile.TarFile, pack: ModelPack) -> dict:
     info.size, info.mode = len(blob), 0o644
     archive.addfile(info, io.BytesIO(blob))
     return {"id": pack.id, "name": pack.name, "source": pack.source, "license": pack.license,
-            "languages": pack.languages, "model_sha256": file_digest(Path(pack.model)),
-            "projector_sha256": file_digest(Path(pack.projector))}
+            "languages": pack.languages, "adapter": pack.adapter, "model_sha256": file_digest(Path(pack.model)),
+            "projector_sha256": file_digest(Path(pack.projector)) if pack.projector else ""}
 
 
 def bundle_neural_pack(archive: tarfile.TarFile, pack: NeuralPack) -> dict:

@@ -46,6 +46,7 @@ class OCRResult:
     worker_peak: int = 0
     layout: str = ""
     geometry: str = "word"
+    runtime: str = ""
 
     @property
     def confidence(self) -> float | None:

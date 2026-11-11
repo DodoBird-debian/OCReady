@@ -35,6 +35,7 @@ class ModelPack:
     bundled: bool = False
     max_pixels: int = 1_000_000
     max_edge: int = 1600
+    adapter: str = "llama.cpp"
 
     def validate(self) -> None:
         if not re.fullmatch(r"[a-zA-Z0-9_-]{1,60}", self.id):
@@ -51,14 +52,16 @@ class ModelPack:
             raise OCRError("Set a nonempty transcription prompt shorter than 4000 characters.")
         if self.languages not in {"ara+eng", "ara", "eng"}:
             raise OCRError("Model languages must be ara+eng, ara, or eng.")
-        for name, value in (("CPU runner", self.runner), ("model", self.model), ("vision projector", self.projector)):
+        from ocready.engines.vision_adapters import get_adapter
+        adapter = get_adapter(self.adapter)
+        assets = [("CPU runner", self.runner), ("model", self.model)]
+        if self.projector:
+            assets.append(("vision projector", self.projector))
+        for name, value in assets:
             path = Path(value).expanduser()
             if not value or not path.is_file():
                 raise OCRError(f"The {name} file does not exist. Choose it in Settings → Vision models.")
-            if name != "CPU runner":
-                with path.open("rb") as handle:
-                    if handle.read(4) != b"GGUF":
-                        raise OCRError(f"The {name} is not a GGUF file.")
+        adapter.validate_model(self)
         if self.cuda_runner and not Path(self.cuda_runner).expanduser().is_file():
             raise OCRError("The configured CUDA runner does not exist.")
 
@@ -79,7 +82,7 @@ class ModelPack:
         try:
             pack = cls(**{key: value for key, value in data.items() if key in allowed})
             if not all(isinstance(getattr(pack, field), str) for field in
-                       ("id", "name", "runner", "model", "projector", "cuda_runner", "prompt", "source", "license", "languages")):
+                       ("id", "name", "runner", "model", "projector", "cuda_runner", "prompt", "source", "license", "languages", "adapter")):
                 raise ValueError("paths and names must be strings")
             if any(type(getattr(pack, key)) is not int for key in ("memory_mb", "tokens", "max_pixels", "max_edge")):
                 raise ValueError("memory, token and image limits must be integers")
@@ -87,6 +90,8 @@ class ModelPack:
                 raise ValueError("vision image limits are out of range")
             if type(pack.bundled) is not bool:
                 raise ValueError("bundled must be a boolean")
+            from ocready.engines.vision_adapters import get_adapter
+            get_adapter(pack.adapter)
             return pack
         except (TypeError, ValueError) as exc:
             raise OCRError(f"Invalid model manifest: {exc}") from exc

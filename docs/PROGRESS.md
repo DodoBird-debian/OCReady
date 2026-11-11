@@ -308,3 +308,12 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Reran Qwen CPU source workloads from clean `423a1b3` after scaling the sequential benchmark deadline. All four passed; the repeated 16 MP GUI completed four 43–45 second recognitions in 178 seconds, with 3.45 GB peak tree RSS. The failed earlier deadline-limited report is retained.
 - Interrupted work was explicitly restarted after the user resumed early; the scheduled later restart was disabled. The canceled combined Actions run remains canceled rather than being counted as passed.
 - The release-gate change passed all 158 tests and Ruff before integration. Complete Studio onefile measurements and the new runtime-adapter architecture remain active work.
+
+## Iteration 34 — interchangeable vision runtime adapters
+
+- Extracted a fixed adapter registry and protocol for model validation, commands, capability probing, environments and response decoding. The pipeline/UI continue using shared orchestration for admission, containment, cancellation and selective CPU retry. Manifests cannot name arbitrary Python imports.
+- Preserved llama.cpp as the default for all old packs. Added an offline JSON v1 worker adapter with strict schema, Unicode text, input dimensions and actual CPU/CUDA reporting; its model format is worker-owned and its projector can be optional.
+- Added native runtime selection for external packs, immutable bundled runtime identity, format-preserving embedding, adapter provenance/diagnostics and result runtime identity. Documented the worker contract and backward-compatible pack format.
+- All 174 tests and Ruff passed, including malformed protocol rejection, missing/unknown adapters, exact-image validation, CPU-only enforcement, fallback reporting, cancellation/budget exclusions, native settings swap and opaque-file embedding.
+- Replayed actual SmolVLM CPU and Qwen CUDA inference through the refactored default adapter. Both retained expected sample text and backend identity; Qwen preserved the full Arabic/English sample. The JSON interface is protocol-tested; a separately compiled real reference worker remains its next validation step.
+- A complete Studio binary with classical/neural OCR plus both SmolVLM and Qwen is compiling independently from clean `3d2adb7`; its packaged resource evidence remains pending.

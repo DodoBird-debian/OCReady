@@ -1,5 +1,7 @@
 # Local vision models
 
+Models and runners are interchangeable through a pack-based [runtime adapter layer](VISION-ADAPTERS.md). Existing GGUF packs remain compatible; an explicit local JSON-worker contract supports other runtime interfaces without changing the OCR pipeline.
+
 Offline Tesseract is the default for Arabic and English. Everyday and Studio can also use local vision-language models through `llama-mtmd-cli`, subject to their RAM admission checks. Model weights and the matching visual encoder/projector are separate GGUF files. A text-only language model cannot read an image.
 
 Open **Settings → Vision models** and select the CPU runner, model, and matching projector. Give it a name and a conservative total runner RAM estimate. Optionally select a separate CUDA-enabled runner; Auto also probes the CPU-runner path when it can support both backends. Choose an edition with enough RAM and select the saved model in the method list. Models run one at a time and unload when the subprocess exits. No source image is sent to an external service.

@@ -24,7 +24,7 @@ def diagnostics() -> dict:
         "fast_data": str(data_dir("fast") or "missing"),
         "best_data": str(data_dir("best") or "missing"),
         "ready": ready, "status": status, "methods": profile["methods"],
-        "vision_models": [{"id": p.id, "languages": p.languages, "bundled": p.bundled} for p in packs],
+        "vision_models": [{"id": p.id, "languages": p.languages, "bundled": p.bundled, "adapter": p.adapter} for p in packs],
         "neural_models": [{"id": p.id, "languages": p.languages, "bundled": p.bundled, "geometry": "line"} for p in neural_packs],
         "build_source": profile.get("source", {}),
         "memory_policy": "whole-tree RSS sampled every 40 ms, plus worker cgroup-v2 allocation limits on delegated Linux desktops or Job Object committed-memory limits on Windows; these counters are not identical to RSS",

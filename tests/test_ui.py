@@ -640,3 +640,23 @@ def test_model_image_limits_survive_settings_edits(window, tmp_path):
     assert window.packs[0].max_pixels == 750_000
     assert window.packs[0].max_edge == 1024
     dialog.close()
+
+
+def test_external_vision_runtime_can_be_swapped_in_native_settings(window, tmp_path):
+    from ocready.ui.settings import SettingsDialog
+    runner, model = tmp_path / "runner", tmp_path / "model.onnx"
+    runner.write_bytes(b"runner")
+    model.write_bytes(b"opaque model")
+    dialog = SettingsDialog(window)
+    dialog.new_pack()
+    dialog.name.setText("Custom offline vision")
+    dialog.adapter.setCurrentIndex(dialog.adapter.findData("json-cli-v1"))
+    dialog.fields["runner"].setText(str(runner))
+    dialog.fields["model"].setText(str(model))
+    dialog.fields["projector"].clear()
+    dialog.save_model()
+    pack = next(p for p in window.packs if p.name == "Custom offline vision")
+    assert pack.adapter == "json-cli-v1" and pack.projector == ""
+    dialog.select_pack(next(i for i, p in enumerate(dialog.packs) if p.id == pack.id))
+    assert dialog.adapter.currentData() == "json-cli-v1"
+    dialog.close()
