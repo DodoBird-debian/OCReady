@@ -1526,3 +1526,17 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M57.V4: Exercise interrupted extraction and locked-file repair on both operating systems.
 - M57.V5: Re-measure complete binaries, including every model and RAM workload.
 - Release gate: Real cold/warm/concurrent/repair evidence and safe cache lifecycle on Linux and Windows.
+
+## M58 — diagnostic deadlines and retained failure evidence
+
+- Responsibility: Test complete workflows within explicit bounds that cover legitimate engine operations.
+- M58.T1: Keep engine attempt/probe limits in one shared policy without relaxing the inference limits themselves.
+- M58.T2: Derive diagnostic envelopes from selected method, compute preference, retries and sequential GUI iterations.
+- M58.T3: Include explicit startup and GUI allowances while retaining finite outer deadlines.
+- M58.T4: Save deadline values, timeout status, sampled memory and errors even when a scenario fails.
+- M58.T5: Terminate owned launcher/descendant trees on diagnostic timeout or interruption.
+- M58.T6: Preserve failed artifacts alongside later successes; never infer a passing workflow from memory alone.
+- M58.V1: Reproduce premature GUI cancellation using the old policy and allow a legitimate longer job under the new policy.
+- M58.V2: Retain a timeout row rather than abandoning the benchmark report.
+- M58.V3: Verify real descendant cleanup and rerun all platform/model gates before publication.
+- Release gate: Every required scenario completes successfully with unchanged RAM and accuracy checks; historical failures remain visible.

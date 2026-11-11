@@ -75,7 +75,7 @@ No document content is uploaded. Vision inference is a local subprocess. Model i
 
 Budgets use decimal MB/GB. GPU VRAM is separate and must also be reported. Small-tier vision models require a measured complete inference footprint before admission. Arabic accuracy and Windows behavior are separate validation gates.
 
-See [measured memory workloads and limitations](docs/MEMORY.md). Updated Pocket executables at `31d32ae` passed all four packaged workloads on both CI platforms, peaking at 227 MB on Linux and 173 MB on Windows, including their launchers. All three Linux source editions passed their documented workloads; a separate 100-job Pocket source-GUI soak also passed. These measurements are not universal hard-memory certifications.
+See [measured memory workloads and limitations](docs/MEMORY.md). Branded Pocket executables at `8fa1f03` passed all four packaged workloads on both CI platforms, peaking at 228 MB on Linux and 175 MB on Windows, including their launchers. Studio's two-LLM composition also passed twenty scenarios per platform at clean `25c7477`, with 3.255 GB Linux and 3.138 GB Windows maxima. A subsequent Studio release attempt exposed a diagnostic deadline mismatch; corrected verification remains required before publication. These measurements are not universal hard-memory certifications.
 
 The [accuracy corpus and evaluator](docs/ACCURACY.md) track character/word errors across Arabic and English styles, including difficult cases. Passing resource tests is separate from transcription accuracy.
 

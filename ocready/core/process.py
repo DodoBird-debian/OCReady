@@ -6,6 +6,7 @@ from pathlib import Path
 
 from ocready.core.containment import start_worker
 from ocready.core.memory import stop_tree, tree_rss
+from ocready.core.timeouts import PROCESS_TIMEOUT_SECONDS
 from ocready.core.types import BudgetExceeded, Cancelled, OCRError
 
 MAX_OUTPUT = 8_000_000
@@ -24,7 +25,7 @@ class ProcessResult:
 
 def run_process(
     command: list[str], *, budget: int, cancel: threading.Event | None = None,
-    timeout: float = 120, env: dict[str, str] | None = None,
+    timeout: float = PROCESS_TIMEOUT_SECONDS, env: dict[str, str] | None = None,
     cwd: Path | None = None,
 ) -> ProcessResult:
     cancel = cancel or threading.Event()

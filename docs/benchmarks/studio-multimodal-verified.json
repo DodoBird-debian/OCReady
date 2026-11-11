@@ -1,0 +1,67 @@
+{
+  "source_revision": "25c7477e37a0b73b50f5e3428792109f11623761",
+  "workflow_run_id": 43007639337,
+  "edition": "studio",
+  "variant": "multimodal",
+  "verification_scope": "Metadata and reports retrieved from the successful CI run; executables were checked by CI, not downloaded for this index. JSON values are preserved; repository line endings use LF.",
+  "artifacts": [
+    {
+      "platform": "Linux",
+      "binary_sha256": "4cf9973cb0b5f52ebbfd0d1da7dc295267124551224d47f4dd286b2208ca517b",
+      "filename": "OCReady-studio-multimodal-linux-x86_64",
+      "peak_rss_bytes": 3254996992,
+      "passed_scenarios": 20,
+      "embedded_models": [
+        {
+          "id": "smolvlm-256m-q4",
+          "name": "SmolVLM 256M Q4 · English (experimental)",
+          "source": "https://huggingface.co/ggml-org/SmolVLM-256M-Instruct-GGUF",
+          "license": "Apache-2.0",
+          "languages": "eng",
+          "adapter": "llama.cpp",
+          "model_sha256": "0574eaffbb56eea1b7eaddd6ed61e0b93ad5832fe3e939d272747faac94f4277",
+          "projector_sha256": "7e943f7c53f0382a6fc41b6ee0c2def63ba4fded9ab8ed039cc9e2ab905e0edd"
+        },
+        {
+          "id": "qwen3-vl-2b-q4",
+          "name": "Qwen3-VL 2B (experimental)",
+          "source": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct-GGUF",
+          "license": "Apache-2.0",
+          "languages": "ara+eng",
+          "adapter": "llama.cpp",
+          "model_sha256": "089d75c52f4b7ffc56ba998ffc50aae89fcafc755f9e7208aacca281dca6c2ae",
+          "projector_sha256": "f9a68fabba69c3b81e153367b2c7521030b0fa8bb0de400c9599c8e6725f9c82"
+        }
+      ]
+    },
+    {
+      "platform": "Windows",
+      "binary_sha256": "fdc1973fb4316888221cfec0bc077906552f9f71489c96e6f9d7acec735a5914",
+      "filename": "OCReady-studio-multimodal-windows-amd64.exe",
+      "peak_rss_bytes": 3138465792,
+      "passed_scenarios": 20,
+      "embedded_models": [
+        {
+          "id": "smolvlm-256m-q4",
+          "name": "SmolVLM 256M Q4 · English (experimental)",
+          "source": "https://huggingface.co/ggml-org/SmolVLM-256M-Instruct-GGUF",
+          "license": "Apache-2.0",
+          "languages": "eng",
+          "adapter": "llama.cpp",
+          "model_sha256": "0574eaffbb56eea1b7eaddd6ed61e0b93ad5832fe3e939d272747faac94f4277",
+          "projector_sha256": "7e943f7c53f0382a6fc41b6ee0c2def63ba4fded9ab8ed039cc9e2ab905e0edd"
+        },
+        {
+          "id": "qwen3-vl-2b-q4",
+          "name": "Qwen3-VL 2B (experimental)",
+          "source": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct-GGUF",
+          "license": "Apache-2.0",
+          "languages": "ara+eng",
+          "adapter": "llama.cpp",
+          "model_sha256": "089d75c52f4b7ffc56ba998ffc50aae89fcafc755f9e7208aacca281dca6c2ae",
+          "projector_sha256": "f9a68fabba69c3b81e153367b2c7521030b0fa8bb0de400c9599c8e6725f9c82"
+        }
+      ]
+    }
+  ]
+}

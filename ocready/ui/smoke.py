@@ -5,10 +5,13 @@ from pathlib import Path
 from PySide6.QtCore import QTimer
 
 from ocready.core.memory import tree_rss
+from ocready.core.timeouts import gui_workload_timeout_seconds
 
 
 def attach_smoke_run(app, window, image: str | None, output: Path) -> None:
     started = False
+    deadline = gui_workload_timeout_seconds(str(window.method_combo.currentData()), backend=window.vision_backend,
+                                           compare=window.compare_check.isChecked())
 
     def start():
         nonlocal started
@@ -30,7 +33,7 @@ def attach_smoke_run(app, window, image: str | None, output: Path) -> None:
         result = window.result
         output.parent.mkdir(parents=True, exist_ok=True)
         record = {"text": window.editor.toPlainText(), "words": len(window.canvas.words),
-                  "linked": window.editor.linked, "rss": tree_rss(), "error": error}
+                  "linked": window.editor.linked, "rss": tree_rss(), "error": error, "deadline_seconds": deadline}
         if not result:
             record["error"] = error or window.status.text()
         else:
@@ -49,4 +52,4 @@ def attach_smoke_run(app, window, image: str | None, output: Path) -> None:
     window._smoke_timer.timeout.connect(poll)
     window._smoke_timer.start(50)
     QTimer.singleShot(200, start)
-    QTimer.singleShot(120_000, lambda: finish("GUI smoke test timed out"))
+    QTimer.singleShot(deadline * 1000, lambda: finish("GUI smoke test timed out"))

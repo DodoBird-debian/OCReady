@@ -1,0 +1,183 @@
+{
+  "sample_interval_ms": 10,
+  "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
+  "platform": "linux",
+  "python": "3.12.16",
+  "cpu_count": 4,
+  "binary": true,
+  "scenarios": [
+    {
+      "edition": "studio",
+      "max_pixels": 16000000,
+      "scenario": "sample",
+      "peak_rss_bytes": 2033315840,
+      "budget_bytes": 4000000000,
+      "below_budget": true,
+      "elapsed_seconds": 25.965,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 6.207761007000045,
+        "peak_rss": 513482752,
+        "engine": "vision:smolvlm-256m-q4",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 3923542016,
+        "worker_peak": 330899456,
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "studio",
+      "max_pixels": 16000000,
+      "scenario": "dark",
+      "peak_rss_bytes": 2033377280,
+      "budget_bytes": 4000000000,
+      "below_budget": true,
+      "elapsed_seconds": 25.404,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 5.701173321000169,
+        "peak_rss": 513642496,
+        "engine": "vision:smolvlm-256m-q4",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 3923488768,
+        "worker_peak": 330899456,
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "studio",
+      "max_pixels": 16000000,
+      "scenario": "max-pixels",
+      "peak_rss_bytes": 2032246784,
+      "budget_bytes": 4000000000,
+      "below_budget": true,
+      "elapsed_seconds": 28.895,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 9.451912451999988,
+        "peak_rss": 588390400,
+        "engine": "vision:smolvlm-256m-q4",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 3856371712,
+        "worker_peak": 338575360,
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "studio",
+      "max_pixels": 16000000,
+      "scenario": "gui-onefile",
+      "peak_rss_bytes": 2034544640,
+      "budget_bytes": 4000000000,
+      "below_budget": true,
+      "elapsed_seconds": 29.859,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 9.608997238000029,
+        "peak_rss": 671264768,
+        "engine": "vision:smolvlm-256m-q4",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 3773362176,
+        "worker_peak": 338423808,
+        "words": 0
+      },
+      "error": ""
+    }
+  ],
+  "source": {
+    "revision": "25c7477e37a0b73b50f5e3428792109f11623761",
+    "dirty": false,
+    "tree_sha256": "5cb649de79d181c02d91042346c0db804a02fc74c2ded60e4c1eda60071f4a81"
+  },
+  "sources_changed_during_run": false,
+  "binary_sha256": "4cf9973cb0b5f52ebbfd0d1da7dc295267124551224d47f4dd286b2208ca517b",
+  "binary_changed_during_run": false,
+  "build_profile": {
+    "edition": "studio",
+    "available_editions": [
+      "studio"
+    ],
+    "methods": [
+      "neural",
+      "tesseract-fast",
+      "tesseract-best",
+      "vision"
+    ],
+    "platform": "Linux-6.8.0-1070-azure-x86_64-with-glibc2.35",
+    "python": "3.12.16",
+    "embedded_models": [
+      {
+        "id": "smolvlm-256m-q4",
+        "name": "SmolVLM 256M Q4 · English (experimental)",
+        "source": "https://huggingface.co/ggml-org/SmolVLM-256M-Instruct-GGUF",
+        "license": "Apache-2.0",
+        "languages": "eng",
+        "adapter": "llama.cpp",
+        "model_sha256": "0574eaffbb56eea1b7eaddd6ed61e0b93ad5832fe3e939d272747faac94f4277",
+        "projector_sha256": "7e943f7c53f0382a6fc41b6ee0c2def63ba4fded9ab8ed039cc9e2ab905e0edd"
+      },
+      {
+        "id": "qwen3-vl-2b-q4",
+        "name": "Qwen3-VL 2B (experimental)",
+        "source": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct-GGUF",
+        "license": "Apache-2.0",
+        "languages": "ara+eng",
+        "adapter": "llama.cpp",
+        "model_sha256": "089d75c52f4b7ffc56ba998ffc50aae89fcafc755f9e7208aacca281dca6c2ae",
+        "projector_sha256": "f9a68fabba69c3b81e153367b2c7521030b0fa8bb0de400c9599c8e6725f9c82"
+      }
+    ],
+    "default_model": "smolvlm-256m-q4",
+    "embedded_neural": [
+      {
+        "id": "ppocr-v5-arabic",
+        "name": "Arabic + English",
+        "source": "https://huggingface.co/PaddlePaddle/arabic_PP-OCRv5_mobile_rec_onnx",
+        "license": "Apache-2.0",
+        "languages": "ara+eng",
+        "geometry": "line",
+        "detector_sha256": "a431985659dc921974177a95adcfbb90fd9e51989a5e04d70d0b75f597b6e61d",
+        "recognizer_sha256": "799113ebf267fbe742deb99eb36e8d42c9ddc5291ceacf92add41b4d52a59110",
+        "dictionary_sha256": "7f92f7dbb9b75a4787a83bfb4f6d14a8ab515525130c9d40a9036f61cf6999e9"
+      }
+    ],
+    "default_neural": "ppocr-v5-arabic",
+    "variant": "multimodal",
+    "runtime_bundle_sha256": "a10c12e5387c0b9689700dde6ab0063a3cb090e463bf5495c3d33185547ea4a8",
+    "source": {
+      "revision": "25c7477e37a0b73b50f5e3428792109f11623761",
+      "dirty": false,
+      "tree_sha256": "5cb649de79d181c02d91042346c0db804a02fc74c2ded60e4c1eda60071f4a81"
+    },
+    "built_at_utc": "2026-11-11T10:58:10.258089+00:00",
+    "dependencies": {
+      "Nuitka": "4.3.5",
+      "Pillow": "12.3.0",
+      "psutil": "7.2.2",
+      "PySide6-Essentials": "6.8.3"
+    },
+    "onefile_compression": {
+      "policy": "Nuitka low-memory",
+      "level": 3,
+      "compiler_version": "4.3.5"
+    },
+    "memory_certification": "Uncertified; see docs/PROGRESS.md and benchmark evidence",
+    "payload_memory": {
+      "enabled": true,
+      "nuitka": "4.3.5",
+      "strategy": "drop-unused-launcher-pages-v1",
+      "original_bootstrap_sha256": "73e5da1368005fa1d8ac82c62269095bb26cf231604f260409533a8fb21eb827",
+      "helper_sha256": "c065722f1e62de5b6e6a3bdde8db51c90d58fa010b61a98297f44dee4e9fda7d",
+      "patched_bootstrap_sha256": "4108a89dd7633c1de00be0bc858022912fb83687ffa7b29bbf5dab5d27d573c1"
+    }
+  },
+  "requested_method": "vision",
+  "requested_pack_id": "smolvlm-256m-q4"
+}

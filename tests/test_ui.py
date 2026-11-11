@@ -66,6 +66,55 @@ def test_empty_workspace_and_image_loading(window):
     assert window.image_stack.currentWidget() is window.canvas
 
 
+def test_gui_smoke_does_not_cancel_vision_inside_its_engine_deadline(window, app, tmp_path, monkeypatch):
+    import json
+    import threading
+    from types import SimpleNamespace
+
+    from PySide6.QtCore import QTimer
+
+    from ocready.core.models import ModelPack
+    from ocready.core.types import OCRResult
+    from ocready.ui import smoke
+
+    # Accelerate only the diagnostic's scheduled deadlines. The simulated job
+    # lasts 150 ms: longer than its former 120 s limit scaled by 1/1000.
+    class AcceleratedTimer(QTimer):
+        @staticmethod
+        def singleShot(milliseconds, callback):
+            QTimer.singleShot(max(1, milliseconds // 1000), callback)
+
+    monkeypatch.setattr(smoke, "QTimer", AcceleratedTimer)
+    window.edition_combo.setCurrentIndex(window.edition_combo.findData("everyday"))
+    window.packs = [ModelPack("slow", "Slow English", "runner", "model", "projector", memory_mb=500, languages="eng")]
+    window.refresh_methods()
+    window.method_combo.setCurrentIndex(window.method_combo.findData("vision:slow"))
+    window.vision_backend = "cpu"
+    cancelled = threading.Event()
+
+    def recognize():
+        window.worker = SimpleNamespace(cancel=cancelled, wait=lambda _: True, isRunning=lambda: False)
+        def complete():
+            if getattr(window, "_smoke_done", False):
+                return
+            window._recognized(window.job, OCRResult("Expected text", engine="vision:slow", geometry="none"), [])
+            window.worker = None
+        QTimer.singleShot(150, complete)
+
+    monkeypatch.setattr(window, "recognize", recognize)
+    codes = []
+    output = tmp_path / "smoke.json"
+    smoke.attach_smoke_run(SimpleNamespace(exit=codes.append), window, None, output)
+    until = time.monotonic() + 3
+    while not output.exists() and time.monotonic() < until:
+        app.processEvents()
+        time.sleep(.005)
+    record = json.loads(output.read_text())
+    assert not cancelled.is_set() and codes == [0]
+    assert record["text"] == "Expected text" and not record["error"]
+    assert record["deadline_seconds"] > 300
+
+
 def test_edition_method_layout_and_backend_choices_restore(window):
     from ocready.core.settings import save_settings
     save_settings({"edition": "studio", "methods": {"studio": "tesseract-fast", "everyday": "tesseract-best"},

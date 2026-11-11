@@ -7,6 +7,7 @@ from ocready.core.editions import Edition
 from ocready.core.memory import tree_rss
 from ocready.core.models import ModelPack
 from ocready.core.process import run_process
+from ocready.core.timeouts import CUDA_PROBE_TIMEOUT_SECONDS, VISION_TIMEOUT_SECONDS
 from ocready.core.types import BudgetExceeded, Cancelled, OCRError, OCRResult
 from ocready.engines.vision_adapters import clean_llama_output, get_adapter, local_environment
 
@@ -18,7 +19,7 @@ def runner_env(runner: str) -> dict[str, str]:
 def has_cuda(runner: str, edition: Edition, cancel: threading.Event | None, adapter_id: str = "llama.cpp") -> bool:
     adapter = get_adapter(adapter_id)
     try:
-        result = run_process(adapter.probe_command(runner), budget=edition.budget, timeout=20,
+        result = run_process(adapter.probe_command(runner), budget=edition.budget, timeout=CUDA_PROBE_TIMEOUT_SECONDS,
                              env=adapter.environment(runner), cancel=cancel)
         return adapter.probe_cuda(result.stdout, result.stderr)
     except (Cancelled, BudgetExceeded):
@@ -55,7 +56,7 @@ def recognize(image: Path, edition: Edition, pack: ModelPack, *, language: str =
     progress(f"Reading with {pack.name} · {'CUDA' if cuda else 'CPU'}…")
     try:
         process = run_process(command(pack, image, cuda=cuda), budget=edition.budget, cancel=cancel,
-                              timeout=300, env=adapter.environment(cuda_program if cuda else pack.runner))
+                              timeout=VISION_TIMEOUT_SECONDS, env=adapter.environment(cuda_program if cuda else pack.runner))
     except (Cancelled, BudgetExceeded):
         raise
     except OCRError as exc:
@@ -64,7 +65,7 @@ def recognize(image: Path, edition: Edition, pack: ModelPack, *, language: str =
             raise
         progress("CUDA could not initialize. Retrying on CPU…")
         process = run_process(command(pack, image, cuda=False), budget=edition.budget, cancel=cancel,
-                              timeout=300, env=adapter.environment(pack.runner))
+                              timeout=VISION_TIMEOUT_SECONDS, env=adapter.environment(pack.runner))
         cuda = False
         note += " CUDA failed to initialize; retried on CPU."
     read = adapter.decode(process.stdout, image, cuda)

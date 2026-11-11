@@ -1,8 +1,13 @@
 import json
+import subprocess
 import sys
 from pathlib import Path
 
+import psutil
+import pytest
+
 from scripts.benchmark import check_requested_engine, observe, redact_details
+from scripts.smoke_binary import run_checked
 
 
 def test_resource_workload_cannot_pass_after_silently_selecting_another_engine():
@@ -43,3 +48,26 @@ def test_benchmark_reads_arabic_under_a_windows_codepage(tmp_path, monkeypatch):
     monkeypatch.setattr(Path, "read_text", windows_default)
     result = observe([sys.executable, "-c", "pass"], output, 4_000_000_000)
     assert result["details"]["text"] == "مرحبا بالعالم"
+
+
+def test_deadline_failure_preserves_a_result_instead_of_discarding_measurements(tmp_path):
+    output = tmp_path / "result.json"
+    result = observe([sys.executable, "-c", "import time; time.sleep(10)"], output, 4_000_000_000, timeout_seconds=.05)
+    assert result["exit_code"] and result["timed_out"]
+    assert result["timeout_seconds"] == .05
+    assert "exceeded" in result["details"]["error"]
+    assert result["peak_rss_bytes"] > 0 and result["below_budget"]
+
+
+def test_smoke_timeout_cleans_the_onefile_style_descendant_tree(tmp_path):
+    pid_file = tmp_path / "child.pid"
+    program = ("import subprocess, sys, time\nfrom pathlib import Path\n"
+               "child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(30)'])\n"
+               f"Path({str(pid_file)!r}).write_text(str(child.pid))\n"
+               "time.sleep(30)\n")
+    with pytest.raises(subprocess.TimeoutExpired):
+        run_checked([sys.executable, "-c", program], timeout=2)
+    try:
+        assert psutil.Process(int(pid_file.read_text())).status() == psutil.STATUS_ZOMBIE
+    except psutil.NoSuchProcess:
+        pass

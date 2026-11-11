@@ -10,6 +10,7 @@ from ocready.core.editions import Edition
 from ocready.core.memory import tree_rss
 from ocready.core.neural_packs import NeuralPack
 from ocready.core.process import run_process
+from ocready.core.timeouts import PROCESS_TIMEOUT_SECONDS
 from ocready.core.types import Box, BudgetExceeded, Cancelled, OCRError, OCRResult, Word
 from ocready.engines.vision import runner_env
 
@@ -77,7 +78,7 @@ def recognize(image: Path, edition: Edition, pack: NeuralPack, *, language: str 
     progress(f"Reading with {pack.name}…")
     try:
         process = run_process(command(runner, backend), budget=edition.budget, cancel=cancel,
-                              timeout=120, env=runner_env(runner))
+                              timeout=PROCESS_TIMEOUT_SECONDS, env=runner_env(runner))
     except (Cancelled, BudgetExceeded):
         raise
     except OCRError as exc:
@@ -85,7 +86,7 @@ def recognize(image: Path, edition: Edition, pack: NeuralPack, *, language: str 
             raise
         progress("CUDA could not initialize. Retrying neural OCR on CPU…")
         process = run_process(command(pack.runner, "cpu"), budget=edition.budget, cancel=cancel,
-                              timeout=120, env=runner_env(pack.runner))
+                              timeout=PROCESS_TIMEOUT_SECONDS, env=runner_env(pack.runner))
     result = parse_output(process.stdout, size, pack=pack, language=language)
     if not result.text:
         result.note = (result.note + " No text lines found. Try a tighter crop or another OCR method.").strip()

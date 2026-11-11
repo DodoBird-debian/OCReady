@@ -7,6 +7,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+from ocready.core.timeouts import observed_workload_timeout_seconds
+
 
 def embedded_selections(profile: dict) -> list[tuple[str, str]]:
     selections = []
@@ -17,6 +19,20 @@ def embedded_selections(profile: dict) -> list[tuple[str, str]]:
         else:
             selections.append((method, ""))
     return selections
+
+
+def run_checked(command: list[str], *, timeout: float | None = None, **kwargs) -> None:
+    """Keep diagnostic timeouts/interruption from orphaning a onefile child."""
+    child = subprocess.Popen(command, **kwargs)
+    try:
+        code = child.wait(timeout=timeout)
+        if code:
+            raise subprocess.CalledProcessError(code, command)
+    finally:
+        if child.poll() is None:
+            from ocready.core.memory import stop_tree
+            stop_tree(child.pid)
+        child.wait()
 
 
 def main() -> None:
@@ -41,10 +57,11 @@ def main() -> None:
         if pack_id:
             selection += ["--pack-id", pack_id]
         label = method + ("-" + pack_id if pack_id else "")
+        deadline = observed_workload_timeout_seconds(method)
         with tempfile.TemporaryDirectory(prefix="ocready-smoke-") as temporary:
             output = Path(temporary) / "result.json"
-            subprocess.run([str(binary), str(root / "assets/sample-bilingual.png"), "--json", "--layout", "sparse",
-                            "--output", str(output), *selection], cwd=temporary, env=env, check=True, timeout=150)
+            run_checked([str(binary), str(root / "assets/sample-bilingual.png"), "--json", "--layout", "sparse",
+                         "--output", str(output), *selection], cwd=temporary, env=env, timeout=deadline)
             result = json.loads(output.read_text(encoding="utf-8"))
             assert not result.get("error"), result
             assert result["engine"] == (f"{method}:{pack_id}" if pack_id else method) or not pack_id and result["engine"].startswith(method), result
@@ -58,8 +75,8 @@ def main() -> None:
             output = Path(temporary) / "gui-result.json"
             gui_env = {**env, "QT_QPA_PLATFORM": "offscreen", "XDG_CONFIG_HOME": str(Path(temporary) / "config"),
                        "APPDATA": str(Path(temporary) / "config")}
-            subprocess.run([str(binary), str(root / "assets/sample-bilingual.png"),
-                            "--ui-smoke-output", str(output), *selection], cwd=temporary, env=gui_env, check=True, timeout=150)
+            run_checked([str(binary), str(root / "assets/sample-bilingual.png"),
+                         "--ui-smoke-output", str(output), *selection], cwd=temporary, env=gui_env, timeout=deadline)
             gui = json.loads(output.read_text(encoding="utf-8"))
             assert not gui["error"], gui
             assert gui["result"]["engine"] == result["engine"], gui
@@ -75,9 +92,8 @@ def main() -> None:
             suffix = "-" + profile.get("variant", "") if profile.get("variant") else ""
             suffix += "-" + label if args.all_methods else ""
             report = root / "test-output" / f"packaged-{profile['edition']}{suffix}.json"
-            subprocess.run([sys.executable, str(root / "scripts/benchmark.py"),
-                            "--edition", profile["edition"], "--binary", str(binary), "--output", str(report), *selection],
-                           cwd=root, check=True)
+            run_checked([sys.executable, str(root / "scripts/benchmark.py"),
+                         "--edition", profile["edition"], "--binary", str(binary), "--output", str(report), *selection], cwd=root)
 
 
 if __name__ == "__main__":

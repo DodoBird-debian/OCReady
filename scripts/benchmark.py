@@ -18,6 +18,7 @@ from PIL import Image, ImageOps
 
 from ocready.core.editions import EDITIONS
 from ocready.core.memory import tree_rss
+from ocready.core.timeouts import gui_workload_timeout_seconds, observed_workload_timeout_seconds
 from scripts.provenance import file_sha256, source_record
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -139,7 +140,9 @@ def gui_child(image_path: str, edition: str, output: str, loops: int, pack_path:
         window.close()
         app.quit()
 
-    QTimer.singleShot(120_000 * max(1, loops), timed_out)
+    method = "vision" if pack_path else "neural" if neural_path else str(window.method_combo.currentData())
+    deadline = gui_workload_timeout_seconds(method, backend=window.vision_backend, loops=loops)
+    QTimer.singleShot(deadline * 1000, timed_out)
     app.exec()
     return 2 if failed else 0
 
@@ -151,6 +154,7 @@ def observe(command: list[str], output: Path, budget: int, timeout_seconds: int 
     env["APPDATA"] = str(output.parent / "config")
     start = time.monotonic()
     peak = 0
+    timed_out = False
     with tempfile.TemporaryFile() as log:
         process = subprocess.Popen(command, cwd=ROOT, env=env, stdout=log, stderr=log)
         try:
@@ -159,12 +163,17 @@ def observe(command: list[str], output: Path, budget: int, timeout_seconds: int 
                 if time.monotonic() - start > timeout_seconds:
                     from ocready.core.memory import stop_tree
                     stop_tree(process.pid)
-                    raise RuntimeError(f"Benchmark scenario exceeded {timeout_seconds} seconds")
+                    timed_out = True
+                    break
                 time.sleep(.01)
         finally:
+            if process.poll() is None:
+                from ocready.core.memory import stop_tree
+                stop_tree(process.pid)
             process.wait()
-        log.seek(0)
-        error = log.read()[-3000:].decode("utf-8", errors="replace")
+        log.seek(0, os.SEEK_END)
+        log.seek(max(0, log.tell() - 3000))
+        error = log.read(3000).decode("utf-8", errors="replace")
     exit_code = process.returncode
     try:
         details = json.loads(output.read_text(encoding="utf-8"))
@@ -173,11 +182,14 @@ def observe(command: list[str], output: Path, budget: int, timeout_seconds: int 
     except (OSError, ValueError):
         details = {"error": "The process did not produce a valid benchmark result."}
         exit_code = exit_code or 2
+    if timed_out:
+        details["error"] = f"Benchmark scenario exceeded {timeout_seconds} seconds"
+        exit_code = exit_code or 2
     if details.get("error"):
         exit_code = exit_code or 2
     return {"peak_rss_bytes": peak, "budget_bytes": budget, "below_budget": peak < budget,
             "elapsed_seconds": round(time.monotonic() - start, 3), "exit_code": exit_code,
-            "details": details, "error": error if exit_code else ""}
+            "details": details, "error": error if exit_code else "", "timeout_seconds": timeout_seconds, "timed_out": timed_out}
 
 
 def main() -> int:
@@ -242,8 +254,10 @@ def main() -> int:
                         command += ["--neural-pack", str(args.neural_pack.resolve())]
                 elif scenario == "gui-onefile":
                     command = [*base, str(image), "--edition", edition, "--ui-smoke-output", str(output), *selection]
-                result = observe(command, output, EDITIONS[edition].budget,
-                                 timeout_seconds=720 if scenario == "gui-repeated" else 180)
+                method = args.method or ("vision" if args.vision_pack else "neural" if args.neural_pack else
+                                         binary_profile["methods"][0] if binary_profile else "tesseract-fast")
+                deadline = observed_workload_timeout_seconds(method, loops=4 if scenario == "gui-repeated" else 1)
+                result = observe(command, output, EDITIONS[edition].budget, timeout_seconds=deadline)
                 result = {"edition": edition, "max_pixels": EDITIONS[edition].max_pixels, "scenario": scenario, **result}
                 # Preserve evidence without copying all recognized document contents into reports.
                 if "text" in result["details"]:

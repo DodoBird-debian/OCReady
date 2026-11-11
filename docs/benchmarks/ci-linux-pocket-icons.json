@@ -1,0 +1,147 @@
+{
+  "sample_interval_ms": 10,
+  "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
+  "platform": "linux",
+  "python": "3.12.16",
+  "cpu_count": 4,
+  "binary": true,
+  "scenarios": [
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "sample",
+      "peak_rss_bytes": 97677312,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 1.911,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 1.3280760339999915,
+        "peak_rss": 97677312,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 289787904,
+        "worker_peak": 40157184,
+        "words": 31
+      },
+      "error": ""
+    },
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "dark",
+      "peak_rss_bytes": 97923072,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 1.859,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 1.2804867039999976,
+        "peak_rss": 97050624,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 289460224,
+        "worker_peak": 40054784,
+        "words": 31
+      },
+      "error": ""
+    },
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "max-pixels",
+      "peak_rss_bytes": 128208896,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 2.317,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 1.6954561560000343,
+        "peak_rss": 128208896,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 272060416,
+        "worker_peak": 53051392,
+        "words": 92
+      },
+      "error": ""
+    },
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "gui-onefile",
+      "peak_rss_bytes": 227549184,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 2.927,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 1.7070487780000008,
+        "peak_rss": 227549184,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 172687360,
+        "worker_peak": 53035008,
+        "words": 92
+      },
+      "error": ""
+    }
+  ],
+  "source": {
+    "revision": "8fa1f03854b6da9a7b5e4ffdd9d4b43c40bb3a47",
+    "dirty": false,
+    "tree_sha256": "1eb88d7c716b452f582a81d0b40d7835ff64e7e5ddb27754b320fd0bffa80455"
+  },
+  "sources_changed_during_run": false,
+  "binary_sha256": "7e6453ad79d7e354c61b66d2f1b726a6811570cabd9180eb50ed3f00bed50453",
+  "binary_changed_during_run": false,
+  "build_profile": {
+    "edition": "pocket",
+    "available_editions": [
+      "pocket"
+    ],
+    "methods": [
+      "tesseract-fast"
+    ],
+    "platform": "Linux-6.8.0-1070-azure-x86_64-with-glibc2.35",
+    "python": "3.12.16",
+    "embedded_models": [],
+    "default_model": "",
+    "embedded_neural": [],
+    "default_neural": "",
+    "variant": "",
+    "runtime_bundle_sha256": "d9c30edf69ac8cab3d3b3b3eb091f2ced0eb7171806a62eda28d6e4b9fd81346",
+    "source": {
+      "revision": "8fa1f03854b6da9a7b5e4ffdd9d4b43c40bb3a47",
+      "dirty": false,
+      "tree_sha256": "1eb88d7c716b452f582a81d0b40d7835ff64e7e5ddb27754b320fd0bffa80455"
+    },
+    "built_at_utc": "2026-11-11T11:25:54.072412+00:00",
+    "dependencies": {
+      "Nuitka": "4.3.5",
+      "Pillow": "12.3.0",
+      "psutil": "7.2.2",
+      "PySide6-Essentials": "6.8.3"
+    },
+    "onefile_compression": {
+      "policy": "Nuitka low-memory",
+      "level": 3,
+      "compiler_version": "4.3.5"
+    },
+    "memory_certification": "Uncertified; see docs/PROGRESS.md and benchmark evidence",
+    "payload_memory": {
+      "enabled": true,
+      "nuitka": "4.3.5",
+      "strategy": "drop-unused-launcher-pages-v1",
+      "original_bootstrap_sha256": "73e5da1368005fa1d8ac82c62269095bb26cf231604f260409533a8fb21eb827",
+      "helper_sha256": "c065722f1e62de5b6e6a3bdde8db51c90d58fa010b61a98297f44dee4e9fda7d",
+      "patched_bootstrap_sha256": "4108a89dd7633c1de00be0bc858022912fb83687ffa7b29bbf5dab5d27d573c1"
+    }
+  },
+  "requested_method": "tesseract-fast",
+  "requested_pack_id": null
+}

@@ -66,6 +66,8 @@ All four clean `423a1b3` CPU source resource workloads subsequently passed. The 
 
 The complete Linux Studio multimodal executable at clean `31d32ae` subsequently passed all twenty packaged resource workloads across neural, Fast, Precision, SmolVLM Q8 and Qwen3. Qwen's largest observed complete-tree peak was **3.255 GB**, including cold launch/extraction and the native GUI ([packaged Qwen report](benchmarks/ci-linux-packaged-studio-multimodal-vision-qwen3-vl-2b-q4.json)). Its matched Windows build failed before launch with WinError 193, so this combination was not released as a verified platform pair. The compact Q4 SmolVLM composition is a subsequent build and requires its own measurements.
 
+Clean `25c7477` then verified the compact Q4 SmolVLM + Qwen composition on Linux and Windows: every CLI/GUI smoke check and all twenty packaged resource scenarios passed per platform. Largest observed tree RSS was 3.255 GB on Linux and 3.138 GB on Windows ([paired index](benchmarks/studio-multimodal-verified.json)). The same locked Q4 derivation was reproduced on both systems. A later release attempt hit an unrelated fixed GUI diagnostic deadline on Linux, with memory still below budget; its failed result is retained and fresh method-aware verification is required before publication.
+
 ## Building a compatible CUDA runner
 
 For a Linux driver that cannot run newer upstream PTX, an optional developer tool builds pinned llama.cpp with native kernels and NVIDIA's checksum-verified CUDA 12.4 redistributables:
