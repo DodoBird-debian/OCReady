@@ -1,0 +1,643 @@
+{
+  "text": "A little less typing.\n\nTurn your screenshots into something useful.\n\nSelect a word. Copy a sentence. Keep going.\n\nمرحبا بالعالم\n\nاللغة العربية واللغة الإنجليزية\n\nOCReady / Local. Private. Ready to copy.",
+  "words": 31,
+  "linked": true,
+  "rss": 150630400,
+  "error": "",
+  "deadline_seconds": 150,
+  "qt_platform": "windows",
+  "clipboard_copy_verified": true,
+  "ui_font_family": "Segoe UI",
+  "editor_font_family": "Segoe UI",
+  "source_selection_verified": true,
+  "result": {
+    "text": "A little less typing.\n\nTurn your screenshots into something useful.\n\nSelect a word. Copy a sentence. Keep going.\n\nمرحبا بالعالم\n\nاللغة العربية واللغة الإنجليزية\n\nOCReady / Local. Private. Ready to copy.",
+    "words": [
+      {
+        "text": "A",
+        "box": {
+          "x": 60,
+          "y": 57,
+          "width": 31,
+          "height": 30
+        },
+        "confidence": 96.111351,
+        "start": 0,
+        "end": 1,
+        "line": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "little",
+        "box": {
+          "x": 108,
+          "y": 56,
+          "width": 101,
+          "height": 32
+        },
+        "confidence": 96.355278,
+        "start": 2,
+        "end": 8,
+        "line": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "less",
+        "box": {
+          "x": 229,
+          "y": 56,
+          "width": 83,
+          "height": 32
+        },
+        "confidence": 96.615715,
+        "start": 9,
+        "end": 13,
+        "line": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "typing.",
+        "box": {
+          "x": 328,
+          "y": 56,
+          "width": 155,
+          "height": 40
+        },
+        "confidence": 95.985664,
+        "start": 14,
+        "end": 21,
+        "line": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "Turn",
+        "box": {
+          "x": 60,
+          "y": 152,
+          "width": 65,
+          "height": 23
+        },
+        "confidence": 96.824364,
+        "start": 23,
+        "end": 27,
+        "line": [
+          1,
+          2,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "your",
+        "box": {
+          "x": 139,
+          "y": 157,
+          "width": 71,
+          "height": 25
+        },
+        "confidence": 95.819321,
+        "start": 28,
+        "end": 32,
+        "line": [
+          1,
+          2,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "screenshots",
+        "box": {
+          "x": 222,
+          "y": 151,
+          "width": 189,
+          "height": 24
+        },
+        "confidence": 96.208519,
+        "start": 33,
+        "end": 44,
+        "line": [
+          1,
+          2,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "into",
+        "box": {
+          "x": 425,
+          "y": 151,
+          "width": 57,
+          "height": 24
+        },
+        "confidence": 96.378868,
+        "start": 45,
+        "end": 49,
+        "line": [
+          1,
+          2,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "something",
+        "box": {
+          "x": 495,
+          "y": 151,
+          "width": 165,
+          "height": 31
+        },
+        "confidence": 96.574661,
+        "start": 50,
+        "end": 59,
+        "line": [
+          1,
+          2,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "useful.",
+        "box": {
+          "x": 676,
+          "y": 151,
+          "width": 101,
+          "height": 24
+        },
+        "confidence": 95.960655,
+        "start": 60,
+        "end": 67,
+        "line": [
+          1,
+          2,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "Select",
+        "box": {
+          "x": 62,
+          "y": 226,
+          "width": 96,
+          "height": 24
+        },
+        "confidence": 96.287491,
+        "start": 69,
+        "end": 75,
+        "line": [
+          1,
+          3,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "a",
+        "box": {
+          "x": 171,
+          "y": 232,
+          "width": 15,
+          "height": 18
+        },
+        "confidence": 96.597679,
+        "start": 76,
+        "end": 77,
+        "line": [
+          1,
+          3,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "word.",
+        "box": {
+          "x": 200,
+          "y": 226,
+          "width": 84,
+          "height": 24
+        },
+        "confidence": 96.597679,
+        "start": 78,
+        "end": 83,
+        "line": [
+          1,
+          3,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "Copy",
+        "box": {
+          "x": 299,
+          "y": 227,
+          "width": 79,
+          "height": 30
+        },
+        "confidence": 96.212837,
+        "start": 84,
+        "end": 88,
+        "line": [
+          1,
+          3,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "a",
+        "box": {
+          "x": 391,
+          "y": 232,
+          "width": 15,
+          "height": 18
+        },
+        "confidence": 96.284096,
+        "start": 89,
+        "end": 90,
+        "line": [
+          1,
+          3,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "sentence.",
+        "box": {
+          "x": 420,
+          "y": 227,
+          "width": 152,
+          "height": 23
+        },
+        "confidence": 96.667801,
+        "start": 91,
+        "end": 100,
+        "line": [
+          1,
+          3,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "Keep",
+        "box": {
+          "x": 589,
+          "y": 227,
+          "width": 74,
+          "height": 30
+        },
+        "confidence": 96.654716,
+        "start": 101,
+        "end": 105,
+        "line": [
+          1,
+          3,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "going.",
+        "box": {
+          "x": 676,
+          "y": 226,
+          "width": 95,
+          "height": 31
+        },
+        "confidence": 96.187553,
+        "start": 106,
+        "end": 112,
+        "line": [
+          1,
+          3,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "مرحبا",
+        "box": {
+          "x": 951,
+          "y": 357,
+          "width": 86,
+          "height": 40
+        },
+        "confidence": 92.263199,
+        "start": 114,
+        "end": 119,
+        "line": [
+          1,
+          4,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "بالعالم",
+        "box": {
+          "x": 832,
+          "y": 357,
+          "width": 99,
+          "height": 40
+        },
+        "confidence": 91.401154,
+        "start": 120,
+        "end": 127,
+        "line": [
+          1,
+          4,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "اللغة",
+        "box": {
+          "x": 979,
+          "y": 456,
+          "width": 58,
+          "height": 25
+        },
+        "confidence": 92.737823,
+        "start": 129,
+        "end": 134,
+        "line": [
+          1,
+          5,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "العربية",
+        "box": {
+          "x": 878,
+          "y": 456,
+          "width": 85,
+          "height": 33
+        },
+        "confidence": 93.240891,
+        "start": 135,
+        "end": 142,
+        "line": [
+          1,
+          5,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "واللغة",
+        "box": {
+          "x": 788,
+          "y": 456,
+          "width": 75,
+          "height": 33
+        },
+        "confidence": 91.914772,
+        "start": 143,
+        "end": 149,
+        "line": [
+          1,
+          5,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "الإنجليزية",
+        "box": {
+          "x": 653,
+          "y": 456,
+          "width": 119,
+          "height": 33
+        },
+        "confidence": 93.035149,
+        "start": 150,
+        "end": 160,
+        "line": [
+          1,
+          5,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "OCReady",
+        "box": {
+          "x": 62,
+          "y": 585,
+          "width": 130,
+          "height": 28
+        },
+        "confidence": 91.466705,
+        "start": 162,
+        "end": 169,
+        "line": [
+          1,
+          6,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "/",
+        "box": {
+          "x": 212,
+          "y": 586,
+          "width": 9,
+          "height": 24
+        },
+        "confidence": 91.755569,
+        "start": 170,
+        "end": 171,
+        "line": [
+          1,
+          6,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "Local.",
+        "box": {
+          "x": 242,
+          "y": 585,
+          "width": 79,
+          "height": 22
+        },
+        "confidence": 95.869713,
+        "start": 172,
+        "end": 178,
+        "line": [
+          1,
+          6,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "Private.",
+        "box": {
+          "x": 336,
+          "y": 585,
+          "width": 104,
+          "height": 22
+        },
+        "confidence": 96.78643,
+        "start": 179,
+        "end": 187,
+        "line": [
+          1,
+          6,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "Ready",
+        "box": {
+          "x": 455,
+          "y": 585,
+          "width": 86,
+          "height": 28
+        },
+        "confidence": 96.159035,
+        "start": 188,
+        "end": 193,
+        "line": [
+          1,
+          6,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "to",
+        "box": {
+          "x": 552,
+          "y": 587,
+          "width": 27,
+          "height": 20
+        },
+        "confidence": 96.773827,
+        "start": 194,
+        "end": 196,
+        "line": [
+          1,
+          6,
+          1,
+          1
+        ]
+      },
+      {
+        "text": "copy.",
+        "box": {
+          "x": 592,
+          "y": 591,
+          "width": 69,
+          "height": 22
+        },
+        "confidence": 95.729187,
+        "start": 197,
+        "end": 202,
+        "line": [
+          1,
+          6,
+          1,
+          1
+        ]
+      }
+    ],
+    "engine": "tesseract-fast",
+    "language": "ara+eng",
+    "elapsed": 0.3909999999999627,
+    "peak_rss": 204722176,
+    "backend": "CPU",
+    "recipe": "Original",
+    "note": "",
+    "containment": "windows-job",
+    "worker_limit": 3833331712,
+    "worker_peak": 37584896,
+    "layout": "sparse",
+    "geometry": "word",
+    "runtime": "",
+    "confidence": 95.2728290967742
+  },
+  "build_profile": {
+    "edition": "studio",
+    "available_editions": [
+      "studio"
+    ],
+    "methods": [
+      "tesseract-fast",
+      "tesseract-best",
+      "vision",
+      "neural"
+    ],
+    "platform": "Windows-2025Server-10.0.26100-SP0",
+    "python": "3.12.10",
+    "embedded_models": [],
+    "default_model": "",
+    "embedded_neural": [],
+    "default_neural": "",
+    "variant": "",
+    "runtime_bundle_sha256": "c18881324d41fefb3ec3bf3775a1f8f1240c0df3bfaec32fa8c42a1dd5a1c327",
+    "source": {
+      "revision": "3ebd77c28a81d492b532063eaa6667735b92dbea",
+      "dirty": false,
+      "tree_sha256": "8ff9561fb3e921588c1bdcbdef2626341f421961bd090e3e1de320c048cf06f5"
+    },
+    "built_at_utc": "2026-11-11T15:35:21.842366+00:00",
+    "dependencies": {
+      "Nuitka": "4.3.5",
+      "Pillow": "12.3.0",
+      "psutil": "7.2.2",
+      "PySide6-Essentials": "6.8.3"
+    },
+    "onefile_compression": {
+      "policy": "Nuitka low-memory",
+      "level": 3,
+      "compiler_version": "4.3.5"
+    },
+    "memory_certification": "Uncertified; see docs/PROGRESS.md and benchmark evidence",
+    "validation_policy": {
+      "portable_runtime_environment": 1,
+      "native_gui_backend": true,
+      "unicode_paths": true
+    },
+    "payload_memory": {
+      "enabled": true,
+      "nuitka": "4.3.5",
+      "strategy": "drop-unused-launcher-pages-v1",
+      "original_bootstrap_sha256": "73e5da1368005fa1d8ac82c62269095bb26cf231604f260409533a8fb21eb827",
+      "helper_sha256": "eba94369550127fd2a5a43070420df2d041e5691f623b3895401f6dce67a3643",
+      "patched_bootstrap_sha256": "8460dcfb5676b9bd1cc74a06dfa369df1c67b1d12e7eb9b3fdd7e48751855364"
+    }
+  },
+  "requested_method": "tesseract-fast",
+  "requested_pack_id": ""
+}

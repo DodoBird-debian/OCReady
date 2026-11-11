@@ -32,7 +32,7 @@ jobs:
           uv sync --frozen --extra dev
       - name: Linux runtime
         if: runner.os == 'Linux'
-        run: bash scripts/ci_linux_runtime.sh tesseract-ocr tesseract-ocr-ara libegl1 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxkbcommon-x11-0 patchelf xvfb xauth
+        run: bash scripts/ci_linux_runtime.sh tesseract-ocr tesseract-ocr-ara patchelf xvfb xauth
       - name: Windows runtime
         if: runner.os == 'Windows'
         run: choco install tesseract --no-progress -y

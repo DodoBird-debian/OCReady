@@ -59,4 +59,5 @@ task_apt_options=(
     -o 'Acquire::https::Timeout=30'
 )
 sudo apt-get "${task_apt_options[@]}" update
-sudo apt-get "${task_apt_options[@]}" install --no-install-recommends -y "$@"
+sudo apt-get "${task_apt_options[@]}" install --no-install-recommends -y \
+    libegl1 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-shape0 libxkbcommon-x11-0 "$@"

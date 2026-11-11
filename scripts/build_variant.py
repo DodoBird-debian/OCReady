@@ -13,6 +13,7 @@ from pathlib import Path
 
 from ocready.core.models import load_pack
 from scripts.prepare_vision import ROOT
+from scripts.qt_runtime import require_x11
 from scripts.variants import MODEL_VARIANTS, vision_presets
 
 
@@ -32,6 +33,7 @@ def main() -> None:
     parser.add_argument("--variant", choices=MODEL_VARIANTS, required=True)
     parser.add_argument("--jobs", type=int, default=2)
     args = parser.parse_args()
+    require_x11(output=ROOT / "dist" / f"{args.edition}-{args.variant}" / "qt-source-runtime.json")
     methods = "neural" if args.variant == "neural" else "neural,fast,best,vision"
     command = [sys.executable, "-m", "scripts.build", "--edition", args.edition, "--methods", methods,
                "--neural-pack", str(ROOT / "models/ppocr-v5/pack.json"), "--variant", args.variant, "--jobs", str(args.jobs)]

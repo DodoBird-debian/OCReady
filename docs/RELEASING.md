@@ -53,7 +53,7 @@ The workflow retains `gui-*.png` and `gui-*.json` records of the fixed public sa
 
 ## Linux desktop dependencies
 
-The onefile embeds the application, Qt plugins and selected OCR/model runtimes. Linux's loader, display server, graphics drivers, font and X11/Wayland client libraries remain desktop dependencies. On Ubuntu/Debian, the X11 build/test environment includes `libegl1 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxkbcommon-x11-0`; package dependencies provide additional XCB libraries. KDE desktops normally supply many of these already. This does not require an installed Python or Tesseract for a packaged application.
+The onefile embeds the application, Qt plugins and selected OCR/model runtimes. Linux's loader, display server, graphics drivers, font and X11/Wayland client libraries remain desktop dependencies. On Ubuntu/Debian, the X11 build/test environment includes `libegl1 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-shape0 libxkbcommon-x11-0`; package dependencies provide additional XCB libraries. KDE desktops normally supply many of these already. This does not require an installed Python or Tesseract for a packaged application.
 
 The [Qt platform dependency reference](https://doc.qt.io/qt-6/linux-requirements.html) lists ICCCM and key-symbol libraries separately from cursor support. A generic Qt cursor warning alone does not identify the unresolved library. The builder now checks `ldd` against both the build wheel's X11 plugin and the generated standalone plugin, rejects any unresolved dependency, and retains `qt-source-runtime.json` / `qt-packaged-runtime.json`. This loader check requires no display and complements the subsequent genuine X11/clipboard test; it cannot replace it.
 
