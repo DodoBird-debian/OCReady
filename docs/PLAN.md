@@ -1570,3 +1570,19 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M60.V2: Exercise word and line geometry through their real widgets; VLM results retain no fabricated regions.
 - M60.V3: Review native platform screenshots separately from interactive capture integration.
 - Release gate: Correct native GUI and copy checks on both platforms; cross-application pasting and actual snipping remain separate evidence.
+
+## M61 — desktop loader dependencies and usable downloads
+
+- Responsibility: Detect incomplete desktop build environments before compilation and expose verified edition choices.
+- M61.T1: Inspect the build wheel's X11 plugin using the OS loader without opening a display.
+- M61.T2: Reject unresolved dependencies before producing a large runtime/model bundle.
+- M61.T3: Repeat the inspection on the compiler's generated standalone X11 plugin.
+- M61.T4: Retain source/packaged loader diagnostics alongside native-window evidence.
+- M61.T5: Declare desktop graphics dependencies separately from embedded OCR/model components.
+- M61.T6: Read all bilingual diagnostic records using explicit UTF-8 on both platforms.
+- M61.T7: Link each downloadable edition to an existing exact asset and its release evidence.
+- M61.V1: Compile a real dependency pair, remove one library and require an actionable loader failure.
+- M61.V2: Exercise report reading under an emulated Windows legacy default encoding.
+- M61.V3: Preserve failed tags and historical evidence; publish corrections under new identities.
+- M61.V4: Rerun every selected model/resource/native clipboard workflow after dependency corrections.
+- Release gate: Resolved plugin dependencies and passing native-platform workflows, with edition downloads bound to their actual published revisions.

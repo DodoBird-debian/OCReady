@@ -1,0 +1,191 @@
+{
+  "sample_interval_ms": 10,
+  "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
+  "platform": "win32",
+  "python": "3.12.10",
+  "cpu_count": 4,
+  "binary": true,
+  "scenarios": [
+    {
+      "edition": "studio",
+      "max_pixels": 16000000,
+      "scenario": "sample",
+      "peak_rss_bytes": 2988855296,
+      "budget_bytes": 4000000000,
+      "below_budget": true,
+      "elapsed_seconds": 67.984,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 28.71900000000005,
+        "peak_rss": 2988855296,
+        "engine": "vision:qwen3-vl-2b-q4",
+        "backend": "CPU",
+        "containment": "windows-job",
+        "worker_limit": 3943194624,
+        "worker_peak": 2190446592,
+        "words": 0
+      },
+      "error": "",
+      "timeout_seconds": 770,
+      "timed_out": false
+    },
+    {
+      "edition": "studio",
+      "max_pixels": 16000000,
+      "scenario": "dark",
+      "peak_rss_bytes": 2988789760,
+      "budget_bytes": 4000000000,
+      "below_budget": true,
+      "elapsed_seconds": 66.031,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 29.077999999999975,
+        "peak_rss": 2988609536,
+        "engine": "vision:qwen3-vl-2b-q4",
+        "backend": "CPU",
+        "containment": "windows-job",
+        "worker_limit": 3942871040,
+        "worker_peak": 2189815808,
+        "words": 0
+      },
+      "error": "",
+      "timeout_seconds": 770,
+      "timed_out": false
+    },
+    {
+      "edition": "studio",
+      "max_pixels": 16000000,
+      "scenario": "max-pixels",
+      "peak_rss_bytes": 3086553088,
+      "budget_bytes": 4000000000,
+      "below_budget": true,
+      "elapsed_seconds": 100.906,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 62.13999999999987,
+        "peak_rss": 3086372864,
+        "engine": "vision:qwen3-vl-2b-q4",
+        "backend": "CPU",
+        "containment": "windows-job",
+        "worker_limit": 3882225664,
+        "worker_peak": 2238234624,
+        "words": 0
+      },
+      "error": "",
+      "timeout_seconds": 770,
+      "timed_out": false
+    },
+    {
+      "edition": "studio",
+      "max_pixels": 16000000,
+      "scenario": "gui-onefile",
+      "peak_rss_bytes": 3140337664,
+      "budget_bytes": 4000000000,
+      "below_budget": true,
+      "elapsed_seconds": 102.781,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 62.641000000000076,
+        "peak_rss": 3140157440,
+        "engine": "vision:qwen3-vl-2b-q4",
+        "backend": "CPU",
+        "containment": "windows-job",
+        "worker_limit": 3828269056,
+        "worker_peak": 2238046208,
+        "words": 0
+      },
+      "error": "",
+      "timeout_seconds": 770,
+      "timed_out": false
+    }
+  ],
+  "source": {
+    "revision": "5dec752069936d49d119b75f6d02263662b6f7b9",
+    "dirty": false,
+    "tree_sha256": "e47465bfeed28a1821ec52a5c602742f570e05a3531fdbdec90278c474c20a02"
+  },
+  "sources_changed_during_run": false,
+  "binary_sha256": "2975ff9ef304fe672c842de7cab2a82bf90d001021a0b7abf10cf362130977b8",
+  "binary_changed_during_run": false,
+  "build_profile": {
+    "edition": "studio",
+    "available_editions": [
+      "studio"
+    ],
+    "methods": [
+      "neural",
+      "tesseract-fast",
+      "tesseract-best",
+      "vision"
+    ],
+    "platform": "Windows-2025Server-10.0.26100-SP0",
+    "python": "3.12.10",
+    "embedded_models": [
+      {
+        "id": "smolvlm-256m-q4",
+        "name": "SmolVLM 256M Q4 · English (experimental)",
+        "source": "https://huggingface.co/ggml-org/SmolVLM-256M-Instruct-GGUF",
+        "license": "Apache-2.0",
+        "languages": "eng",
+        "adapter": "llama.cpp",
+        "model_sha256": "0574eaffbb56eea1b7eaddd6ed61e0b93ad5832fe3e939d272747faac94f4277",
+        "projector_sha256": "7e943f7c53f0382a6fc41b6ee0c2def63ba4fded9ab8ed039cc9e2ab905e0edd"
+      },
+      {
+        "id": "qwen3-vl-2b-q4",
+        "name": "Qwen3-VL 2B (experimental)",
+        "source": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct-GGUF",
+        "license": "Apache-2.0",
+        "languages": "ara+eng",
+        "adapter": "llama.cpp",
+        "model_sha256": "089d75c52f4b7ffc56ba998ffc50aae89fcafc755f9e7208aacca281dca6c2ae",
+        "projector_sha256": "f9a68fabba69c3b81e153367b2c7521030b0fa8bb0de400c9599c8e6725f9c82"
+      }
+    ],
+    "default_model": "smolvlm-256m-q4",
+    "embedded_neural": [
+      {
+        "id": "ppocr-v5-arabic",
+        "name": "Arabic + English",
+        "source": "https://huggingface.co/PaddlePaddle/arabic_PP-OCRv5_mobile_rec_onnx",
+        "license": "Apache-2.0",
+        "languages": "ara+eng",
+        "geometry": "line",
+        "detector_sha256": "a431985659dc921974177a95adcfbb90fd9e51989a5e04d70d0b75f597b6e61d",
+        "recognizer_sha256": "799113ebf267fbe742deb99eb36e8d42c9ddc5291ceacf92add41b4d52a59110",
+        "dictionary_sha256": "7f92f7dbb9b75a4787a83bfb4f6d14a8ab515525130c9d40a9036f61cf6999e9"
+      }
+    ],
+    "default_neural": "ppocr-v5-arabic",
+    "variant": "multimodal",
+    "runtime_bundle_sha256": "fbf627d759ed8ce449498f543a9b69163dc40c462124ae6186239c3e9ac09ca6",
+    "source": {
+      "revision": "5dec752069936d49d119b75f6d02263662b6f7b9",
+      "dirty": false,
+      "tree_sha256": "e47465bfeed28a1821ec52a5c602742f570e05a3531fdbdec90278c474c20a02"
+    },
+    "built_at_utc": "2026-11-11T11:54:36.068114+00:00",
+    "dependencies": {
+      "Nuitka": "4.3.5",
+      "Pillow": "12.3.0",
+      "psutil": "7.2.2",
+      "PySide6-Essentials": "6.8.3"
+    },
+    "onefile_compression": {
+      "policy": "Nuitka low-memory",
+      "level": 3,
+      "compiler_version": "4.3.5"
+    },
+    "memory_certification": "Uncertified; see docs/PROGRESS.md and benchmark evidence",
+    "payload_memory": {
+      "enabled": true,
+      "nuitka": "4.3.5",
+      "strategy": "drop-unused-launcher-pages-v1",
+      "original_bootstrap_sha256": "73e5da1368005fa1d8ac82c62269095bb26cf231604f260409533a8fb21eb827",
+      "helper_sha256": "eba94369550127fd2a5a43070420df2d041e5691f623b3895401f6dce67a3643",
+      "patched_bootstrap_sha256": "8460dcfb5676b9bd1cc74a06dfa369df1c67b1d12e7eb9b3fdd7e48751855364"
+    }
+  },
+  "requested_method": "vision",
+  "requested_pack_id": "qwen3-vl-2b-q4"
+}

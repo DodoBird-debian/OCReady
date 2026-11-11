@@ -14,6 +14,7 @@ from pathlib import Path
 
 from scripts.payload_memory import compiler_overlay, overlay_environment
 from scripts.provenance import file_sha256, included_runtime_manifest, require_unchanged, source_record
+from scripts.qt_runtime import require_x11
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -33,6 +34,8 @@ def main() -> None:
     defaults = {"pocket": ["fast"], "everyday": ["fast", "best", "vision", "neural"], "studio": ["fast", "best", "vision", "neural"]}
     if args.variant and not re.fullmatch(r"[a-z0-9_-]{1,30}", args.variant):
         parser.error("Variant names use 1–30 lowercase letters, digits, underscores or hyphens.")
+    variant_directory = args.edition + ("-" + args.variant if args.variant else "")
+    require_x11(output=ROOT / "dist" / variant_directory / "qt-source-runtime.json")
     methods = args.methods.split(",") if args.methods else defaults[args.edition]
     if not methods or not set(methods) <= set(defaults[args.edition]):
         parser.error("Methods must be a nonempty subset of the edition's supported methods.")
@@ -128,6 +131,7 @@ def main() -> None:
         profile["payload_memory"] = metadata
         manifest.write_text(json.dumps(profile, indent=2) + "\n", encoding="utf-8")
         subprocess.run(command, cwd=ROOT, env=overlay_environment(env, overlay), check=True)
+    require_x11(out / "launch.dist", output=out / "qt-packaged-runtime.json")
     require_unchanged(ROOT, source)
     extension = ".exe" if os.name == "nt" else ""
     artifact = out / (name + extension)

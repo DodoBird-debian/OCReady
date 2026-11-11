@@ -6,6 +6,16 @@ A local-first desktop workspace for turning Arabic and English screenshots into 
 
 [Download experimental Linux and Windows prereleases](https://github.com/DodoBird-debian/OCReady/releases). They include all three editions, checksums, build manifests, and measured resource reports. Development continues beyond each tagged snapshot.
 
+Choose an experimental download with its OCR models already embedded:
+
+| Edition | Linux x86-64 | Windows x64 | Included methods |
+| --- | --- | --- | --- |
+| Pocket / 350 MB | [Download](https://github.com/DodoBird-debian/OCReady/releases/download/v0.1.0-preview.2/OCReady-pocket-linux-x86_64) | [Download](https://github.com/DodoBird-debian/OCReady/releases/download/v0.1.0-preview.2/OCReady-pocket-windows-amd64.exe) | Fast Arabic/English OCR |
+| Everyday / 1 GB | [Download](https://github.com/DodoBird-debian/OCReady/releases/download/v0.1.0-everyday-multimodal-json-preview.8/OCReady-everyday-multimodal-json-linux-x86_64) | [Download](https://github.com/DodoBird-debian/OCReady/releases/download/v0.1.0-everyday-multimodal-json-preview.8/OCReady-everyday-multimodal-json-windows-amd64.exe) | Fast, Precision, bilingual neural OCR, small English VLM |
+| Studio / 4 GB | [Download](https://github.com/DodoBird-debian/OCReady/releases/download/v0.1.0-studio-multimodal-preview.9/OCReady-studio-multimodal-linux-x86_64) | [Download](https://github.com/DodoBird-debian/OCReady/releases/download/v0.1.0-studio-multimodal-preview.9/OCReady-studio-multimodal-windows-amd64.exe) | Everyday choices plus bilingual Qwen3-VL |
+
+These snapshots have different source revisions; checksums and exact workload evidence are on their release pages. RAM figures name the target budgets. Measured passes and their limits are documented below. Linux uses the desktop's graphics libraries; see [runtime requirements](docs/RELEASING.md#linux-desktop-dependencies).
+
 The application uses a native Qt split view, offline Tesseract OCR, optional local vision-language models, reversible image cleanup, source-word highlighting, and KDE / Windows screenshot integration. Linux and Windows builds target one-file executables using Nuitka (compiled application and embedded runtime, extracted on launch).
 
 ![Native bilingual OCR workspace](docs/images/workspace.png)
@@ -75,7 +85,7 @@ No document content is uploaded. Vision inference is a local subprocess. Model i
 
 Budgets use decimal MB/GB. GPU VRAM is separate and must also be reported. Small-tier vision models require a measured complete inference footprint before admission. Arabic accuracy and Windows behavior are separate validation gates.
 
-See [measured memory workloads and limitations](docs/MEMORY.md). Branded Pocket executables at `8fa1f03` passed all four packaged workloads on both CI platforms, peaking at 228 MB on Linux and 175 MB on Windows, including their launchers. Studio's two-LLM composition also passed twenty scenarios per platform at clean `25c7477`, with 3.255 GB Linux and 3.138 GB Windows maxima. A subsequent Studio release attempt exposed a diagnostic deadline mismatch; corrected verification remains required before publication. These measurements are not universal hard-memory certifications.
+See [measured memory workloads and limitations](docs/MEMORY.md). Branded Pocket executables at `8fa1f03` passed all four packaged workloads on both CI platforms, peaking at 228 MB on Linux and 175 MB on Windows, including their launchers. The [published Studio two-LLM composition](https://github.com/DodoBird-debian/OCReady/releases/tag/v0.1.0-studio-multimodal-preview.9) at clean `5dec752` passed twenty scenarios per platform, with 3.257 GB Linux and 3.141 GB Windows maxima ([exact release evidence](docs/benchmarks/studio-multimodal-release.json)). Its corrected diagnostic deadlines retain the unchanged inference and RAM limits. Fresh isolated X11/Win32 checks are under development and do not retroactively extend these older releases' validation scope. These measurements are not universal hard-memory certifications.
 
 The [accuracy corpus and evaluator](docs/ACCURACY.md) track character/word errors across Arabic and English styles, including difficult cases. Passing resource tests is separate from transcription accuracy.
 

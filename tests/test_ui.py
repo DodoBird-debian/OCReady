@@ -109,13 +109,13 @@ def test_gui_smoke_does_not_cancel_vision_inside_its_engine_deadline(window, app
     while not output.exists() and time.monotonic() < until:
         app.processEvents()
         time.sleep(.005)
-    record = json.loads(output.read_text())
+    record = json.loads(output.read_text(encoding="utf-8"))
     assert not cancelled.is_set() and codes == [0]
     assert record["text"] == "Expected text" and not record["error"]
     assert record["deadline_seconds"] > 300
 
 
-def test_packaged_smoke_clicks_a_real_arabic_region_and_copies_text(window, app, tmp_path):
+def test_packaged_smoke_clicks_a_real_arabic_region_and_copies_text(window, app, tmp_path, monkeypatch):
     import json
     from types import SimpleNamespace
 
@@ -124,13 +124,19 @@ def test_packaged_smoke_clicks_a_real_arabic_region_and_copies_text(window, app,
     if not readiness()[0]:
         pytest.skip("Prepare OCR runtime for the real copy workflow")
     output = tmp_path / "copy-smoke.json"
+    original_read = Path.read_text
+    def windows_default_encoding(path, *args, **kwargs):
+        if path == output:
+            kwargs.setdefault("encoding", "cp1252")
+        return original_read(path, *args, **kwargs)
+    monkeypatch.setattr(Path, "read_text", windows_default_encoding)
     codes = []
     attach_smoke_run(SimpleNamespace(exit=codes.append), window, None, output)
     until = time.monotonic() + 10
     while not output.exists() and time.monotonic() < until:
         app.processEvents()
         time.sleep(.01)
-    record = json.loads(output.read_text())
+    record = json.loads(output.read_text(encoding="utf-8"))
     assert codes == [0] and not record["error"]
     assert record["source_selection_verified"] is True
     assert record["clipboard_copy_verified"] is True

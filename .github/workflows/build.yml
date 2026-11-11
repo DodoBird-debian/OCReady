@@ -32,7 +32,7 @@ jobs:
           uv sync --frozen --extra dev
       - name: Linux runtime
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-ara libegl1 libxcb-cursor0 libxkbcommon-x11-0 patchelf xvfb xauth
+        run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-ara libegl1 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxkbcommon-x11-0 patchelf xvfb xauth
       - name: Windows runtime
         if: runner.os == 'Windows'
         run: choco install tesseract --no-progress -y
@@ -61,6 +61,7 @@ jobs:
           name: OCReady-${{ matrix.edition }}-${{ runner.os }}-diagnostics
           path: |
             dist/${{ matrix.edition }}/pe-layout.json
+            dist/${{ matrix.edition }}/qt-*-runtime.json
             dist/${{ matrix.edition }}/compilation-report.xml
             build/${{ matrix.edition }}/payload/build-manifest.json
             test-output/packaged-${{ matrix.edition }}.json
@@ -75,6 +76,7 @@ jobs:
             dist/${{ matrix.edition }}/OCReady-*
             dist/${{ matrix.edition }}/build-manifest.json
             dist/${{ matrix.edition }}/pe-layout.json
+            dist/${{ matrix.edition }}/qt-*-runtime.json
             test-output/packaged-${{ matrix.edition }}.json
             test-output/gui-*.json
             test-output/gui-*.png

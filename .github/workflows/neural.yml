@@ -40,7 +40,7 @@ jobs:
           uv sync --frozen --extra dev --extra neural
       - name: Linux runtime
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-ara libegl1 libxcb-cursor0 libxkbcommon-x11-0 patchelf xvfb xauth
+        run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-ara libegl1 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxkbcommon-x11-0 patchelf xvfb xauth
       - name: Windows runtime
         if: runner.os == 'Windows'
         run: choco install tesseract --no-progress -y
@@ -90,6 +90,7 @@ jobs:
           name: OCReady-${{ inputs.edition }}-${{ inputs.variant }}-${{ runner.os }}-diagnostics
           path: |
             dist/${{ inputs.edition }}-${{ inputs.variant }}/pe-layout.json
+            dist/${{ inputs.edition }}-${{ inputs.variant }}/qt-*-runtime.json
             dist/${{ inputs.edition }}-${{ inputs.variant }}/compilation-report.xml
             build/${{ inputs.edition }}-${{ inputs.variant }}/payload/build-manifest.json
             test-output/packaged-*.json
@@ -104,6 +105,7 @@ jobs:
             dist/${{ inputs.edition }}-${{ inputs.variant }}/OCReady-*
             dist/${{ inputs.edition }}-${{ inputs.variant }}/build-manifest.json
             dist/${{ inputs.edition }}-${{ inputs.variant }}/pe-layout.json
+            dist/${{ inputs.edition }}-${{ inputs.variant }}/qt-*-runtime.json
             test-output/packaged-${{ inputs.edition }}-${{ inputs.variant }}-*.json
             test-output/neural-accuracy.json
             test-output/gui-*.json
