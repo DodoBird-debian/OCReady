@@ -9,12 +9,14 @@ from PySide6.QtWidgets import (
     QDialog,
     QFileDialog,
     QFormLayout,
+    QFrame,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QListWidget,
     QPlainTextEdit,
     QPushButton,
+    QScrollArea,
     QSpinBox,
     QTabWidget,
     QVBoxLayout,
@@ -134,7 +136,11 @@ class SettingsDialog(QDialog):
         save.setObjectName("Primary")
         save.clicked.connect(self.save_model)
         layout.addWidget(save, 0, Qt.AlignmentFlag.AlignRight)
-        tabs.addTab(models, "Vision models")
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        scroll.setWidget(models)
+        tabs.addTab(scroll, "Vision models")
         done = QPushButton("Done")
         done.clicked.connect(self.accept)
         outer.addWidget(done, 0, Qt.AlignmentFlag.AlignRight)

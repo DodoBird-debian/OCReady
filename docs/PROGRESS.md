@@ -138,3 +138,9 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Added model image-limit controls and manifest validation. Corrected the compiled benchmark's method selection for vision-only binaries and rejected unsupported benchmark combinations explicitly.
 - Real Q4 SmolVLM source inference passed four fresh-process scenarios, including four repeated 8 MP GUI jobs; maximum observed peak was 735.0 MB. These stress cases validate memory/inference, not tiled-image transcription accuracy.
 - Validation: 96 tests and Ruff passed. The updated embedded Everyday vision-only binary is compiling for its own cap-sized checks. Settings now need a scrollable layout for small screens; broader bilingual accuracy and real desktop capture remain open priorities.
+
+## Iteration 13 — settings on smaller screens
+
+- Put the advanced model form inside a resizable scroll area while keeping Done outside it. The form no longer forces an 854-pixel-tall dialog.
+- Inspected the actual rendered 790 × 700 dialog and verified the prompt remains reachable by scrolling at a 560-pixel dialog height. Keyboard-accessible native controls are retained.
+- Validation: the native GUI suite (20 tests) and Ruff passed; the smaller-screen case was rerun after simplifying its viewport assertion. The core vision build and fresh source CI are still being observed separately.

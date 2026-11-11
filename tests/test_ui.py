@@ -5,7 +5,7 @@ from pathlib import Path
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import pytest
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QPoint, Qt
 from PySide6.QtGui import QTextCursor
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
@@ -152,10 +152,21 @@ def test_paste_image_from_native_clipboard(window, app):
 
 
 def test_settings_model_form_opens_without_a_configured_model(window, app):
+    from PySide6.QtWidgets import QScrollArea, QTabWidget
+
     from ocready.ui.settings import SettingsDialog
     dialog = SettingsDialog(window)
+    dialog.findChild(QTabWidget).setCurrentIndex(1)
+    dialog.resize(790, 560)
     dialog.show()
     app.processEvents()
+    assert dialog.height() == 560
+    scroll = dialog.findChild(QScrollArea)
+    assert scroll.verticalScrollBar().maximum() > 0
+    scroll.ensureWidgetVisible(dialog.prompt)
+    app.processEvents()
+    prompt_top = dialog.prompt.mapTo(scroll.viewport(), QPoint()).y()
+    assert 0 <= prompt_top < scroll.viewport().height()
     assert dialog.fields["projector"].text() == ""
     assert dialog.memory.value() == 2800
     assert dialog.list.count() == 0
