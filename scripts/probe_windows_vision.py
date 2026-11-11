@@ -122,7 +122,7 @@ def main() -> None:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             print(json.dumps(record, ensure_ascii=True), flush=True)
-    if not all(row["exit_code"] == 0 and row.get("english_sample_verified")
+    if not all(not row["timed_out"] and row["exit_code"] == 0 and row.get("english_sample_verified")
                and any("-m" in worker["command"] and worker.get("exit_code") == 0 for worker in row["native_workers"])
                for row in report["cases"]):
         raise SystemExit(1)

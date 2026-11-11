@@ -1,0 +1,22 @@
+{
+  "scope": "Local experimental Q8-to-Q4 projector requantization; not a published model pack or Pocket release",
+  "runtime_release": "b12255",
+  "quantizer_sha256": "229512160dfef61afb8f14368c3be86896d204d60448d51fb9fc3c157f2082c9",
+  "command": [
+    "runtime/vision-cpu/b12255-linux-x86_64/llama-b12255/llama-quantize",
+    "--allow-requantize",
+    "models/vision/smol-q4/mmproj-SmolVLM-256M-Instruct-Q8_0.gguf",
+    "test-output/pocket-vision/mmproj-Q4_0.gguf",
+    "Q4_0"
+  ],
+  "original": {
+    "sha256": "7e943f7c53f0382a6fc41b6ee0c2def63ba4fded9ab8ed039cc9e2ab905e0edd",
+    "bytes": 103769856
+  },
+  "derived": {
+    "sha256": "93664a350333584147498c859ec7f50b7748f1c8f259b6f2c8cfc26b5813fd32",
+    "bytes": 57763584
+  },
+  "log": "smol-q4-projector-quantization.log",
+  "log_sha256": "8b31cb5c6455c85140b0451d96f4a574d196565605e4d4e326f0a38a92c43e94"
+}
