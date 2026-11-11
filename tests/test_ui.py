@@ -120,6 +120,50 @@ def test_recognition_worker_returns_to_idle(window, app):
     assert not window.editor.isReadOnly()
 
 
+def test_busy_workspace_cannot_change_recipe_or_edit_text(window, monkeypatch):
+    from ocready.core.types import Box
+    from ocready.ui.settings import SettingsDialog
+    if not readiness()[0]:
+        pytest.skip("Prepare OCR runtime to test background recognition")
+    window.load_example()
+    window.editor.setPlainText("Keep\nlines")
+    window.editor.document().setModified(False)
+    window.crop_button.setChecked(True)
+    window.toggle_crop()
+    window.recognize()
+    recipe = window.worker.request.recipe
+    preview = window.preview.size
+    assert not window.canvas.crop_mode
+    assert not window.view_original.isChecked()
+    assert not window.view_original.isEnabled()
+    assert not window.settings_button.isEnabled()
+    assert not window.join_lines_button.isEnabled()
+    window._crop_selected(Box(0, 0, 100, 100))
+    window.join_lines()
+    monkeypatch.setattr(SettingsDialog, "exec", lambda _self: pytest.fail("Settings opened during recognition"))
+    window.show_settings()
+    assert window.recipe == recipe
+    assert window.preview.size == preview
+    assert window.editor.toPlainText() == "Keep\nlines"
+    window.cancel_recognition()
+
+
+def test_ctrl_c_copies_source_words_without_replacing_editor_copy(recognized, app):
+    window = recognized
+    window.canvas.set_selection({0})
+    window.canvas.setFocus()
+    QTest.keyClick(window.canvas, Qt.Key.Key_C, Qt.KeyboardModifier.ControlModifier)
+    app.processEvents()
+    assert QApplication.clipboard().text() == window.result.words[0].text
+    cursor = window.editor.textCursor()
+    cursor.setPosition(0)
+    cursor.setPosition(5, QTextCursor.MoveMode.KeepAnchor)
+    window.editor.setTextCursor(cursor)
+    window.editor.setFocus()
+    QTest.keyClick(window.editor, Qt.Key.Key_C, Qt.KeyboardModifier.ControlModifier)
+    assert QApplication.clipboard().text() == window.result.text[:5]
+
+
 def test_recognition_flushes_a_pending_preview(window, app):
     if not readiness()[0]:
         pytest.skip("Prepare OCR runtime to test background recognition")
@@ -187,6 +231,33 @@ def test_automatic_direction_is_independent_per_paragraph(window, app):
     cursor = window.editor.textCursor()
     cursor.setPosition(first.next().position())
     assert window.editor.cursorRect(cursor).x() > window.editor.viewport().width() / 2
+
+
+def test_pasted_arabic_paragraphs_get_direction_with_one_undo(window, app):
+    editor = window.editor
+    editor.setPlainText("English")
+    editor.document().setModified(False)
+    editor.moveCursor(QTextCursor.MoveOperation.End)
+    editor.insertPlainText("\nمرحبا بالعالم\nAnother line")
+    app.processEvents()
+    blocks = editor.document().firstBlock()
+    assert blocks.blockFormat().layoutDirection() == Qt.LayoutDirection.LeftToRight
+    assert blocks.next().blockFormat().layoutDirection() == Qt.LayoutDirection.RightToLeft
+    assert blocks.next().next().blockFormat().layoutDirection() == Qt.LayoutDirection.LeftToRight
+    assert editor.document().isModified()
+    editor.undo()
+    assert editor.toPlainText() == "English"
+    assert not editor.document().isModified()
+    editor.redo()
+    assert "مرحبا بالعالم" in editor.toPlainText()
+    assert editor.document().firstBlock().next().blockFormat().layoutDirection() == Qt.LayoutDirection.RightToLeft
+
+
+def test_explicit_paragraph_direction_survives_arabic_edits(window):
+    editor = window.editor
+    editor.set_direction("ltr")
+    editor.insertPlainText("مرحبا")
+    assert editor.document().firstBlock().blockFormat().layoutDirection() == Qt.LayoutDirection.LeftToRight
 
 
 def test_original_image_keeps_located_word_selection_after_rotation(window, app):

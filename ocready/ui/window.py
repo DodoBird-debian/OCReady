@@ -133,7 +133,8 @@ class MainWindow(QMainWindow):
         brand.addWidget(self.edition_combo)
         brand.addSpacing(8)
         brand.addWidget(button("Help", self.show_help, quiet=True))
-        brand.addWidget(button("Settings", self.show_settings, quiet=True))
+        self.settings_button = button("Settings", self.show_settings, quiet=True)
+        brand.addWidget(self.settings_button)
         layout.addLayout(brand)
 
         title = QHBoxLayout()
@@ -362,7 +363,8 @@ class MainWindow(QMainWindow):
         row.addStretch()
         self.link_status = label("")
         row.addWidget(self.link_status)
-        row.addWidget(button("Join lines", self.join_lines, quiet=True, tooltip="Join wrapped lines while keeping paragraphs. Undo is available."))
+        self.join_lines_button = button("Join lines", self.join_lines, quiet=True, tooltip="Join wrapped lines while keeping paragraphs. Undo is available.")
+        row.addWidget(self.join_lines_button)
         self.save_button = button("Save text", self.save_text, quiet=True)
         row.addWidget(self.save_button)
         outer.addLayout(row)
@@ -378,6 +380,10 @@ class MainWindow(QMainWindow):
             shortcut = QShortcut(QKeySequence(key), self)
             shortcut.activated.connect(slot)
             self.shortcuts.append(shortcut)
+        source_copy = QShortcut(QKeySequence.StandardKey.Copy, self.canvas)
+        source_copy.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        source_copy.activated.connect(self.copy_image_selection)
+        self.shortcuts.append(source_copy)
 
     def _set_status(self, text: str, error=False) -> None:
         self.status.setText(text)
@@ -388,8 +394,13 @@ class MainWindow(QMainWindow):
         self.progress.setVisible(busy)
         for control in (self.open_button, self.paste_button, self.capture_button, self.edition_combo,
                         self.method_combo, self.language_combo, self.layout_combo, self.cleanup,
-                        self.compare_check):
+                        self.compare_check, self.settings_button, self.join_lines_button):
             control.setEnabled(not busy)
+        self.view_original.setEnabled(not busy and self.source is not None and self.preview is not None and
+                                      (self.recipe != Recipe() or self.preview.size != self.source.size))
+        if busy:
+            self.crop_button.setChecked(False)
+            self.canvas.crop_mode = False
         self.recognize_button.setEnabled(self.source is not None and not busy)
         self.editor.setReadOnly(busy)
         if not busy:
@@ -524,13 +535,15 @@ class MainWindow(QMainWindow):
             self._set_status("Drag a rectangle on the original image to crop. Reset all restores the full image.")
 
     def _crop_selected(self, box: Box) -> None:
+        if self.worker:
+            return
         self.recipe = dataclasses.replace(self.recipe, crop=box)
         self.crop_button.setChecked(False)
         self.canvas.crop_mode = False
         self._apply_recipe()
 
     def toggle_original(self) -> None:
-        if self.source is None:
+        if self.source is None or self.worker:
             return
         original = self.view_original.isChecked()
         self.canvas.set_image(self.source if original else self.preview)
@@ -605,6 +618,11 @@ class MainWindow(QMainWindow):
         self.preview_timer.stop()
         if preview_pending:
             self._apply_recipe()
+        # Restore the exact inference preview before locking the workspace.
+        # This also releases a larger original-view pixmap in vision mode.
+        if self.view_original.isChecked():
+            self.view_original.setChecked(False)
+            self.toggle_original()
         self.job += 1
         method = self.method_combo.currentData()
         pack = next((p for p in self.packs if method == f"vision:{p.id}"), None)
@@ -728,6 +746,8 @@ class MainWindow(QMainWindow):
                 self._set_status(f"Could not save text: {exc}", error=True)
 
     def join_lines(self) -> None:
+        if self.worker:
+            return
         text = self.editor.toPlainText()
         joined = unwrap_lines(text)
         if joined != text:
@@ -757,6 +777,8 @@ class MainWindow(QMainWindow):
         QMessageBox.information(self, "A few shortcuts to your words", "1. Open, paste, or capture an image.\n2. Choose Recognize text.\n3. Edit, select, and copy.\n\nClick a word in the picture, or drag over a sentence.\nSelecting text also highlights its source. Manual edits turn off source linking until you recognize again.\n\nCtrl+O  Open image\nCtrl+Shift+V  Paste image\nCtrl+Shift+S  Capture region\nCtrl+Enter  Recognize\nCtrl+Shift+C  Copy all\nCtrl+S  Save text\nEscape  Cancel or clear selection\n\nMouse wheel  Zoom image\nMiddle mouse drag  Pan image\n\nPocket: fast OCR, 350 MB budget\nEveryday: fast + precision OCR, 1 GB budget\nStudio: OCR + optional local vision models, 4 GB budget\n\nRAM is sampled, not an OS-enforced hard ceiling. Nothing is uploaded.")
 
     def show_settings(self) -> None:
+        if self.worker:
+            return
         from ocready.ui.settings import SettingsDialog
         SettingsDialog(self).exec()
 

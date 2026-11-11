@@ -161,3 +161,11 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Added boundary tests: the compact policy admits a 500 MB runner beside a 457 MB resident app, refuses the same app with the larger image policy, and still refuses the compact policy if resident usage rises too far.
 - This is a conservative admission heuristic followed by native worker limits and RSS monitoring, not a claim that future allocations are known. A fresh clean-source embedded build is required to validate the previously refused GUI workload.
 - Validation: the 100-test suite exposed one old test's fixed-reserve assumption; its refusal case was updated to remain above the new budget boundary and the vision suite was rerun. Ruff passed.
+
+## Iteration 16 — stable recognition workspace and native text editing
+
+- Reproduced a live crop gesture changing the preview while the worker retained its original recipe. Recognition now exits crop mode, restores the exact processing preview, and prevents crop/settings/original-view changes until the worker finishes.
+- Disabled the Join lines action during recognition and guarded its programmatic path, so read-only pending text cannot be changed through an action before replacement.
+- Added picture-focused Ctrl+C for selected source words while retaining native text-pane copying.
+- Automatic paragraph direction now follows newly typed/pasted Arabic and English, not only the initial OCR result. Direction formatting joins the text operation so one Undo/Redo restores both content and layout; explicit direction choices remain respected.
+- Native GUI validation covers the reproduced crop race, pending-text protection, focus-sensitive copying, mixed-language paste, and undo/redo. All 104 tests and Ruff passed in the isolated worktree, using the real prepared OCR runtime. Work was isolated while the clean embedded vision build completed its source check.

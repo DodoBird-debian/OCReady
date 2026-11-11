@@ -52,8 +52,12 @@ class TextEditor(QTextEdit):
         self.linkChanged.emit(False)
 
     def _on_edit(self) -> None:
-        if not self._setting and self.linked and self.result and self.toPlainText() != self.result.text:
+        if self._setting:
+            return
+        if self.linked and self.result and self.toPlainText() != self.result.text:
             self.invalidate_link()
+        if self.direction == "auto":
+            self.set_direction("auto", join_edit=True)
 
     def _on_selection(self) -> None:
         if not self.linked or not self.result:
@@ -87,7 +91,7 @@ class TextEditor(QTextEdit):
             if not self.viewport().rect().contains(position):
                 scrollbar.setValue(scrollbar.value() + position.y() - self.viewport().height() // 2)
 
-    def set_direction(self, value: str) -> None:
+    def set_direction(self, value: str, *, join_edit: bool = False) -> None:
         self.direction = value
         direction = {"auto": Qt.LayoutDirection.LayoutDirectionAuto,
                      "rtl": Qt.LayoutDirection.RightToLeft, "ltr": Qt.LayoutDirection.LeftToRight}[value]
@@ -97,7 +101,10 @@ class TextEditor(QTextEdit):
         option.setTextDirection(direction)
         self.document().setDefaultTextOption(option)
         cursor = QTextCursor(self.document())
-        cursor.beginEditBlock()
+        if join_edit:
+            cursor.joinPreviousEditBlock()
+        else:
+            cursor.beginEditBlock()
         block = self.document().firstBlock()
         while block.isValid():
             strong = next((unicodedata.bidirectional(character) for character in block.text()
@@ -105,10 +112,13 @@ class TextEditor(QTextEdit):
             rtl = value == "rtl" or (value == "auto" and strong in {"R", "AL"})
             cursor.setPosition(block.position())
             formatting = cursor.blockFormat()
-            formatting.setLayoutDirection(Qt.LayoutDirection.RightToLeft if rtl else Qt.LayoutDirection.LeftToRight)
-            formatting.setAlignment((Qt.AlignmentFlag.AlignRight if rtl else Qt.AlignmentFlag.AlignLeft)
-                                    | Qt.AlignmentFlag.AlignAbsolute)
-            cursor.setBlockFormat(formatting)
+            wanted_direction = Qt.LayoutDirection.RightToLeft if rtl else Qt.LayoutDirection.LeftToRight
+            wanted_alignment = ((Qt.AlignmentFlag.AlignRight if rtl else Qt.AlignmentFlag.AlignLeft)
+                                | Qt.AlignmentFlag.AlignAbsolute)
+            if formatting.layoutDirection() != wanted_direction or formatting.alignment() != wanted_alignment:
+                formatting.setLayoutDirection(wanted_direction)
+                formatting.setAlignment(wanted_alignment)
+                cursor.setBlockFormat(formatting)
             block = block.next()
         cursor.endEditBlock()
         self.document().setModified(modified)
