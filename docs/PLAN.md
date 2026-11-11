@@ -1454,3 +1454,21 @@ PaddleOCR-VL original model card: https://huggingface.co/PaddlePaddle/PaddleOCR-
 - M53.V6: Test actual CUDA inference/failure fallback separately from provider-presence metadata.
 - Release gate: Real engine, Unicode, geometry and complete-process resource evidence for each published variant.
 Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-obligations
+
+## M54 — interchangeable local vision runtime adapters
+
+- Responsibility: Keep model choice and inference-runtime details independent of the OCR workflow.
+- M54.T1: Preserve the existing local pack format and default llama.cpp behavior for saved packs.
+- M54.T2: Identify each pack's runtime adapter through a validated stable identifier.
+- M54.T3: Define command creation, runtime environment, capability probing and result decoding at one adapter boundary.
+- M54.T4: Keep shared admission, cancellation, worker containment and CPU retry policy outside model-specific adapters.
+- M54.T5: Describe supported model/projector formats and give actionable compatibility errors before inference.
+- M54.T6: Offer an offline versioned JSON worker protocol for additional local vision runtimes.
+- M54.T7: Carry adapter identity through pack import, settings, embedding and build/release provenance.
+- M54.T8: Never import arbitrary Python modules named by a pack manifest.
+- M54.V1: Existing GLM, SmolVLM and Qwen packs continue working without migration.
+- M54.V2: Swap two different runtime adapters without changing the pipeline or text/source UI.
+- M54.V3: Validate actual response schemas, Unicode text, dimensions and declared backend.
+- M54.V4: Fail unsupported adapters, protocol versions and malformed output before displaying a result.
+- M54.V5: Exercise real CPU/GPU fallback with cancellation and memory failure exclusions retained.
+- Release gate: At least two concrete adapter implementations, backward compatibility and per-pack packaged evidence.
