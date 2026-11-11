@@ -4,6 +4,8 @@ A local-first desktop workspace for turning Arabic and English screenshots into 
 
 **Under construction.** See [the modular implementation plan](docs/PLAN.md) and [iteration log](docs/PROGRESS.md). Memory tiers are engineering budgets until benchmarked; no vision model is claimed to fit a tier based on parameter count alone.
 
+[Download the experimental Linux and Windows prerelease](https://github.com/DodoBird-debian/OCReady/releases/tag/v0.1.0-preview.1). It includes all three editions, checksums, build manifests, and measured resource reports. Development continues beyond that tagged snapshot.
+
 The application uses a native Qt split view, offline Tesseract OCR, optional local vision-language models, reversible image cleanup, source-word highlighting, and KDE / Windows screenshot integration. Linux and Windows builds target one-file executables using Nuitka (compiled application and embedded runtime, extracted on launch).
 
 ![Native bilingual OCR workspace](docs/images/workspace.png)
@@ -29,6 +31,8 @@ Open/paste/capture an image, choose **Recognize text**, and copy. Click or drag 
 Use **Ctrl+C** with the picture focused to copy its selected words. The text pane keeps native selection copying. Automatic paragraph direction also follows Arabic and English as you edit or paste; Undo restores the text in one step.
 
 Everyday admits smaller local vision-language packs; Studio admits larger ones. Configure one or more packs under **Settings → Vision models**; see [setup and measured results](docs/VISION.md). Real CPU inference, CUDA inference, and a GPU-failure-to-CPU fallback have been exercised on Linux. Vision output has no invented source boxes or confidence. Arabic uses classical OCR by default; the tested tiny vision alternative is English-only.
+
+Fresh Everyday/Studio GUI sessions prefer Precision for bilingual text. Your method choice is remembered separately for each edition, along with the last available edition, layout, language, and compute backend. An explicit `--edition` overrides the saved GUI edition; headless defaults remain the build's default.
 
 ## Compiling a single executable
 

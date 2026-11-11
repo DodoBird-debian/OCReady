@@ -16,6 +16,19 @@ Reports include expected/actual text because every fixture is original public te
 
 The first exploratory runs found exact recognition for several clean English/Arabic font cases, but substantial errors on diacritics, small Arabic, and mixed digits. Precision recovered bilingual lines that Fast omitted. Layout comparison improved the small-text case but could also choose an incomplete result with higher OCR confidence. Confidence is therefore a diagnostic, not measured transcription accuracy. These findings motivate visible alternatives and further detection/layout work.
 
+## First clean-source baseline
+
+Linux, prepared Tesseract 5.5.0, clean source `1595c32`, the committed eleven fixtures. The reports identify source and corpus digests and confirm that sources remained unchanged during evaluation.
+
+| Method | Screenshot layout CER / WER | Automatic + comparison CER / WER |
+| --- | ---: | ---: |
+| Fast | 29.2% / 26.7% | 28.4% / 28.3% |
+| Precision | 9.9% / 11.7% | 7.5% / 8.3% |
+
+These are weighted error rates on this synthetic corpus, not overall product accuracy. Arabic diacritics remain particularly poor (68.1% CER even with Precision in these runs). Screenshot layout read the Kufi case exactly with Fast, while confidence-based comparison selected a worse 49.2% CER result. Comparison did improve small Arabic from 30.8% CER to zero. A user must be able to inspect alternatives rather than assume higher confidence guarantees complete transcription.
+
+Raw case-by-case references, output and scoring: [Screenshot layout](accuracy/linux-sparse.json), [Automatic plus comparison](accuracy/linux-compare.json).
+
 This small synthetic corpus does not establish real-world accuracy. It lacks camera perspective, handwriting, complex tables and many font/print conditions. Adding representative, redistribution-safe examples and auditing reading order remain ongoing work. Do not describe `1 - CER` as a universal product accuracy percentage.
 
 Regeneration requires Qt and the named DejaVu/Noto Arabic font families:

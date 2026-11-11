@@ -69,7 +69,7 @@ def divider() -> QFrame:
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, *, edition: str = "pocket"):
+    def __init__(self, *, edition: str | None = None):
         super().__init__()
         self.setWindowTitle("OCReady — Arabic + English OCR")
         self.setWindowIcon(app_icon())
@@ -78,8 +78,16 @@ class MainWindow(QMainWindow):
         self.setAcceptDrops(True)
         self.preferences = load_settings()
         self.profile = build_profile()
+        edition = edition or self.preferences.get("edition", self.profile["edition"])
+        if edition not in self.profile["available_editions"]:
+            edition = self.profile["edition"]
+        saved_methods = self.preferences.get("methods", {})
+        self.method_preferences = {key: value for key, value in saved_methods.items() if key in EDITIONS and isinstance(value, str)} if isinstance(saved_methods, dict) else {}
+        self._method_edition = None
         self.packs = load_packs()
         self.vision_backend = self.preferences.get("vision_backend", "auto")
+        if self.vision_backend not in ("auto", "cpu", "cuda"):
+            self.vision_backend = "auto"
         self.source: Image.Image | None = None
         self.preview: Image.Image | None = None
         self._preview_limits: tuple[int, int] | None = None
@@ -190,7 +198,7 @@ class MainWindow(QMainWindow):
         self.layout_combo.setAccessibleName("Page layout")
         for key, (_, name) in LAYOUTS.items():
             self.layout_combo.addItem(name, key)
-        self.layout_combo.setCurrentIndex(2)
+        self.layout_combo.setCurrentIndex(max(0, self.layout_combo.findData(self.preferences.get("layout", "sparse"))))
         options.addWidget(self.layout_combo)
         options.addStretch()
         self.compare_check = QCheckBox("Compare layouts")
@@ -563,7 +571,7 @@ class MainWindow(QMainWindow):
             self._update_memory()
 
     def refresh_methods(self) -> None:
-        selected = self.method_combo.currentData()
+        selected = self.method_combo.currentData() if self._method_edition == self.edition.id else self.method_preferences.get(self.edition.id)
         self.method_combo.blockSignals(True)
         self.method_combo.clear()
         for name, method in (("Fast OCR", "tesseract-fast"), ("Precision OCR", "tesseract-best")):
@@ -581,9 +589,15 @@ class MainWindow(QMainWindow):
             self.method_combo.model().item(0).setEnabled(False)
         index = self.method_combo.findData(selected)
         if index < 0 or not self.method_combo.model().item(index).isEnabled():
-            index = next((i for i in range(self.method_combo.count()) if self.method_combo.model().item(i).isEnabled()), 0)
+            preferred = "tesseract-best" if self.edition.best_data and "tesseract-best" in self.profile["methods"] else "tesseract-fast"
+            if self.profile["methods"][0] == "vision":
+                preferred = f"vision:{self.profile.get('default_model', '')}"
+            index = self.method_combo.findData(preferred)
+            if index < 0 or not self.method_combo.model().item(index).isEnabled():
+                index = next((i for i in range(self.method_combo.count()) if self.method_combo.model().item(i).isEnabled()), 0)
         self.method_combo.setCurrentIndex(index)
         self.method_combo.blockSignals(False)
+        self._method_edition = self.edition.id
         self._method_changed()
 
     def _method_changed(self, *_args) -> None:
@@ -597,6 +611,8 @@ class MainWindow(QMainWindow):
             if pack and self.language_combo.currentData() != pack.languages and pack.languages != "ara+eng":
                 self.language_combo.setCurrentIndex(self.language_combo.findData(pack.languages))
         item = self.method_combo.model().item(self.method_combo.currentIndex())
+        if item is not None and item.isEnabled() and self.method_combo.currentData():
+            self.method_preferences[self.edition.id] = self.method_combo.currentData()
         self.recognize_button.setEnabled(self.source is not None and not self.worker and item is not None and item.isEnabled())
         policy = self._image_policy()
         if self.source is not None and self._preview_limits != (policy.max_pixels, policy.max_edge):
@@ -808,7 +824,8 @@ class MainWindow(QMainWindow):
             return
         try:
             save_settings({"edition": self.edition.id, "language": self.language_combo.currentData(),
-                           "vision_backend": self.vision_backend})
+                           "vision_backend": self.vision_backend, "methods": self.method_preferences,
+                           "layout": self.layout_combo.currentData()})
         except OSError:
             pass
         event.accept()

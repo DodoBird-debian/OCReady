@@ -8,7 +8,7 @@ from ocready.ui.theme import app_icon, apply_theme
 from ocready.ui.window import MainWindow
 
 
-def run(image: str | None = None, edition: str = "pocket", *, smoke_output: Path | None = None) -> int:
+def run(image: str | None = None, edition: str | None = None, *, smoke_output: Path | None = None) -> int:
     app = QApplication.instance() or QApplication(sys.argv[:1])
     app.setApplicationName("OCReady")
     app.setOrganizationName("OCReady")

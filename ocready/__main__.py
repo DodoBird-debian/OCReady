@@ -34,7 +34,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="OCReady — local Arabic + English OCR")
     parser.add_argument("image", nargs="?", help="Image to open, or recognize with --text / --json")
     parser.add_argument("--version", action="version", version=f"OCReady {__version__}")
-    parser.add_argument("--edition", choices=profile["available_editions"], default=profile["edition"])
+    parser.add_argument("--edition", choices=profile["available_editions"], help="Memory edition; GUI restores the last available edition, CLI uses the build default")
     parser.add_argument("--language", choices=("ara+eng", "ara", "eng"))
     parser.add_argument("--method", choices=("tesseract-fast", "tesseract-best", "vision"), default=profile["methods"][0])
     parser.add_argument("--model-pack", type=Path, help="Local vision model JSON manifest")
@@ -64,7 +64,7 @@ def main(argv: list[str] | None = None) -> int:
             from ocready.core.images import load_image
             from ocready.core.pipeline import Request, recognize_image
             from ocready.core.preprocess import Recipe
-            edition = edition_for(args.edition)
+            edition = edition_for(args.edition or profile["edition"])
             source = load_image(args.image, edition)
             recipe = Recipe(invert=args.invert, grayscale=args.grayscale, autocontrast=args.autocontrast,
                             threshold=args.threshold, rotation=args.rotate)

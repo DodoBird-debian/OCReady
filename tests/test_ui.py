@@ -5,7 +5,7 @@ from pathlib import Path
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import pytest
-from PySide6.QtCore import QPoint, Qt
+from PySide6.QtCore import QCoreApplication, QEvent, QPoint, Qt
 from PySide6.QtGui import QTextCursor
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
@@ -29,16 +29,22 @@ def app():
 def window(app, tmp_path, monkeypatch):
     monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path))
     monkeypatch.setenv("APPDATA", str(tmp_path))
+    existing = set(app.topLevelWidgets())
     widget = MainWindow()
     widget.show()
     app.processEvents()
     yield widget
-    if widget.worker:
-        widget.worker.cancel.set()
-        widget.worker.wait(3000)
-        app.processEvents()
-    widget.editor.document().setModified(False)
-    widget.close()
+    for current in app.topLevelWidgets():
+        if current in existing or not isinstance(current, MainWindow):
+            continue
+        if current.worker:
+            current.worker.cancel.set()
+            current.worker.wait(3000)
+            app.processEvents()
+        current.editor.document().setModified(False)
+        current.close()
+        current.deleteLater()
+    QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
     app.processEvents()
 
 
@@ -58,6 +64,47 @@ def test_empty_workspace_and_image_loading(window):
     assert window.recognize_button.isEnabled()
     assert window.preview.size == (1100, 720)
     assert window.image_stack.currentWidget() is window.canvas
+
+
+def test_edition_method_layout_and_backend_choices_restore(window):
+    from ocready.core.settings import save_settings
+    save_settings({"edition": "studio", "methods": {"studio": "tesseract-fast", "everyday": "tesseract-best"},
+                   "layout": "block", "vision_backend": "cpu"})
+    restored = MainWindow()
+    assert restored.edition.id == "studio"
+    assert restored.method_combo.currentData() == "tesseract-fast"
+    assert restored.layout_combo.currentData() == "block"
+    assert restored.vision_backend == "cpu"
+    restored.edition_combo.setCurrentIndex(restored.edition_combo.findData("everyday"))
+    assert restored.method_combo.currentData() == "tesseract-best"
+    restored.edition_combo.setCurrentIndex(restored.edition_combo.findData("studio"))
+    assert restored.method_combo.currentData() == "tesseract-fast"
+    restored.close()
+    explicit = MainWindow(edition="pocket")
+    assert explicit.edition.id == "pocket"
+    assert explicit.method_combo.currentData() == "tesseract-fast"
+    explicit.close()
+
+
+def test_fresh_everyday_prefers_precision_and_build_restrictions_override_preferences(window, monkeypatch):
+    fresh = MainWindow(edition="everyday")
+    assert fresh.method_combo.currentData() == "tesseract-best"
+    fresh.close()
+    monkeypatch.setattr("ocready.ui.window.build_profile", lambda: {
+        "edition": "pocket", "available_editions": ["pocket"], "methods": ["tesseract-fast"]})
+    restricted = MainWindow()
+    assert restricted.edition.id == "pocket"
+    assert restricted.method_combo.currentData() == "tesseract-fast"
+    restricted.close()
+
+
+def test_gui_entrypoint_preserves_saved_edition_unless_explicitly_overridden(window, monkeypatch):
+    from ocready.__main__ import main
+    calls = []
+    monkeypatch.setattr("ocready.ui.app.run", lambda image, edition, **_kwargs: calls.append(edition) or 17)
+    assert main([]) == 17
+    assert main(["--edition", "studio"]) == 17
+    assert calls == [None, "studio"]
 
 
 def test_clicking_arabic_source_word_copies_logical_text(recognized, app):

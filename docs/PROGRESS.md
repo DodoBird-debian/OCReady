@@ -194,3 +194,13 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Source CI now uploads the synthetic-corpus accuracy report on Linux and Windows. No accuracy percentage threshold is inferred from this small artificial corpus; runtime evaluation errors still fail the step.
 - Added six scoring tests, including canonical Unicode equivalence, preserved Arabic marks, Arabic/Western digit errors and hallucination rates above 100%. A clean-source baseline and further UI/reading-order improvements follow.
 - The six packaged builds at `1192174`, including the crop/editing fixes, are now all green. The `v0.1.0-preview.1` tag build is still running its own verification/release path.
+
+## Iteration 20 — remembered choices and published accuracy evidence
+
+- Fixed the GUI entrypoint overriding the saved edition on every launch. Available saved editions now restore; explicit CLI editions and compiled edition restrictions take precedence.
+- Remember method choices per edition and restore layout/backend alongside existing language preferences. Fresh Everyday/Studio sessions prefer Precision, informed by the measured bilingual omissions in Fast. Headless method/edition defaults remain stable.
+- Added native tests for restored choices, edition switching, compiled restrictions, fresh Precision defaults and the actual GUI entrypoint override contract.
+- Published clean-source `1595c32` accuracy reports: weighted synthetic-corpus CER/WER were Fast 29.2%/26.7%, Precision 9.9%/11.7%; with automatic layout comparison, Fast 28.4%/28.3%, Precision 7.5%/8.3%. These are limited corpus error rates, not universal accuracy claims.
+- All six tag builds and the release verification/publishing job passed. The first public prerelease, `v0.1.0-preview.1` at `ffc654b`, contains 27 assets including six native executables and their evidence. Development continues beyond that tagged snapshot.
+- Verified the public release's downloaded evidence index and notes against its published aggregate checksums. All six listed workload peaks remained below their respective budgets.
+- The expanded GUI suite initially retained extra closed test windows and exhausted a Pocket worker allowance. Test teardown now disposes all windows created by each test and flushes deferred Qt deletion. All 119 tests and Ruff then passed. The runtime guard correctly refused the overfilled test process without killing it.
