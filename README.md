@@ -65,6 +65,8 @@ Budgets use decimal MB/GB. GPU VRAM is separate and must also be reported. Small
 
 See [measured memory workloads and limitations](docs/MEMORY.md). The Linux Pocket executable at `65bd416` peaked at 314 MB in the cap-sized GUI benchmark, including its launcher. All three Linux source editions passed their documented workloads. These measurements are not universal hard-memory certifications.
 
+The [accuracy corpus and evaluator](docs/ACCURACY.md) track character/word errors across Arabic and English styles, including difficult cases. Passing resource tests is separate from transcription accuracy.
+
 ## License
 
 GPL-3.0-or-later. Qt/PySide and bundled OCR components retain their own notices. See [third-party notices](docs/THIRD_PARTY.md).

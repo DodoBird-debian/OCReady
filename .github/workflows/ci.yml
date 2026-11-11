@@ -37,6 +37,8 @@ jobs:
         run: uv run pytest -q --junitxml=test-output/results.xml
       - name: Headless real-engine smoke test
         run: uv run python -m ocready assets/sample-bilingual.png --json --layout sparse --output test-output/bilingual.json
+      - name: Report bilingual transcription errors
+        run: uv run python -m scripts.accuracy evaluate --output test-output/accuracy.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:

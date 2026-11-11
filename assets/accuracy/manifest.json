@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "description": "Original synthetic text; Qt-rendered Arabic/English accuracy cases, not a real-world accuracy certification.",
+  "normalization": "NFC and collapsed whitespace only; diacritics/digits/punctuation are preserved",
+  "cases": [
+    {
+      "id": "english-ui",
+      "language": "eng",
+      "font_family": "DejaVu Sans",
+      "font_pixels": 36,
+      "image": "english-ui.png",
+      "image_sha256": "c9f5ae4f32a8e96dcaf3bf265f1d57d4e97244bc2d9cbb44d949a5c3394a7caa",
+      "expected": "Your screenshots are ready to copy.\nOrder 12345 costs 25.00 USD.\nKeep punctuation, numbers, and paragraphs.",
+      "recipe": {}
+    },
+    {
+      "id": "arabic-ui",
+      "language": "ara",
+      "font_family": "Noto Sans Arabic",
+      "font_pixels": 36,
+      "image": "arabic-ui.png",
+      "image_sha256": "557b60f9a789af5989493bacd28830497715d850a3679b8e51ee0eaecc08f06d",
+      "expected": "مرحبا بالعالم\nاللغة العربية واللغة الإنجليزية\nهذا النص جاهز للنسخ",
+      "recipe": {}
+    },
+    {
+      "id": "bilingual-ui",
+      "language": "ara+eng",
+      "font_family": "DejaVu Sans",
+      "font_pixels": 36,
+      "image": "bilingual-ui.png",
+      "image_sha256": "7577d1eab0cbe06231702c1f18980ca49146cf5a0617468166d735ed5dfee0a5",
+      "expected": "Your screenshots are ready to copy.\nمرحبا بالعالم\nاللغة العربية واللغة الإنجليزية",
+      "recipe": {}
+    },
+    {
+      "id": "arabic-naskh",
+      "language": "ara",
+      "font_family": "Noto Naskh Arabic",
+      "font_pixels": 42,
+      "image": "arabic-naskh.png",
+      "image_sha256": "80e37fd159fd36fdb2cbfdbcaf1af6a0461abd6c3396a6dc777dc00f9647bd3c",
+      "expected": "مرحبا بالعالم\nاللغة العربية واللغة الإنجليزية\nهذا النص جاهز للنسخ",
+      "recipe": {}
+    },
+    {
+      "id": "arabic-kufi",
+      "language": "ara",
+      "font_family": "Noto Kufi Arabic",
+      "font_pixels": 36,
+      "image": "arabic-kufi.png",
+      "image_sha256": "a35af25e34a774e18fabaed245af3eed61ca5603d5cb69598c15200a9a8c6a06",
+      "expected": "مرحبا بالعالم\nاللغة العربية واللغة الإنجليزية\nهذا النص جاهز للنسخ",
+      "recipe": {}
+    },
+    {
+      "id": "arabic-diacritics",
+      "language": "ara",
+      "font_family": "Noto Naskh Arabic",
+      "font_pixels": 42,
+      "image": "arabic-diacritics.png",
+      "image_sha256": "f77005faa011b899fe7fbed8b4baa25e864d063820ade6258e4ff4c1c969fb69",
+      "expected": "مَرْحَبًا بِالْعَالَمِ\nاللُّغَةُ الْعَرَبِيَّةُ\nنَصٌّ جَاهِزٌ لِلنَّسْخِ",
+      "recipe": {}
+    },
+    {
+      "id": "mixed-digits",
+      "language": "ara+eng",
+      "font_family": "DejaVu Sans",
+      "font_pixels": 36,
+      "image": "mixed-digits.png",
+      "image_sha256": "8169f69f8209c4e0a67f046177c0ded4f93f2652aae499bd0b6b9a0cf0358b79",
+      "expected": "رقم الطلب OCReady 123\nالإجمالي ٢٥٠٠ دينار\nContact: user@example.com",
+      "recipe": {}
+    },
+    {
+      "id": "small-arabic",
+      "language": "ara",
+      "font_family": "Noto Sans Arabic",
+      "font_pixels": 18,
+      "image": "small-arabic.png",
+      "image_sha256": "05859f9147907b5ea24c2d0c3922e6a032575ef6eab7d72831a63ffb358e611c",
+      "expected": "مرحبا بالعالم\nاللغة العربية واللغة الإنجليزية\nهذا النص جاهز للنسخ",
+      "recipe": {
+        "scale": 2
+      }
+    },
+    {
+      "id": "dark-bilingual",
+      "language": "ara+eng",
+      "font_family": "DejaVu Sans",
+      "font_pixels": 36,
+      "image": "dark-bilingual.png",
+      "image_sha256": "a67d90d9333475570207b722c8dfca1ff3b58550b804b4622ad180a79df5a2d5",
+      "expected": "Your screenshots are ready to copy.\nمرحبا بالعالم\nاللغة العربية واللغة الإنجليزية",
+      "recipe": {
+        "invert": true
+      }
+    },
+    {
+      "id": "low-contrast",
+      "language": "ara+eng",
+      "font_family": "DejaVu Sans",
+      "font_pixels": 36,
+      "image": "low-contrast.png",
+      "image_sha256": "cf7ab18a62350becc303efd8af7d7686e1691836919feb034fa68ff8df78a269",
+      "expected": "Your screenshots are ready to copy.\nمرحبا بالعالم\nاللغة العربية واللغة الإنجليزية",
+      "recipe": {
+        "autocontrast": true
+      }
+    },
+    {
+      "id": "rotated-bilingual",
+      "language": "ara+eng",
+      "font_family": "DejaVu Sans",
+      "font_pixels": 36,
+      "image": "rotated-bilingual.png",
+      "image_sha256": "6f38dbc24603b96389d26242fa873a9cc992f3126170691d58b97c1bb13fef5b",
+      "expected": "Your screenshots are ready to copy.\nمرحبا بالعالم\nاللغة العربية واللغة الإنجليزية",
+      "recipe": {
+        "rotation": 270
+      }
+    }
+  ]
+}

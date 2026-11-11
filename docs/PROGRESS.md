@@ -185,3 +185,12 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Added a tag-only prerelease job after the six-build matrix. Only that job receives release-write permission; ordinary pushes keep read-only build permissions. Existing releases are not replaced.
 - Added six tests covering complete preparation and rejection of modified executables, mismatched source, failed GUI runs, numeric budget exceedance and changed measurement sources.
 - Validation: all 110 local tests and Ruff passed. The complete six-build matrix at `e9cdf23` is now green with provenance enabled. The newer `1192174` builds, including the crop/editing fixes, are still running; release publication waits for verified candidate artifacts.
+
+## Iteration 19 — bilingual transcription corpus and error measurement
+
+- Added eleven original, visually inspected Qt-rendered fixtures with ground-truth Unicode and image digests: clean English/Arabic, mixed scripts/digits, Naskh/Kufi/UI fonts, diacritics, small Arabic, dark/low-contrast text, and corrected rotation.
+- Added sequential Fast/Precision/local-vision evaluation with explicit completed/skipped/error counts, strict NFC/whitespace normalization, per-case CER/WER and weighted summaries. Diacritics, digits, punctuation and directional controls are not silently removed to improve scores.
+- Exploratory results exposed Fast missing Arabic lines that Precision recovered, difficult diacritics/digits, and layout confidence selecting incomplete text in one case. These are recorded as quality gaps rather than hidden by memory-test success.
+- Source CI now uploads the synthetic-corpus accuracy report on Linux and Windows. No accuracy percentage threshold is inferred from this small artificial corpus; runtime evaluation errors still fail the step.
+- Added six scoring tests, including canonical Unicode equivalence, preserved Arabic marks, Arabic/Western digit errors and hallucination rates above 100%. A clean-source baseline and further UI/reading-order improvements follow.
+- The six packaged builds at `1192174`, including the crop/editing fixes, are now all green. The `v0.1.0-preview.1` tag build is still running its own verification/release path.
