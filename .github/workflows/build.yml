@@ -43,6 +43,7 @@ jobs:
           QT_QPA_PLATFORM: offscreen
         run: uv run pytest -q
       - name: Compile selected edition
+        id: compile
         if: github.event_name != 'workflow_dispatch' || inputs.edition == 'all' || inputs.edition == matrix.edition
         run: uv run python scripts/build.py --edition ${{ matrix.edition }} --jobs 2
       - name: Smoke-test compiled binary on X11
@@ -69,7 +70,20 @@ jobs:
             test-output/gui-*.log
             test-output/gui-*.json
             test-output/gui-*.png
+            test-output/host-*.json
           if-no-files-found: warn
+      - name: Retain the exact executable from failed native verification
+        if: failure() && steps.compile.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: OCReady-${{ matrix.edition }}-${{ runner.os }}-failed-binary
+          path: |
+            dist/${{ matrix.edition }}/OCReady-*
+            dist/${{ matrix.edition }}/build-manifest.json
+            dist/${{ matrix.edition }}/pe-layout.json
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: github.event_name != 'workflow_dispatch' || inputs.edition == 'all' || inputs.edition == matrix.edition
         with:
@@ -84,6 +98,7 @@ jobs:
             test-output/gui-*.log
             test-output/gui-*.json
             test-output/gui-*.png
+            test-output/host-*.json
           if-no-files-found: error
   release:
     needs: build

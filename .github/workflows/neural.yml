@@ -72,6 +72,7 @@ jobs:
           path: runtime/neural-runner/cpu/neural_runner.dist
           key: ${{ steps.worker-cache.outputs.cache-primary-key }}
       - name: Compile outer onefile application
+        id: compile
         run: uv run python -m scripts.build_variant --edition ${{ inputs.edition }} --variant ${{ inputs.variant }} --jobs 2
       - name: Verify complete executable and X11 memory workloads
         if: runner.os == 'Linux'
@@ -98,7 +99,20 @@ jobs:
             test-output/gui-*.log
             test-output/gui-*.json
             test-output/gui-*.png
+            test-output/host-*.json
           if-no-files-found: warn
+      - name: Retain the exact executable from failed native verification
+        if: failure() && steps.compile.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: OCReady-${{ inputs.edition }}-${{ inputs.variant }}-${{ runner.os }}-failed-binary
+          path: |
+            dist/${{ inputs.edition }}-${{ inputs.variant }}/OCReady-*
+            dist/${{ inputs.edition }}-${{ inputs.variant }}/build-manifest.json
+            dist/${{ inputs.edition }}-${{ inputs.variant }}/pe-layout.json
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: success()
         with:
@@ -114,6 +128,7 @@ jobs:
             test-output/gui-*.log
             test-output/gui-*.json
             test-output/gui-*.png
+            test-output/host-*.json
           if-no-files-found: error
   release:
     needs: build

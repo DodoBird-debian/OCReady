@@ -91,9 +91,10 @@ def test_optional_helpers_follow_model_identity_without_persisting_extracted_ass
     assert selected.cuda_runner == str(external)
     selected.validate()
     save([dataclasses.replace(selected, memory_mb=650)])
-    all_config = "".join(path.read_text() for path in module.config_root().glob("*.json"))
+    all_config = "".join(path.read_text(encoding="utf-8") for path in module.config_root().glob("*.json"))
     assert "first-extraction" not in all_config
-    assert str(external) in all_config
+    helper_record = json.loads((module.config_root() / "cuda-helpers.json").read_text(encoding="utf-8"))
+    assert str(external) in helper_record["helpers"].values()
     runtime["path"] = tmp_path / "fresh-extraction"
     fresh = prepare_bundle(runtime["path"], kind)
     restored = load()[0]

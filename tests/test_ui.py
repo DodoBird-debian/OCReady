@@ -974,7 +974,7 @@ def test_builtin_cuda_helper_can_be_saved_and_cleared_in_settings(window, tmp_pa
     save()
     assert load()[0].cuda_runner == str(external)
     assert load()[0].runner == str(folder / "runner")
-    config = "".join(path.read_text() for path in module.config_root().glob("*.json"))
+    config = "".join(path.read_text(encoding="utf-8") for path in module.config_root().glob("*.json"))
     assert "managed-runtime" not in config
     assert field.text() == str(external)
     field.clear()

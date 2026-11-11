@@ -1691,6 +1691,7 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M69.T3: Observe only owned process trees and stable process identities in Windows diagnostic probes.
 - M69.T4: Record actual CPU identity, private memory and RSS as separate counters without inferring one from another.
 - M69.T5: Compare ASCII/Arabic paths and automatic/CPU selection on a checksum-bound reference executable.
+- M69.T6: Retain the exact failed candidate with its checksum/source manifest for bounded diagnostic storage, and persist CPU/available-memory context before inference.
 - M69.V1: Exercise genuine process failures and preserve statuses after long diagnostic output.
 - M69.V2: Keep original failures and distinguish a passing reference from a reproduced failing artifact.
 - Release gate: Demonstrated cause/fix with fresh complete platform/model checks; a retry or improved error message alone is insufficient.

@@ -9,7 +9,9 @@ import unicodedata
 from pathlib import Path
 
 from ocready.core.timeouts import observed_workload_timeout_seconds
+from scripts.host_diagnostics import host_identity
 from scripts.packaged_environment import gui_test_platform, runtime_test_environment
+from scripts.provenance import file_sha256, source_record
 
 
 def embedded_selections(profile: dict) -> list[tuple[str, str]]:
@@ -89,6 +91,12 @@ def main() -> None:
     binary = next(p for p in directory.glob("OCReady-*") if p.is_file() and not p.name.endswith(".sha256"))
     root = Path(__file__).resolve().parents[1]
     profile = json.loads((binary.parent / "build-manifest.json").read_text(encoding="utf-8"))
+    # Persist host and exact binary identity before the first model can fail.
+    host = root / "test-output" / (f"host-{profile['edition']}" + ("-" + profile["variant"] if profile.get("variant") else "") + ".json")
+    host.parent.mkdir(parents=True, exist_ok=True)
+    host.write_text(json.dumps({"host": host_identity(), "binary_name": binary.name,
+                                "binary_sha256": file_sha256(binary), "build_profile": profile,
+                                "controller_source": source_record(root)}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     selections = embedded_selections(profile) if args.all_methods else [(profile["methods"][0], "")]
     if not selections:
         raise RuntimeError("No embedded methods are available to test.")
