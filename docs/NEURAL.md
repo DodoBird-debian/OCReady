@@ -8,6 +8,10 @@ The detector provides real text-line polygons. The application highlights enclos
 
 ![Native neural OCR with a detected Arabic line selected](images/neural-ocr.png)
 
+The workspace also fits a 960 px window. Model names can use the available space, and layout controls appear for classical engines that use them:
+
+![Compact native workspace with Arabic line copy](images/neural-compact.png)
+
 ## Building a worker and pack
 
 ```sh

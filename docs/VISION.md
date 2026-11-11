@@ -83,7 +83,8 @@ A manifest uses these fields (paths may be relative to the manifest):
   "max_pixels": 1000000,
   "max_edge": 1600,
   "tokens": 512,
-  "prompt": "Text Recognition:"
+  "prompt": "Text Recognition:",
+  "languages": "eng"
 }
 ```
 

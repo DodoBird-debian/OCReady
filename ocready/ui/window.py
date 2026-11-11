@@ -191,18 +191,24 @@ class MainWindow(QMainWindow):
         options.addWidget(label("with"))
         self.method_combo = QComboBox()
         self.method_combo.setAccessibleName("OCR method")
+        self.method_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+        self.method_combo.setMinimumContentsLength(10)
+        self.method_combo.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.method_combo.addItem("Fast OCR", "tesseract-fast")
         self.method_combo.addItem("Precision OCR", "tesseract-best")
         self.method_combo.setToolTip("Fast: compact offline models. Precision: larger language data in Everyday or Studio.")
         self.method_combo.currentIndexChanged.connect(self._method_changed)
-        options.addWidget(self.method_combo)
+        options.addWidget(self.method_combo, 1)
         self.layout_combo = QComboBox()
         self.layout_combo.setAccessibleName("Page layout")
+        self.layout_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+        self.layout_combo.setMinimumContentsLength(10)
         for key, (_, name) in LAYOUTS.items():
-            self.layout_combo.addItem(name, key)
+            self.layout_combo.addItem({"auto": "Automatic", "block": "Paragraph", "sparse": "Screenshot"}[key], key)
+            self.layout_combo.setItemData(self.layout_combo.count() - 1, name, Qt.ItemDataRole.ToolTipRole)
+        self.layout_combo.setToolTip("Screenshot: scattered text. Paragraph: one text block. Automatic: infer page layout.")
         self.layout_combo.setCurrentIndex(max(0, self.layout_combo.findData(self.preferences.get("layout", "sparse"))))
         options.addWidget(self.layout_combo)
-        options.addStretch()
         self.compare_check = QCheckBox("Compare layouts")
         self.compare_check.setToolTip("Try two layouts one after another and choose the stronger OCR confidence. Uses more time, not parallel models.")
         options.addWidget(self.compare_check)
@@ -604,13 +610,13 @@ class MainWindow(QMainWindow):
             allowed, reason = pack.admission(self.edition)
             item = self.method_combo.model().item(self.method_combo.count() - 1)
             item.setEnabled(allowed)
-            item.setToolTip(reason)
+            item.setToolTip(f"{pack.name}\n{reason}")
         for pack in self.neural_packs if "neural" in self.profile["methods"] else []:
             self.method_combo.addItem(f"{pack.name} · Neural", f"neural:{pack.id}")
             allowed, reason = pack.admission(self.edition)
             item = self.method_combo.model().item(self.method_combo.count() - 1)
             item.setEnabled(allowed)
-            item.setToolTip(reason)
+            item.setToolTip(f"{pack.name}\n{reason}")
         if not self.method_combo.count():
             self.method_combo.addItem("Configure a vision model in Settings", None)
             self.method_combo.model().item(0).setEnabled(False)
@@ -634,13 +640,21 @@ class MainWindow(QMainWindow):
             return
         method = str(self.method_combo.currentData())
         classical = method.startswith("tesseract-")
+        self.layout_combo.setVisible(classical)
+        self.compare_check.setVisible(classical)
         self.compare_check.setEnabled(classical and not self.worker)
         self.layout_combo.setEnabled(classical and not self.worker)
+        description = ("Compact offline OCR. Select individual words in the picture." if method == "tesseract-fast"
+                       else "Larger offline language models. Select individual words in the picture.")
         if not classical:
             pack = (next((p for p in self.neural_packs if method == f"neural:{p.id}"), None) if method.startswith("neural:")
                     else next((p for p in self.packs if method == f"vision:{p.id}"), None))
             if pack and self.language_combo.currentData() != pack.languages and pack.languages != "ara+eng":
                 self.language_combo.setCurrentIndex(self.language_combo.findData(pack.languages))
+            description = ("Detected text lines link to the picture. Select a line to copy it; use Fast or Precision for individual words."
+                           if method.startswith("neural:") else
+                           "AI transcription can omit or invent text. Check it against the picture; word locations are unavailable.")
+        self.method_combo.setToolTip(f"{self.method_combo.currentText()}\n{description}")
         item = self.method_combo.model().item(self.method_combo.currentIndex())
         if item is not None and item.isEnabled() and self.method_combo.currentData():
             self.method_preferences[self.edition.id] = self.method_combo.currentData()
@@ -867,7 +881,7 @@ class MainWindow(QMainWindow):
         start_capture(self)
 
     def show_help(self) -> None:
-        QMessageBox.information(self, "A few shortcuts to your words", "1. Open, paste, or capture an image.\n2. Choose Recognize text.\n3. Edit, select, and copy.\n\nClick a word in the picture, or drag over a sentence.\nSelecting text also highlights its source. Manual edits turn off source linking until you recognize again.\n\nCtrl+O  Open image\nCtrl+Shift+V  Paste image\nCtrl+Shift+S  Capture region\nCtrl+Enter  Recognize\nCtrl+Shift+C  Copy all\nCtrl+S  Save text\nEscape  Cancel or clear selection\n\nMouse wheel  Zoom image\nMiddle mouse drag  Pan image\n\nPocket: fast OCR, 350 MB budget\nEveryday: fast + precision OCR, 1 GB budget\nStudio: OCR + optional local vision models, 4 GB budget\n\nRAM is sampled, not an OS-enforced hard ceiling. Nothing is uploaded.")
+        QMessageBox.information(self, "A few shortcuts to your words", "1. Open, paste, or capture an image.\n2. Choose Recognize text.\n3. Edit, select, and copy.\n\nFast and Precision locate individual words. Neural OCR locates whole lines. Click or drag in the picture to select them; selecting linked text highlights its source. Manual edits turn off linking until you recognize again.\n\nAI transcription provides editable text without source locations. Verify it against the picture. Available methods depend on your installed edition and model packs.\n\nCtrl+O  Open image\nCtrl+Shift+V  Paste image\nCtrl+Shift+S  Capture region\nCtrl+Enter  Recognize\nCtrl+Shift+C  Copy all\nCtrl+S  Save text\nEscape  Cancel or clear selection\n\nMouse wheel  Zoom image\nMiddle mouse drag  Pan image\n\nPocket: 350 MB budget\nEveryday: 1 GB budget\nStudio: 4 GB budget\n\nRAM is sampled, not a hard ceiling for the whole app. Nothing is uploaded.")
 
     def show_settings(self) -> None:
         if self.worker:

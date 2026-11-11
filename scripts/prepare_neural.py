@@ -51,7 +51,7 @@ def main() -> None:
     dictionary.write_text("\n".join(config["PostProcess"]["character_dict"]) + "\n", encoding="utf-8", newline="\n")
     if file_sha256(dictionary) != lock["derived_dictionary_sha256"]:
         raise RuntimeError("The derived character dictionary differs from its locked reference.")
-    pack = NeuralPack("ppocr-v5-arabic", "Neural OCR · Arabic + English", str(args.runner.resolve()),
+    pack = NeuralPack("ppocr-v5-arabic", "Arabic + English", str(args.runner.resolve()),
                       str(folder / "det-inference.onnx"), str(folder / "rec-inference.onnx"), str(dictionary),
                       cuda_runner=str(args.cuda_runner.resolve()) if args.cuda_runner else "", memory_mb=600 if args.cuda_runner else 300,
                       source="https://huggingface.co/PaddlePaddle/arabic_PP-OCRv5_mobile_rec_onnx", license="Apache-2.0")

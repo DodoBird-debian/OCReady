@@ -264,3 +264,10 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Added curated neural, classical-plus-neural, and multimodal build commands. Everyday multimodal includes SmolVLM; Studio includes both SmolVLM and GLM-OCR. Their Windows/Linux workflow runs per-method validation before uploading artifacts.
 - Both real curated CPU runners completed bilingual-image input locally, reporting CPU and their exact model IDs. SmolVLM omitted Arabic; GLM-OCR repeated its known Arabic word error, consistent with the retained language limitations.
 - All 146 tests and Ruff passed, including preference preservation, exact GUI selection, rejection of missing/oversized packs, and complete embedded-choice enumeration. Full multimodal binaries are the next measured gate.
+
+## Iteration 28 — compact workspace and method guidance
+
+- Adjusted method/layout selectors so long model names do not force the workspace beyond its 960 px minimum. Short layout labels retain their full explanations in tooltips. Classical layout/comparison controls hide for neural and vision methods.
+- Added guidance for word selection, whole-line selection and AI transcription directly to the current-method tooltip and Help. Default neural names no longer repeat the engine family twice. The GLM example manifest explicitly declares English.
+- Rendered the real native 960×700 workspace, ran the compiled neural worker, selected/copied the Arabic line and verified logical clipboard text. Classical minimum layout width was 938 px; neural was 829 px. Saved the inspected compact screenshot.
+- All 146 tests and Ruff passed. The combined executable continues building from the separate clean `602cc5b` snapshot, so these later UI edits do not alter that build's provenance.
