@@ -6,6 +6,8 @@ import shutil
 from pathlib import Path
 
 from ocready.core.editions import EDITIONS
+from ocready.engines.vision_adapters import ADAPTERS
+from scripts.corpus_identity import load_corpus_identity
 from scripts.provenance import file_sha256
 from scripts.release_assets import SCENARIOS
 from scripts.smoke_binary import embedded_selections
@@ -18,6 +20,44 @@ def read_json(path: Path) -> dict:
     return value
 
 
+def embedded_assets(profile: dict) -> dict[tuple[str, str], dict]:
+    """Compare model content/capabilities, independently of platform executables."""
+    assets = {}
+    for method, key, hashes in (("vision", "embedded_models", ("model_sha256", "projector_sha256")),
+                                ("neural", "embedded_neural", ("detector_sha256", "recognizer_sha256", "dictionary_sha256"))):
+        records = profile.get(key, [])
+        if not isinstance(records, list) or records and method not in profile.get("methods", []):
+            raise ValueError("Invalid embedded model inventory.")
+        for record in records:
+            if (not isinstance(record, dict) or not isinstance(record.get("id"), str)
+                    or not re.fullmatch(r"[a-zA-Z0-9_-]{1,60}", record["id"])
+                    or record.get("languages") not in {"ara", "eng", "ara+eng"}):
+                raise ValueError("Invalid embedded model identity or language capability.")
+            identity = {"languages": record["languages"]}
+            if method == "vision":
+                adapter = record.get("adapter", "llama.cpp")
+                if not isinstance(adapter, str) or adapter not in ADAPTERS:
+                    raise ValueError("Invalid embedded vision adapter identity.")
+                identity["adapter"] = adapter
+            else:
+                if record.get("geometry") != "line":
+                    raise ValueError("Invalid embedded neural geometry identity.")
+                identity["geometry"] = record["geometry"]
+            for name in hashes:
+                digest = record.get(name)
+                optional = method == "vision" and name == "projector_sha256" and adapter != "llama.cpp"
+                if not (optional and digest == "") and (not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest)):
+                    raise ValueError("Missing or invalid embedded model asset digest.")
+                identity[name] = digest
+            choice = (method, record["id"])
+            if choice in assets:
+                raise ValueError("Duplicate embedded model identity.")
+            assets[choice] = identity
+    if not any(method == "neural" and row["languages"] == "ara+eng" for (method, _), row in assets.items()):
+        raise ValueError("A model release needs an embedded bilingual neural model.")
+    return assets
+
+
 def verify_variants(root: Path, revision: str, edition: str, variant: str) -> list[dict]:
     if not re.fullmatch(r"[0-9a-f]{40}", revision):
         raise ValueError("Supply the full source revision.")
@@ -26,6 +66,9 @@ def verify_variants(root: Path, revision: str, edition: str, variant: str) -> li
     policy = EDITIONS[edition]
     verified = []
     expected_choices = None
+    expected_assets = None
+    corpus, expected_corpus, legacy_checksums = load_corpus_identity(Path(__file__).resolve().parents[1] / "assets/accuracy/manifest.json")
+    expected_cases = {case["id"]: (case["language"], case["expected"]) for case in corpus["cases"]}
     for platform, suffix, runtime_platform in (("Linux", "linux-x86_64", "linux"),
                                                ("Windows", "windows-amd64.exe", "win32")):
         folder = root / f"OCReady-{edition}-{variant}-{platform}"
@@ -37,6 +80,10 @@ def verify_variants(root: Path, revision: str, edition: str, variant: str) -> li
                 or not re.fullmatch(r"[0-9a-f]{64}", source.get("tree_sha256", ""))
                 or profile.get("edition") != edition or profile.get("variant") != variant):
             raise ValueError(f"{binary.name}: wrong or unclean source/variant identity.")
+        assets = embedded_assets(profile)
+        if expected_assets is not None and assets != expected_assets:
+            raise ValueError("The platform artifacts contain different model assets or capabilities.")
+        expected_assets = assets
         choices = embedded_selections(profile)
         if (not choices or len(choices) != len(set(choices)) or not any(m == "neural" for m, _ in choices)
                 or any(m not in {"tesseract-fast", "tesseract-best", "neural", "vision"}
@@ -94,11 +141,19 @@ def verify_variants(root: Path, revision: str, edition: str, variant: str) -> li
                 or len(cases) != 11 or any(row.get("status") != "ok" or row.get("method") != "neural" for row in cases)
                 or not re.fullmatch(r"[0-9a-f]{64}", evaluation.get("corpus_sha256", ""))):
             raise ValueError("Complete matching-source bilingual neural accuracy evidence is required.")
+        content_digest = evaluation.get("corpus_content_sha256")
+        if (content_digest is not None and content_digest != expected_corpus
+                or content_digest is None and evaluation["corpus_sha256"] not in legacy_checksums
+                or {row.get("case"): (row.get("language"), row.get("expected")) for row in cases} != expected_cases
+                or len({row.get("case") for row in cases}) != len(cases)
+                or any(row.get("engine") not in {f"neural:{pack}" for method, pack in choices if method == "neural"} for row in cases)):
+            raise ValueError("The accuracy reports do not match this checkout's corpus content and model choices.")
         verified.append({"binary": binary, "manifest": manifest, "checksum": checksum, "accuracy": accuracy,
                          "reports": reports, "sha256": digest, "platform": platform,
                          "peak_rss_bytes": max(row["peak_rss_bytes"] for path in reports.values()
                                                for row in read_json(path)["scenarios"]),
-                         "budget_bytes": policy.budget, "neural_accuracy": score})
+                         "budget_bytes": policy.budget, "neural_accuracy": score, "embedded_assets": assets,
+                         "corpus_content_sha256": expected_corpus})
     return verified
 
 
@@ -109,7 +164,11 @@ def prepare_release(root: Path, output: Path, revision: str, edition: str, varia
     if output.exists() and any(output.iterdir()):
         raise ValueError("Choose an empty output directory; existing release files are kept.")
     output.mkdir(parents=True, exist_ok=True)
-    summary = {"source_revision": revision, "workflow_run_id": run_id, "edition": edition, "variant": variant, "artifacts": []}
+    summary = {"source_revision": revision, "workflow_run_id": run_id, "edition": edition, "variant": variant,
+               "corpus_content_sha256": verified[0]["corpus_content_sha256"],
+               "embedded_assets": [{"method": method, "id": pack_id, **identity}
+                                   for (method, pack_id), identity in sorted(verified[0]["embedded_assets"].items())],
+               "artifacts": []}
     for record in verified:
         binary = record["binary"]
         files = [(binary, binary.name), (record["checksum"], binary.name + ".sha256"),

@@ -14,6 +14,7 @@ from ocready.core.models import load_pack
 from ocready.core.neural_packs import load_neural_pack
 from ocready.core.pipeline import Request, recognize_image
 from ocready.core.preprocess import Recipe
+from scripts.corpus_identity import corpus_content_sha256
 from scripts.provenance import file_sha256, source_record
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -153,7 +154,8 @@ def evaluate(args) -> int:
                              "errors": sum(row["method"] == method and row["status"] == "error" for row in rows)}
     report = {"source": source, "sources_changed_during_run": source_record(ROOT) != source,
               "platform": sys.platform,
-              "corpus_sha256": file_sha256(args.manifest), "edition": edition.id,
+              "corpus_sha256": file_sha256(args.manifest), "corpus_content_sha256": corpus_content_sha256(corpus),
+              "edition": edition.id,
               "normalization": corpus["normalization"], "layout": args.layout, "compare": args.compare,
               "summaries": summaries, "cases": rows}
     args.output.parent.mkdir(parents=True, exist_ok=True)

@@ -44,3 +44,5 @@ uv run python -m scripts.accuracy generate
 ```
 
 Inspect the rendered images after regeneration and review ground truth/image digests together. Never change expected text to match a wrong recognition result.
+
+Reports retain `corpus_sha256` for the exact manifest bytes and `corpus_content_sha256` for canonical JSON content. The latter is stable across Git's LF/CRLF checkout formatting and JSON key/whitespace formatting; it still includes exact expected Unicode, image hashes and preprocessing recipes. No OCR-text normalization is applied to this identity. Release verification also checks every case's ID, language, expected text and actual model identity against the committed corpus and embedded choices.
