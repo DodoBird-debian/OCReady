@@ -271,3 +271,10 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Added guidance for word selection, whole-line selection and AI transcription directly to the current-method tooltip and Help. Default neural names no longer repeat the engine family twice. The GLM example manifest explicitly declares English.
 - Rendered the real native 960×700 workspace, ran the compiled neural worker, selected/copied the Arabic line and verified logical clipboard text. Classical minimum layout width was 938 px; neural was 829 px. Saved the inspected compact screenshot.
 - All 146 tests and Ruff passed. The combined executable continues building from the separate clean `602cc5b` snapshot, so these later UI edits do not alter that build's provenance.
+
+## Iteration 29 — worker source identity and exact resource selections
+
+- The neural worker builder now captures its source identity before compilation and rejects any source change before writing the distribution manifest, matching the outer application's provenance discipline.
+- Explicit per-method resource workloads now fail if the returned engine/pack identity differs from the requested choice, even when the process exits successfully. This guards against silently measuring a smaller fallback selection.
+- Added regression coverage for a wrong family, wrong pack and valid explicit/default local choices. Existing provenance checks and the new resource checks passed; Ruff passed.
+- The clean `602cc5b` combined Linux binary built at 530.3 MB and began real per-method validation. The first four Fast OCR workloads passed with a largest observed tree peak of 666.7 MB. Both Windows/Linux neural workers compiled in Actions and moved to the outer-app build; complete results remain pending.

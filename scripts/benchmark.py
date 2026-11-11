@@ -35,6 +35,17 @@ def redact_details(record: dict) -> dict:
     return safe
 
 
+def check_requested_engine(result: dict, method: str | None, pack_id: str | None) -> None:
+    if not method or result["exit_code"]:
+        return
+    engine = result["details"].get("engine", "")
+    expected = f"{method}:{pack_id}" if pack_id else method
+    matched = engine == expected or (not pack_id and method in {"vision", "neural"} and engine.startswith(method + ":"))
+    if not matched:
+        result["exit_code"] = 2
+        result["details"]["error"] = f"Requested {expected}, but the workload returned {engine or 'no engine identity'}."
+
+
 def make_image(path: Path, edition: str, dark=False, maximum=False) -> None:
     sample = Image.open(ROOT / "assets" / "sample-bilingual.png").convert("RGB")
     if maximum:
@@ -236,6 +247,7 @@ def main() -> int:
                 # Preserve evidence without copying all recognized document contents into reports.
                 if "text" in result["details"]:
                     result["details"] = redact_details(result["details"])
+                check_requested_engine(result, args.method, args.pack_id)
                 records.append(result)
                 print(f"{edition:9} {scenario:12} {result['peak_rss_bytes'] / 1e6:7.1f} MB  {'PASS' if result['below_budget'] and not result['exit_code'] else 'FAIL'}", flush=True)
     report = {"sample_interval_ms": 10, "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",

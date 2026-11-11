@@ -9,7 +9,7 @@ import sys
 import sysconfig
 from pathlib import Path
 
-from scripts.provenance import file_sha256, source_record
+from scripts.provenance import file_sha256, require_unchanged, source_record
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -43,6 +43,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--jobs", type=int, default=2)
     args = parser.parse_args()
+    source = source_record(ROOT)
     packages = ("rapidocr", "onnxruntime", "opencv-python-headless", "numpy", "python-bidi", "Pillow", "shapely", "pyclipper", "omegaconf", "PyYAML")
     versions = {name: importlib.metadata.version(name) for name in packages}
     entrypoint = ROOT / "native/neural_runner.py"
@@ -66,7 +67,8 @@ def main() -> None:
         raise RuntimeError("The worker entrypoint changed during compilation; rebuild it.")
     distribution = out / "neural_runner.dist"
     collect_notices(distribution, packages)
-    metadata = {"source": source_record(ROOT), "entrypoint_sha256": digest, "dependencies": versions,
+    require_unchanged(ROOT, source)
+    metadata = {"source": source, "entrypoint_sha256": digest, "dependencies": versions,
                 "protocol": 1, "model_family": "PP-OCRv5", "python": sys.version.split()[0],
                 "files": {file.relative_to(distribution).as_posix(): file_sha256(file) for file in sorted(distribution.rglob("*"))
                           if file.is_file() and file.relative_to(distribution).as_posix() != "neural-build.json"}}

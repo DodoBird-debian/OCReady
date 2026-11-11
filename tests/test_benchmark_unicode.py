@@ -2,7 +2,17 @@ import json
 import sys
 from pathlib import Path
 
-from scripts.benchmark import observe, redact_details
+from scripts.benchmark import check_requested_engine, observe, redact_details
+
+
+def test_resource_workload_cannot_pass_after_silently_selecting_another_engine():
+    for method, pack, actual, expected_status in [("neural", "bilingual", "tesseract-best", 2),
+                                                 ("vision", "large", "vision:small", 2),
+                                                 ("vision", "large", "vision:large", 0),
+                                                 ("vision", None, "vision:large", 0)]:
+        result = {"exit_code": 0, "details": {"engine": actual}}
+        check_requested_engine(result, method, pack)
+        assert result["exit_code"] == expected_status
 
 
 def test_failed_gui_benchmark_preserves_error_without_document_contents():
