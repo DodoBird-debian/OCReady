@@ -300,3 +300,11 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Release output carries both native executables, per-method resource reports, neural accuracy, source manifests, individual/aggregate checksums and explicit CPU, geometry and memory limitations. Existing release output is preserved rather than overwritten.
 - Added opt-in workflow publication after both platform build jobs and evidence verification succeed, with write permission restricted to the release job. Eleven focused tampering/completeness tests and Ruff passed.
 - The user explicitly added easy LLM swapping to the objective. Existing packs swap models, projectors, prompts and runners; a runtime adapter boundary and compatibility checks are the next architecture iteration.
+
+## Iteration 33 — published neural preview and completed Studio source baseline
+
+- Applied the new release verifier to the real `f4000b8` Linux/Windows neural artifacts from successful workflow `42974440284`. Both executable hashes, all eight packaged resource scenarios and both eleven-case accuracy reports matched their clean platform source records.
+- Published `neural-preview.1` with two native model-embedded executables and thirteen total assets, including individual/aggregate checksums, manifests, resource/accuracy reports and limitations. Linux/Windows peak GUI RSS was 537.7/342.3 MB respectively. Updated direct download documentation.
+- Reran Qwen CPU source workloads from clean `423a1b3` after scaling the sequential benchmark deadline. All four passed; the repeated 16 MP GUI completed four 43–45 second recognitions in 178 seconds, with 3.45 GB peak tree RSS. The failed earlier deadline-limited report is retained.
+- Interrupted work was explicitly restarted after the user resumed early; the scheduled later restart was disabled. The canceled combined Actions run remains canceled rather than being counted as passed.
+- The release-gate change passed all 158 tests and Ruff before integration. Complete Studio onefile measurements and the new runtime-adapter architecture remain active work.

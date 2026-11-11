@@ -56,6 +56,8 @@ The official [Qwen3-VL-2B-Instruct GGUF card](https://huggingface.co/Qwen/Qwen3-
 
 On the bilingual example, this quantized model transcribed all visible Arabic and English correctly. The CPU run observed 3.03 GB host process-tree RSS in 20.6 seconds; the native CUDA 12.4/SM75 runner observed 1.43 GB host RSS in 5.9 seconds. [Development probe outputs](benchmarks/linux-qwen3-sample.json) retain the exact text, backend and containment counters. These are single-image development probes, not a clean-source packaged budget or general accuracy certification. CUDA VRAM is separate. Larger images, diacritics, mixed paragraphs and complete Studio binaries remain independent gates. Classical/neural OCR still provide located source selections; Qwen output has no invented geometry.
 
+All four clean `423a1b3` CPU source resource workloads subsequently passed. The largest observed tree RSS was **3.45 GB** in the repeated 16 MP GUI case, which completed four recognitions in 178 seconds. Each recognition used the pack's bounded preview/encoder input. [Complete source report](benchmarks/linux-qwen3-cpu.json). The earlier fixed-deadline run remains [recorded as failed](benchmarks/linux-qwen3-cpu-first.json). The passing source result does not include a complete Studio onefile launcher, nor prove a universal 4 GB ceiling.
+
 ## Building a compatible CUDA runner
 
 For a Linux driver that cannot run newer upstream PTX, an optional developer tool builds pinned llama.cpp with native kernels and NVIDIA's checksum-verified CUDA 12.4 redistributables:

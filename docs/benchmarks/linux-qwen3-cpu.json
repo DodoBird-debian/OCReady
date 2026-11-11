@@ -1,0 +1,123 @@
+{
+  "sample_interval_ms": 10,
+  "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
+  "platform": "linux",
+  "python": "3.12.16",
+  "cpu_count": 12,
+  "binary": false,
+  "scenarios": [
+    {
+      "edition": "studio",
+      "max_pixels": 16000000,
+      "scenario": "sample",
+      "peak_rss_bytes": 3029323776,
+      "budget_bytes": 4000000000,
+      "below_budget": true,
+      "elapsed_seconds": 19.102,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 18.992639506999694,
+        "peak_rss": 3029323776,
+        "engine": "vision:qwen3-vl-2b-q4",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 3952742400,
+        "worker_peak": 1894645760,
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "studio",
+      "max_pixels": 16000000,
+      "scenario": "dark",
+      "peak_rss_bytes": 3026116608,
+      "budget_bytes": 4000000000,
+      "below_budget": true,
+      "elapsed_seconds": 19.043,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 18.944417026999872,
+        "peak_rss": 3026116608,
+        "engine": "vision:qwen3-vl-2b-q4",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 3956097024,
+        "worker_peak": 1898856448,
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "studio",
+      "max_pixels": 16000000,
+      "scenario": "max-pixels",
+      "peak_rss_bytes": 3154665472,
+      "budget_bytes": 4000000000,
+      "below_budget": true,
+      "elapsed_seconds": 45.05,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 44.79297702199983,
+        "peak_rss": 3154665472,
+        "engine": "vision:qwen3-vl-2b-q4",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 3874914304,
+        "worker_peak": 1944240128,
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "studio",
+      "max_pixels": 16000000,
+      "scenario": "gui-repeated",
+      "peak_rss_bytes": 3447300096,
+      "budget_bytes": 4000000000,
+      "below_budget": true,
+      "elapsed_seconds": 178.476,
+      "exit_code": 0,
+      "details": {
+        "iterations": [
+          {
+            "characters": 1527,
+            "elapsed": 44.568009394999535,
+            "worker_peak_rss": 3304456192,
+            "idle_rss": 258711552
+          },
+          {
+            "characters": 1527,
+            "elapsed": 43.523876751998614,
+            "worker_peak_rss": 3369619456,
+            "idle_rss": 324206592
+          },
+          {
+            "characters": 1527,
+            "elapsed": 44.084564997996495,
+            "worker_peak_rss": 3447300096,
+            "idle_rss": 401899520
+          },
+          {
+            "characters": 1527,
+            "elapsed": 44.440996901998005,
+            "worker_peak_rss": 3372986368,
+            "idle_rss": 327499776
+          }
+        ]
+      },
+      "error": ""
+    }
+  ],
+  "source": {
+    "revision": "423a1b3232fb111b286da4e7d0c9013a8bfc30bc",
+    "dirty": false,
+    "tree_sha256": "aaf2e5b2a65416b3c9c7d1b4a1a495f27dc58b846b9aa9ff41d706694fef165b"
+  },
+  "sources_changed_during_run": false,
+  "binary_sha256": null,
+  "binary_changed_during_run": false,
+  "build_profile": null,
+  "requested_method": null,
+  "requested_pack_id": null
+}

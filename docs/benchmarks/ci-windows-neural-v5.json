@@ -1,0 +1,152 @@
+{
+  "sample_interval_ms": 10,
+  "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
+  "platform": "win32",
+  "python": "3.12.10",
+  "cpu_count": 4,
+  "binary": true,
+  "scenarios": [
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "sample",
+      "peak_rss_bytes": 275099648,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 7.235,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 3.5930000000000746,
+        "peak_rss": 217411584,
+        "engine": "neural:ppocr-v5-arabic",
+        "backend": "CPU",
+        "containment": "windows-job",
+        "worker_limit": 944902144,
+        "worker_peak": 266199040,
+        "words": 6
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "dark",
+      "peak_rss_bytes": 274931712,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 7.078,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 3.453000000000202,
+        "peak_rss": 222515200,
+        "engine": "neural:ppocr-v5-arabic",
+        "backend": "CPU",
+        "containment": "windows-job",
+        "worker_limit": 944812032,
+        "worker_peak": 266305536,
+        "words": 6
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "max-pixels",
+      "peak_rss_bytes": 274620416,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 9.313,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 4.078999999999951,
+        "peak_rss": 252473344,
+        "engine": "neural:ppocr-v5-arabic",
+        "backend": "CPU",
+        "containment": "windows-job",
+        "worker_limit": 915845120,
+        "worker_peak": 281636864,
+        "words": 60
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "gui-onefile",
+      "peak_rss_bytes": 342261760,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 9.968,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 4.094000000000051,
+        "peak_rss": 320491520,
+        "engine": "neural:ppocr-v5-arabic",
+        "backend": "CPU",
+        "containment": "windows-job",
+        "worker_limit": 855801856,
+        "worker_peak": 282050560,
+        "words": 60
+      },
+      "error": ""
+    }
+  ],
+  "source": {
+    "revision": "f4000b836ae4e728133362d38cf41294b25cf3fb",
+    "dirty": false,
+    "tree_sha256": "c36db5e4881c35886172ec8aff7cecd0f04e15b6b6e1df37a28419764ff16915"
+  },
+  "sources_changed_during_run": false,
+  "binary_sha256": "7c7d2cdd1df8a42cc0de319508ffa9ed6d283734ebf271136c095f0fd68c969f",
+  "binary_changed_during_run": false,
+  "build_profile": {
+    "edition": "everyday",
+    "available_editions": [
+      "everyday"
+    ],
+    "methods": [
+      "neural"
+    ],
+    "platform": "Windows-2025Server-10.0.26100-SP0",
+    "python": "3.12.10",
+    "embedded_models": [],
+    "default_model": "",
+    "embedded_neural": [
+      {
+        "id": "ppocr-v5-arabic",
+        "name": "Neural OCR · Arabic + English",
+        "source": "https://huggingface.co/PaddlePaddle/arabic_PP-OCRv5_mobile_rec_onnx",
+        "license": "Apache-2.0",
+        "languages": "ara+eng",
+        "geometry": "line",
+        "detector_sha256": "a431985659dc921974177a95adcfbb90fd9e51989a5e04d70d0b75f597b6e61d",
+        "recognizer_sha256": "799113ebf267fbe742deb99eb36e8d42c9ddc5291ceacf92add41b4d52a59110",
+        "dictionary_sha256": "7f92f7dbb9b75a4787a83bfb4f6d14a8ab515525130c9d40a9036f61cf6999e9"
+      }
+    ],
+    "default_neural": "ppocr-v5-arabic",
+    "variant": "neural",
+    "runtime_bundle_sha256": "dcd83900aa37e2a1e5b54fc77cc743ced644b7beded3c34dd1a05d6c60861ccf",
+    "source": {
+      "revision": "f4000b836ae4e728133362d38cf41294b25cf3fb",
+      "dirty": false,
+      "tree_sha256": "c36db5e4881c35886172ec8aff7cecd0f04e15b6b6e1df37a28419764ff16915"
+    },
+    "built_at_utc": "2026-11-11T06:59:31.480284+00:00",
+    "dependencies": {
+      "Nuitka": "4.3.5",
+      "Pillow": "12.3.0",
+      "psutil": "7.2.2",
+      "PySide6-Essentials": "6.8.3"
+    },
+    "memory_certification": "Uncertified; see docs/PROGRESS.md and benchmark evidence",
+    "payload_memory": {
+      "enabled": true,
+      "nuitka": "4.3.5",
+      "strategy": "drop-unused-launcher-pages-v1",
+      "original_bootstrap_sha256": "73e5da1368005fa1d8ac82c62269095bb26cf231604f260409533a8fb21eb827",
+      "helper_sha256": "eba94369550127fd2a5a43070420df2d041e5691f623b3895401f6dce67a3643",
+      "patched_bootstrap_sha256": "8460dcfb5676b9bd1cc74a06dfa369df1c67b1d12e7eb9b3fdd7e48751855364"
+    }
+  }
+}
