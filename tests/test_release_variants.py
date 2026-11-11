@@ -30,6 +30,8 @@ def artifacts(tmp_path):
                            "model_sha256": "1" * 64, "projector_sha256": "2" * 64}],
                        "embedded_neural": [{"id": "bilingual", "languages": "ara+eng", "geometry": "line",
                            "detector_sha256": "3" * 64, "recognizer_sha256": "4" * 64, "dictionary_sha256": "5" * 64}]}
+            if variant == "multimodal-json":
+                profile["embedded_models"][0]["adapter"] = "json-cli-v1"
             (binary.parent / "build-manifest.json").write_text(json.dumps(profile))
             reports = folder / "test-output"
             reports.mkdir()
@@ -183,6 +185,15 @@ def test_release_requires_the_same_accuracy_corpus_on_both_platforms(artifacts):
     path.write_text(json.dumps(record))
     with pytest.raises(ValueError, match="corpus content"):
         verify_variants(root, REVISION, "everyday", "multimodal")
+
+
+def test_json_variant_requires_a_real_json_adapter_on_both_platforms(artifacts, tmp_path):
+    root = artifacts("multimodal-json")
+    prepare_release(root, tmp_path / "json-release", REVISION, "everyday", "multimodal-json", 123)
+    for folder in root.glob("OCReady-*"):
+        replace_profile(folder, lambda p: p["embedded_models"][0].update(adapter="llama.cpp"))
+    with pytest.raises(ValueError, match="JSON runtime"):
+        verify_variants(root, REVISION, "everyday", "multimodal-json")
 
 
 def test_release_accepts_legacy_lf_and_crlf_corpus_checksums(artifacts):

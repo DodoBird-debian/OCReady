@@ -95,3 +95,12 @@ The builder retains source/native-runner digests, Python/native notices and a `v
 Real Linux validation has exercised SmolVLM on CPU and Qwen on CUDA through this second adapter. Qwen retained the complete public Arabic/English sample. The compiled worker also ran directly from `/tmp` without `VIRTUAL_ENV` or `PYTHONPATH`, and a declared-file archive was extracted elsewhere and successfully used for real SmolVLM inference. [Functional probe outputs and worker source identities](benchmarks/linux-json-vision-samples.json). These establish the tested protocol/runtime/relocation behavior, not complete outer onefile resource certification or Windows JSON-worker validation. The default llama.cpp adapter has separate real CPU/CUDA/fallback evidence.
 
 The second interface now also has complete Linux onefile evidence. Clean `af3baa9` embedded the compiled CPU JSON worker, its native descendant, compact SmolVLM Q4 weights and projector in a 295.4 MB Everyday vision-only executable. Real CLI/native GUI transcription and all four packaged resource workloads passed, including 679.1 MB maximum observed tree RSS in the cap-sized GUI case ([binary-identified report](benchmarks/linux-json-smol-q4-onefile.json)). Python, separate model files and the development environment were not required by this executable. Its pack is English only and supplies no source boxes. Windows JSON-worker packaging, neural combinations and a complete CUDA onefile remain independent measurements.
+
+To build the combined composition after preparing the classical runtime and neural worker/pack:
+
+```sh
+uv run python -m scripts.build_variant --edition everyday --variant multimodal-json
+uv run python -m scripts.smoke_binary dist/everyday-multimodal-json --all-methods --benchmark
+```
+
+The builder provisions locked native weights, compiles one standalone CPU JSON bridge and writes sibling manifests that reference the same assets. Display names, prompts, languages and input/output limits remain intact. Separate IDs distinguish runtime choices if both manifests are installed. Studio uses both compact SmolVLM and bilingual Qwen through this interface. The shared workflow independently builds/tests Linux and Windows; release verification rejects a JSON composition containing a different vision adapter, missing models or incomplete per-method evidence.

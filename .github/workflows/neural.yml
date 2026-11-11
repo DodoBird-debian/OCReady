@@ -12,7 +12,7 @@ on:
         description: Included OCR methods
         required: true
         type: choice
-        options: [neural, combined, multimodal]
+        options: [neural, combined, multimodal, multimodal-json]
         default: neural
       publish:
         description: Publish a prerelease only after both platforms and every method pass

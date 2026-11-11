@@ -424,3 +424,10 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Actual headless and native GUI transcription passed through `json-cli-v1`. All four packaged process-tree resource workloads passed: the largest observed RSS was 679,141,376 bytes for the cap-sized GUI workflow, below Everyday's decimal 1 GB budget.
 - Verified the saved report against the actual binary SHA256 and unchanged clean source identity before retaining it. Embedded provenance records the adapter and exact model/projector hashes. These are Linux CPU single-method measurements; no Arabic, Windows, neural-combination or complete CUDA-onefile claim is inferred.
 - The icon iteration passed 219 tests, Ruff, ICO decoding and actual prior-PE inspection before push. Its Pocket Linux/Windows compilation run `43011766996` is active. Studio compact-model workflow `43007639337` has passed Linux; its Windows job and the subsequent gated-release workflow remain active.
+
+## Iteration 49 — paired-platform builds for the alternate LLM interface
+
+- Added a curated `multimodal-json` composition to the common builder, platform workflow and paired release verifier. It retains classical and bilingual neural OCR, and compiles one standalone JSON CPU bridge for its vision choices.
+- Alternate manifests reuse the verified model/projector files without duplicate downloads or changing prompts, language declarations, input limits, display names or the original native manifests. Distinct IDs and artifact names allow the two runtime choices to coexist. Studio retains both SmolVLM and Qwen.
+- Centralized curated variant names/model selections. The release gate requires every vision pack in the JSON composition to identify the JSON adapter and still verifies every model/asset and all platform resource workloads before publication.
+- All 222 tests and Ruff passed, including pack-swap, two-model retention and release-verifier checks. The first real Linux/Windows combined JSON build follows this checkpoint; previous Linux single-method evidence does not substitute for those gates.

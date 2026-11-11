@@ -11,6 +11,7 @@ from scripts.corpus_identity import load_corpus_identity
 from scripts.provenance import file_sha256
 from scripts.release_assets import SCENARIOS
 from scripts.smoke_binary import embedded_selections
+from scripts.variants import MODEL_VARIANTS, VISION_VARIANTS
 
 
 def read_json(path: Path) -> dict:
@@ -61,7 +62,7 @@ def embedded_assets(profile: dict) -> dict[tuple[str, str], dict]:
 def verify_variants(root: Path, revision: str, edition: str, variant: str) -> list[dict]:
     if not re.fullmatch(r"[0-9a-f]{40}", revision):
         raise ValueError("Supply the full source revision.")
-    if edition not in {"everyday", "studio"} or variant not in {"neural", "combined", "multimodal"}:
+    if edition not in {"everyday", "studio"} or variant not in MODEL_VARIANTS:
         raise ValueError("Choose a supported model edition and variant.")
     policy = EDITIONS[edition]
     verified = []
@@ -81,6 +82,8 @@ def verify_variants(root: Path, revision: str, edition: str, variant: str) -> li
                 or profile.get("edition") != edition or profile.get("variant") != variant):
             raise ValueError(f"{binary.name}: wrong or unclean source/variant identity.")
         assets = embedded_assets(profile)
+        if variant == "multimodal-json" and any(row.get("adapter") != "json-cli-v1" for (method, _), row in assets.items() if method == "vision"):
+            raise ValueError("The JSON multimodal variant needs the JSON runtime for every vision choice.")
         if expected_assets is not None and assets != expected_assets:
             raise ValueError("The platform artifacts contain different model assets or capabilities.")
         expected_assets = assets
@@ -92,7 +95,7 @@ def verify_variants(root: Path, revision: str, edition: str, variant: str) -> li
             raise ValueError("A model release needs unique embedded choices including bilingual neural OCR.")
         if variant != "neural" and not {("tesseract-fast", ""), ("tesseract-best", "")} <= set(choices):
             raise ValueError("The combined variant is missing classical engines.")
-        if variant == "multimodal" and sum(m == "vision" for m, _ in choices) < (2 if edition == "studio" else 1):
+        if variant in VISION_VARIANTS and sum(m == "vision" for m, _ in choices) < (2 if edition == "studio" else 1):
             raise ValueError("The multimodal variant is missing embedded vision choices.")
         if expected_choices is not None and set(choices) != expected_choices:
             raise ValueError("The platform artifacts contain different engine/model choices.")
@@ -208,7 +211,7 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--revision", required=True)
     parser.add_argument("--edition", choices=("everyday", "studio"), required=True)
-    parser.add_argument("--variant", choices=("neural", "combined", "multimodal"), required=True)
+    parser.add_argument("--variant", choices=MODEL_VARIANTS, required=True)
     parser.add_argument("--run-id", type=int, required=True)
     args = parser.parse_args()
     try:
