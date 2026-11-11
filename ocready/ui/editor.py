@@ -1,8 +1,8 @@
 import unicodedata
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QColor, QFont, QTextCharFormat, QTextCursor
-from PySide6.QtWidgets import QTextEdit
+from PySide6.QtGui import QColor, QTextCharFormat, QTextCursor
+from PySide6.QtWidgets import QApplication, QTextEdit
 
 from ocready.core.text import codepoint_offset, utf16_offset
 from ocready.core.types import OCRResult
@@ -16,7 +16,9 @@ class TextEditor(QTextEdit):
         super().__init__(parent)
         self.setPlaceholderText("Your text will appear here.\n\nOpen an image, paste a screenshot, or capture a region.\nThen choose Recognize text.\n\nالعربية والإنجليزية، جاهزتان للنسخ.")
         self.setAccessibleName("Recognized text. Editable, with native Arabic and English support.")
-        self.setFont(QFont("Noto Sans", 13))
+        font = QApplication.font()
+        font.setPointSize(13)
+        self.setFont(font)
         self.setAcceptRichText(False)
         self.setAutoFormatting(QTextEdit.AutoFormattingFlag.AutoNone)
         self.setTabStopDistance(32)

@@ -1,0 +1,44 @@
+{
+  "source": {
+    "revision": "e949d483f77b26bb7e1aa83bb1e29a10eaea9b57",
+    "dirty": false,
+    "tree_sha256": "cdfc1c80ce74be7bdc3ed330b18c5b3ac83507f7c606a52251bd17a480c493a8"
+  },
+  "platform": "win32",
+  "windows_ansi_code_page": 1252,
+  "probe": "source-worker-paths-v1",
+  "cases": [
+    {
+      "case": "ascii",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "engine": "tesseract-fast",
+      "bilingual_text_verified": true
+    },
+    {
+      "case": "arabic-temp",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "engine": "tesseract-fast",
+      "bilingual_text_verified": true
+    },
+    {
+      "case": "arabic-runtime",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "engine": "tesseract-fast",
+      "bilingual_text_verified": true
+    },
+    {
+      "case": "arabic-both",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "engine": "tesseract-fast",
+      "bilingual_text_verified": true
+    }
+  ]
+}

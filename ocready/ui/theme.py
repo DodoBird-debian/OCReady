@@ -1,11 +1,11 @@
 from PySide6.QtCore import QPointF, Qt
-from PySide6.QtGui import QColor, QFont, QIcon, QPainter, QPen, QPixmap
+from PySide6.QtGui import QColor, QFont, QFontDatabase, QIcon, QPainter, QPen, QPixmap
 from PySide6.QtWidgets import QApplication
 
 from ocready.core.paths import resource_root
 
 LIGHT = """
-QWidget { color: #25344c; font-family: 'Inter', 'Segoe UI', 'Noto Sans', sans-serif; font-size: 13px; }
+QWidget { color: #25344c; font-size: 13px; }
 QMainWindow, QDialog { background: #f5f7fb; }
 QLabel#Brand { font-size: 22px; font-weight: 750; letter-spacing: -0.8px; }
 QLabel#Eyebrow { color: #57708f; font-size: 11px; font-weight: 700; letter-spacing: 1px; }
@@ -55,8 +55,12 @@ QGroupBox::title { subcontrol-origin: margin; left: 12px; padding: 0 5px; }
 
 def apply_theme(app: QApplication) -> None:
     app.setStyle("Fusion")
+    font = QFontDatabase.systemFont(QFontDatabase.SystemFont.GeneralFont)
+    font.setFamilies(["Inter", "Segoe UI", "Noto Sans", font.family()])
+    font.setStyleHint(QFont.StyleHint.SansSerif)
+    font.setPointSize(10)
+    app.setFont(font)
     app.setStyleSheet(LIGHT)
-    app.setFont(QFont("Noto Sans", 10))
 
 
 def app_icon() -> QIcon:

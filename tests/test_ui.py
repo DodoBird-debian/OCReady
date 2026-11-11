@@ -66,6 +66,17 @@ def test_empty_workspace_and_image_loading(window):
     assert window.image_stack.currentWidget() is window.canvas
 
 
+def test_workspace_uses_available_sans_fonts_including_the_text_editor(window):
+    from PySide6.QtGui import QFontDatabase, QFontInfo
+
+    available = {name.casefold() for name in QFontDatabase.families()}
+    intended = {name.casefold() for name in ("Inter", "Segoe UI", "Noto Sans")}.intersection(available)
+    if not intended:
+        pytest.skip("This host uses its platform's general-font fallback")
+    assert QFontInfo(window.font()).family().casefold() in intended
+    assert QFontInfo(window.editor.font()).family().casefold() in intended
+
+
 def test_gui_smoke_does_not_cancel_vision_inside_its_engine_deadline(window, app, tmp_path, monkeypatch):
     import json
     import threading

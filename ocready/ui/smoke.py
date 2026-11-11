@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 from PySide6.QtCore import QEvent, QPointF, Qt, QTimer
-from PySide6.QtGui import QGuiApplication, QMouseEvent
+from PySide6.QtGui import QFontInfo, QGuiApplication, QMouseEvent
 from PySide6.QtWidgets import QApplication
 
 from ocready.core.memory import tree_rss
@@ -66,6 +66,8 @@ def attach_smoke_run(app, window, image: str | None, output: Path, *, recipe: Re
         record = {"text": window.editor.toPlainText(), "words": len(window.canvas.words),
                   "linked": window.editor.linked, "rss": tree_rss(), "error": error, "deadline_seconds": deadline,
                   "qt_platform": QGuiApplication.platformName(), "clipboard_copy_verified": copied,
+                  "ui_font_family": QFontInfo(window.font()).family(),
+                  "editor_font_family": QFontInfo(window.editor.font()).family(),
                   "source_selection_verified": source_selected}
         if not result:
             record["error"] = error or window.status.text()
