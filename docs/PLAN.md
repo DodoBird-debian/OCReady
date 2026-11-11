@@ -1629,4 +1629,5 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M64.T5: Remove temporary apt state and refuse execution outside disposable CI.
 - M64.V1: Validate shell syntax and local refusal without changing the user's package manager.
 - M64.V2: Require actual hosted dependency/test/build success before publishing new platform claims.
+- M64.T6: Use only a fixed bounded HTTPS mirror fallback while retaining Ubuntu's original signing trust and suite identities.
 - Release gate: Successful signed dependency preparation followed by unchanged source, native GUI, accuracy and RAM gates.
