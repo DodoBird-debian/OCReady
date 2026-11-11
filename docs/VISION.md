@@ -36,6 +36,20 @@ A Q4 variant was tested in an **entirely embedded, vision-only executable** buil
 
 The later clean `2ba93c6` build releases unused launcher payload residency after extraction. Its 270.0 MB embedded executable passed the same packaged workloads with a **651.6 MB** maximum GUI peak, still counting its launcher and OCR children. [Updated binary-identified report](benchmarks/linux-everyday-smolvlm-q4-onefile-trimmed.json). This adds headroom for future engine combinations; each combination still needs its own admission and packaged tests.
 
+## Preparing reproducible CPU presets
+
+Developer preparation can provision checksum-locked official GGUF files, matching projectors, a Linux/Windows x86_64 CPU runner and retained model cards/notices:
+
+```sh
+uv run python -m scripts.prepare_vision --preset smol
+# Studio can include both choices:
+uv run python -m scripts.prepare_vision --preset smol --preset glm
+```
+
+The manifests are `models/vision/smol/pack.json` and `models/vision/glm/pack.json`. Repeat `--model-pack` when building to embed both. These downloads occur during explicit preparation, never at app startup. Every asset has a pinned revision, byte size and SHA256 in `assets/vision-lock.json`; archive extraction rejects escaping paths and links. Generated manifests use relative paths and include the upstream cards.
+
+Both presets expose English. SmolVLM declares English only. GLM-OCR's upstream card lists eight languages but does not list Arabic; Arabic text occasionally read in experiments does not establish supported Arabic transcription. Use the bilingual classical or neural methods for Arabic. These presets supply CPU inference; `--cuda-runner` can add a separately provisioned compatible runner. A preset's disk size and memory estimate are not packaged resource certification.
+
 ## Building a compatible CUDA runner
 
 For a Linux driver that cannot run newer upstream PTX, an optional developer tool builds pinned llama.cpp with native kernels and NVIDIA's checksum-verified CUDA 12.4 redistributables:

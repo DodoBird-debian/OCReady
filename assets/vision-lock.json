@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "runner": {
+    "release": "b12255",
+    "source_revision": "940a30ee3b5593e1a66fe0aadc3b731989022552",
+    "license": {
+      "file": "LICENSE-llama.txt",
+      "url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/940a30ee3b5593e1a66fe0aadc3b731989022552/LICENSE",
+      "bytes": 1078,
+      "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
+    },
+    "platforms": {
+      "linux-x86_64": {
+        "file": "llama-b12255-bin-ubuntu-x64.tar.gz",
+        "url": "https://github.com/ggml-org/llama.cpp/releases/download/b12255/llama-b12255-bin-ubuntu-x64.tar.gz",
+        "bytes": 23155724,
+        "sha256": "e49f3492de6ca193766f84fa954490a9e32e733be8ac3ec53d08749775461aa7"
+      },
+      "windows-x86_64": {
+        "file": "llama-b12255-bin-win-cpu-x64.zip",
+        "url": "https://github.com/ggml-org/llama.cpp/releases/download/b12255/llama-b12255-bin-win-cpu-x64.zip",
+        "bytes": 24931718,
+        "sha256": "ec06d7b2f3fc4f7cff3e395e3e85c0de5f928b6a62a8647bbf85776351385597"
+      }
+    }
+  },
+  "packs": {
+    "smol": {
+      "id": "smolvlm-256m-q8",
+      "name": "SmolVLM 256M \u00b7 English (experimental)",
+      "repo": "ggml-org/SmolVLM-256M-Instruct-GGUF",
+      "revision": "b9e4379657e1450d04d02eec8e345667265b0a00",
+      "memory_mb": 500,
+      "tokens": 256,
+      "languages": "eng",
+      "license": "Apache-2.0",
+      "prompt": "Read the text in the image. Return only the exact text without explanation.",
+      "limitations": "The upstream model card lists English only. Use classical or neural OCR for Arabic. Generative transcription may omit or invent text.",
+      "files": [
+        {
+          "file": "SmolVLM-256M-Instruct-Q8_0.gguf",
+          "url": "https://huggingface.co/ggml-org/SmolVLM-256M-Instruct-GGUF/resolve/b9e4379657e1450d04d02eec8e345667265b0a00/SmolVLM-256M-Instruct-Q8_0.gguf",
+          "bytes": 175054528,
+          "sha256": "2a31195d3769c0b0fd0a4906201666108834848db768af11de1d2cef7cd35e65"
+        },
+        {
+          "file": "mmproj-SmolVLM-256M-Instruct-Q8_0.gguf",
+          "url": "https://huggingface.co/ggml-org/SmolVLM-256M-Instruct-GGUF/resolve/b9e4379657e1450d04d02eec8e345667265b0a00/mmproj-SmolVLM-256M-Instruct-Q8_0.gguf",
+          "bytes": 103769856,
+          "sha256": "7e943f7c53f0382a6fc41b6ee0c2def63ba4fded9ab8ed039cc9e2ab905e0edd"
+        },
+        {
+          "file": "modelcard.md",
+          "url": "https://huggingface.co/HuggingFaceTB/SmolVLM-256M-Instruct/raw/7e3e67edbbed1bf9888184d9df282b700a323964/README.md",
+          "bytes": 16400,
+          "sha256": "0b687c656b2587d84cb85003825746f8b3a08497dff4ed51b54b1090719fa512"
+        },
+        {
+          "file": "LICENSE-model.txt",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "bytes": 11358,
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        }
+      ]
+    },
+    "glm": {
+      "id": "glm-ocr-q8",
+      "name": "GLM-OCR \u00b7 English (experimental)",
+      "repo": "ggml-org/GLM-OCR-GGUF",
+      "revision": "65a42de1148dbed2297e922b5dbc7d9b70c36578",
+      "memory_mb": 2800,
+      "tokens": 512,
+      "languages": "eng",
+      "license": "MIT (model; see retained upstream model card)",
+      "prompt": "Text Recognition:",
+      "limitations": "The upstream model lists Chinese, English, French, Spanish, Russian, German, Japanese and Korean; Arabic is not listed. This preset exposes English. Use classical or neural OCR for Arabic. Generative transcription may omit or invent text.",
+      "files": [
+        {
+          "file": "GLM-OCR-Q8_0.gguf",
+          "url": "https://huggingface.co/ggml-org/GLM-OCR-GGUF/resolve/65a42de1148dbed2297e922b5dbc7d9b70c36578/GLM-OCR-Q8_0.gguf",
+          "bytes": 950433408,
+          "sha256": "45bc244a6446aff850521dc41f18bc8d7105ad5f0c2c8c28af04e7cc4f4d50b1"
+        },
+        {
+          "file": "mmproj-GLM-OCR-Q8_0.gguf",
+          "url": "https://huggingface.co/ggml-org/GLM-OCR-GGUF/resolve/65a42de1148dbed2297e922b5dbc7d9b70c36578/mmproj-GLM-OCR-Q8_0.gguf",
+          "bytes": 484403648,
+          "sha256": "9c4b58e33e316ed142eb5dcb41abec3844d3e6e5dc361ffb782c3fa9d175141f"
+        },
+        {
+          "file": "modelcard.md",
+          "url": "https://huggingface.co/zai-org/GLM-OCR/raw/2e85a62840ccac27daa451df36c736c4636b8628/README.md",
+          "bytes": 6795,
+          "sha256": "172334449c3df98650bc9a42781c254c64c9d466b440e2ca8ce31f99829212b2"
+        }
+      ]
+    }
+  }
+}

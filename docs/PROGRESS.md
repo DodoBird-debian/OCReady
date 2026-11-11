@@ -249,3 +249,10 @@ The plan describes both the implementation sequence and release gates. Pending i
 - All eleven fixed synthetic accuracy cases completed: weighted CER 3.9%, WER 7.5%. Diacritic-heavy text remains a clear weakness (38.9% CER), so these results are not a general accuracy promise.
 - Added a manual Linux/Windows workflow that compiles the standalone worker, downloads checksum-locked official models, runs source tests and real neural accuracy, embeds the worker in a variant executable, then runs packaged GUI and memory checks before uploading artifacts.
 - Both platform source checks passed at `b2576b9`. Complete Windows neural packaging remains a separate gate under observation.
+
+## Iteration 26 — checksum-locked vision presets
+
+- Added reproducible SmolVLM Q8 and GLM-OCR Q8 preparation with pinned official weights/projectors, model cards, licenses and llama.cpp CPU archives for Linux/Windows x86_64. Generated manifests use relative paths and can be embedded together.
+- Downloads require the exact locked size and SHA256 before atomic publication. Runtime extraction checks paths, links, entry counts and unpacked size; verified archives are re-extracted rather than trusting a stale marker.
+- Prepared both real presets locally and verified all locked assets. Upstream language declarations are now explicit: these vision presets expose English; Arabic remains served by the tested classical/neural engines. CPU presets do not claim validated CUDA packaging.
+- Added regression checks for oversized/corrupt download rejection, valid-cache reuse, Windows archive paths and Linux shared-library links. Three focused tests and Ruff passed. Complete combinations still require their own executable and per-method resource evidence.
