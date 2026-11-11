@@ -138,8 +138,8 @@ def prepare_pack(preset: dict, runner: Path, folder: Path, cuda_runner: Path | N
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--preset", action="append", choices=("smol", "glm"), required=True,
-                        help="Repeat to prepare multiple choices; GLM requires Studio.")
+    parser.add_argument("--preset", action="append", choices=("smol", "glm", "qwen3"), required=True,
+                        help="Repeat to prepare multiple choices; GLM and Qwen3 require Studio.")
     parser.add_argument("--runtime-dir", type=Path, default=ROOT / "runtime/vision-cpu")
     parser.add_argument("--model-dir", type=Path, default=ROOT / "models/vision")
     parser.add_argument("--cuda-runner", type=Path, help="Optional separately provisioned compatible CUDA runner")

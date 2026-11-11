@@ -278,3 +278,10 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Explicit per-method resource workloads now fail if the returned engine/pack identity differs from the requested choice, even when the process exits successfully. This guards against silently measuring a smaller fallback selection.
 - Added regression coverage for a wrong family, wrong pack and valid explicit/default local choices. Existing provenance checks and the new resource checks passed; Ruff passed.
 - The clean `602cc5b` combined Linux binary built at 530.3 MB and began real per-method validation. The first four Fast OCR workloads passed with a largest observed tree peak of 666.7 MB. Both Windows/Linux neural workers compiled in Actions and moved to the outer-app build; complete results remain pending.
+
+## Iteration 30 — evaluate a bilingual Studio vision candidate
+
+- Provisioned official Qwen3-VL-2B Q4_K_M weights and the matching Q8 projector with pinned revision, sizes, digests, model card and Apache notice. The preset uses a conservative 3400 MB runner estimate and Arabic + English evaluation mode.
+- The actual model read the full bilingual sample correctly on CPU and CUDA. Observed host tree RSS/time: CPU 3.03 GB/20.6 s; CUDA 1.43 GB/5.9 s using the previously verified CUDA 12.4 native SM75 runner. Raw development probe outputs explicitly distinguish this from clean packaged certification and VRAM measurement.
+- Changed the curated Studio multimodal combination to SmolVLM plus Qwen3-VL, alongside classical and neural OCR. GLM remains available as a separately selectable pinned preset. Broader accuracy, cap-sized source workloads and full Studio packaging remain required gates.
+- Previous iteration's full source suite passed all 147 tests. Exact current-source Qwen corpus/resource measurements follow this checkpoint; no universal Arabic accuracy or 4 GB guarantee is inferred from one image.

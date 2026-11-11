@@ -42,13 +42,19 @@ Developer preparation can provision checksum-locked official GGUF files, matchin
 
 ```sh
 uv run python -m scripts.prepare_vision --preset smol
-# Studio can include both choices:
-uv run python -m scripts.prepare_vision --preset smol --preset glm
+# Studio can include multiple choices:
+uv run python -m scripts.prepare_vision --preset smol --preset qwen3
 ```
 
-The manifests are `models/vision/smol/pack.json` and `models/vision/glm/pack.json`. Repeat `--model-pack` when building to embed both. These downloads occur during explicit preparation, never at app startup. Every asset has a pinned revision, byte size and SHA256 in `assets/vision-lock.json`; archive extraction rejects escaping paths and links. Generated manifests use relative paths and include the upstream cards.
+The manifests are `models/vision/<preset>/pack.json`. Available presets are `smol`, `glm`, and `qwen3`. Repeat `--model-pack` when building to embed multiple choices. These downloads occur during explicit preparation, never at app startup. Every asset has a pinned revision, byte size and SHA256 in `assets/vision-lock.json`; archive extraction rejects escaping paths and links. Generated manifests use relative paths and include the upstream cards.
 
-Both presets expose English. SmolVLM declares English only. GLM-OCR's upstream card lists eight languages but does not list Arabic; Arabic text occasionally read in experiments does not establish supported Arabic transcription. Use the bilingual classical or neural methods for Arabic. These presets supply CPU inference; `--cuda-runner` can add a separately provisioned compatible runner. A preset's disk size and memory estimate are not packaged resource certification.
+SmolVLM and GLM presets expose English. SmolVLM declares English only. GLM-OCR's upstream card lists eight languages but does not list Arabic; Arabic text occasionally read in experiments does not establish supported Arabic transcription. These presets supply CPU inference; `--cuda-runner` can add a separately provisioned compatible runner. A preset's disk size and memory estimate are not packaged resource certification.
+
+## An experimental bilingual Studio candidate
+
+The official [Qwen3-VL-2B-Instruct GGUF card](https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct-GGUF) describes expanded multilingual OCR. The `qwen3` preset pins revision `52d6c8ffea26cc873ac5ad116f8631268d7eb503`, Q4_K_M language weights and the Q8 projector (1.55 GB combined), with a 3400 MB runner admission estimate. It exposes Arabic + English for direct evaluation.
+
+On the bilingual example, this quantized model transcribed all visible Arabic and English correctly. The CPU run observed 3.03 GB host process-tree RSS in 20.6 seconds; the native CUDA 12.4/SM75 runner observed 1.43 GB host RSS in 5.9 seconds. [Development probe outputs](benchmarks/linux-qwen3-sample.json) retain the exact text, backend and containment counters. These are single-image development probes, not a clean-source packaged budget or general accuracy certification. CUDA VRAM is separate. Larger images, diacritics, mixed paragraphs and complete Studio binaries remain independent gates. Classical/neural OCR still provide located source selections; Qwen output has no invented geometry.
 
 ## Building a compatible CUDA runner
 

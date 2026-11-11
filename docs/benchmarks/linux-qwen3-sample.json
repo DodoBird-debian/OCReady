@@ -1,0 +1,42 @@
+{
+  "scope": "Development single-image probe, not clean-source packaged certification; host process-tree RSS, not VRAM",
+  "image": "assets/sample-bilingual.png",
+  "model_revision": "52d6c8ffea26cc873ac5ad116f8631268d7eb503",
+  "hardware": "GTX 1660 Ti; CUDA runner built with CUDA 12.4 native SM75",
+  "results": {
+    "cpu": {
+      "text": "A little less typing.\nTurn your screenshots into something useful.\nSelect a word. Copy a sentence. Keep going.\nمرحبا بالعالم\nاللغة العربية واللغة الإنجليزية\nOCReady / Local. Private. Ready to copy.",
+      "words": [],
+      "engine": "vision:qwen3-vl-2b-q4",
+      "language": "ara+eng",
+      "elapsed": 20.62051133899513,
+      "peak_rss": 3028000768,
+      "backend": "CPU",
+      "recipe": "Original",
+      "note": "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR.",
+      "containment": "cgroup-v2",
+      "worker_limit": 3953201152,
+      "worker_peak": 1905385472,
+      "layout": "",
+      "geometry": "none",
+      "confidence": null
+    },
+    "cuda": {
+      "text": "A little less typing.\nTurn your screenshots into something useful.\nSelect a word. Copy a sentence. Keep going.\nمرحبا بالعالم\nاللغة العربية واللغة الإنجليزية\nOCReady / Local. Private. Ready to copy.",
+      "words": [],
+      "engine": "vision:qwen3-vl-2b-q4",
+      "language": "ara+eng",
+      "elapsed": 5.867974629996752,
+      "peak_rss": 1428078592,
+      "backend": "CUDA",
+      "recipe": "Original",
+      "note": "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR.",
+      "containment": "cgroup-v2",
+      "worker_limit": 3952685056,
+      "worker_peak": 381153280,
+      "layout": "",
+      "geometry": "none",
+      "confidence": null
+    }
+  }
+}

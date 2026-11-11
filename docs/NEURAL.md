@@ -39,7 +39,7 @@ uv run python -m scripts.build_variant --edition everyday --variant multimodal
 uv run python -m scripts.smoke_binary dist/everyday-multimodal --all-methods --benchmark
 ```
 
-`neural` embeds only the bilingual neural method; `combined` adds classical engines; `multimodal` also provisions the locked English SmolVLM preset, plus GLM-OCR in Studio. The latter downloads large model files during explicit preparation. It does not yet imply a published, validated combined executable. The all-methods smoke check runs actual CLI, native GUI and four resource workloads for each embedded choice, preserving separate variant/method reports.
+`neural` embeds only the bilingual neural method; `combined` adds classical engines; `multimodal` also provisions the locked English SmolVLM preset, plus the experimental bilingual Qwen3-VL preset in Studio. The latter downloads large model files during explicit preparation. It does not yet imply a published, validated combined executable. The all-methods smoke check runs actual CLI, native GUI and four resource workloads for each embedded choice, preserving separate variant/method reports.
 
 Both CLI and GUI accept an explicit installed choice, for example `--method vision --pack-id smolvlm-256m-q8`. A missing or inadmissible choice fails rather than silently testing another model. Normal GUI launches preserve the saved method.
 
