@@ -229,3 +229,15 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Both executables and project sources remained unchanged during measurement. Published the binary-identified reports rather than extrapolating from the small native probe.
 - A separate source-GUI soak completed all 100 cap-sized image loads/recognitions. Peak was 231.6 MB; average idle usage stayed flat (160.5 MB first ten jobs, 158.4 MB last ten). The raw report distinguishes source testing from a compiled soak and records when its source fingerprint was captured.
 - The Linux default-edition matrix is green with the new bootstrap. Windows jobs are still under observation. Neural OCR integration remains next, with explicit logical text ordering and honest line geometry required before shipping it.
+
+## Iteration 24 — neural worker, protocol and native source workflow
+
+- Added a separate PP-OCRv5 worker, strict line-polygon response parsing, memory admission, pipeline/CLI routing, configurable pack storage, native settings and line selection. Word positions are not invented for this engine.
+- Fixed visual CTC copy order for the tested Arabic-led mixed text, Arabic digits, English punctuation and email cases. Reading direction remains an explicit pack option for ambiguous mixed layouts.
+- Compiled a standalone numerical worker and ran it outside the project without a virtual environment. The app-to-worker pipeline read the bilingual sample with six detected lines; clicking/copying the Arabic line in the real native GUI preserved logical Unicode. Observed sample tree peaks were 313 MB headless and 398 MB source GUI, not complete onefile/cap-sized certification.
+- Added pinned official ONNX/config downloads and a verified derived dictionary, offline worker loading, declared-distribution hash manifests, retained runtime/model notices, neural-only/combined build options and separate artifact variant names.
+- Extended accuracy/resource tools for neural packs. Fixed a benchmark blind spot so a successful exit without a valid result, or an error-bearing result, cannot pass; GUI timeout explicitly fails.
+- Default app builds do not import numerical libraries into the Qt process. Full embedded variants, neural GPU inference and Windows worker packaging remain independent verification gates.
+- Fixed a onefile restart bug in both model families: built-in options no longer persist ephemeral asset paths. They are reapplied to freshly extracted assets, remain saved across editions, and protect built-in asset fields from accidental replacement.
+- All 140 tests and Ruff passed. Rebuilt the worker with offline loading/telemetry settings and declared runtime/Python notices. A real prefer-CUDA request on the CPU worker reported CPU fallback and preserved the expected mixed Arabic/English/digit text.
+- The previous launcher change is now green on all six Linux/Windows builds. The complete neural-only/combined application builds, cap-sized measurements and Windows worker packaging follow this source integration.

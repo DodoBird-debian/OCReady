@@ -11,6 +11,16 @@ def test_failed_gui_benchmark_preserves_error_without_document_contents():
     assert redact_details({"text": "private", "result": {"text": "private", "words": [{"text": "private"}], "engine": "vision"}}) == {"words": 1, "engine": "vision"}
 
 
+def test_benchmark_refuses_success_without_a_valid_result_file(tmp_path):
+    output = tmp_path / "missing.json"
+    result = observe([sys.executable, "-c", "pass"], output, 4_000_000_000)
+    assert result["exit_code"] != 0
+    assert result["details"]["error"]
+    output.write_text('{"error":"GUI timed out"}', encoding="utf-8")
+    result = observe([sys.executable, "-c", "pass"], output, 4_000_000_000)
+    assert result["exit_code"] != 0
+
+
 
 def test_benchmark_reads_arabic_under_a_windows_codepage(tmp_path, monkeypatch):
     output = tmp_path / "result.json"

@@ -9,6 +9,7 @@ from PIL import Image
 
 from ocready.core.editions import Edition
 from ocready.core.models import ModelPack
+from ocready.core.neural_packs import NeuralPack
 from ocready.core.preprocess import Recipe, preprocess
 from ocready.core.types import Cancelled, OCRError, OCRResult
 from ocready.engines import tesseract
@@ -24,11 +25,12 @@ class Request:
     compare: bool = False
     model_pack: ModelPack | None = None
     backend: str = "auto"
+    neural_pack: NeuralPack | None = None
 
 
-def image_policy(edition: Edition, method: str, pack: ModelPack | None = None) -> Edition:
+def image_policy(edition: Edition, method: str, pack: ModelPack | NeuralPack | None = None) -> Edition:
     """Use identical input bounds for the displayed preview and engine image."""
-    if not method.startswith("vision"):
+    if not method.startswith(("vision", "neural")):
         return edition
     return replace(edition, max_pixels=min(edition.max_pixels, pack.max_pixels if pack else 1_000_000),
                    max_edge=min(edition.max_edge, pack.max_edge if pack else 1600))
@@ -39,7 +41,8 @@ def recognize_image(source: Image.Image, request: Request, *, cancel: threading.
     cancel = cancel or threading.Event()
     started = time.monotonic()
     progress("Preparing image…")
-    processed = preprocess(source, request.recipe, image_policy(request.edition, request.method, request.model_pack))
+    pack = request.neural_pack if request.method.startswith("neural") else request.model_pack
+    processed = preprocess(source, request.recipe, image_policy(request.edition, request.method, pack))
     results = []
     with tempfile.TemporaryDirectory(prefix="ocready-ocr-") as directory:
         image_path = Path(directory) / "image.png"
@@ -53,6 +56,12 @@ def recognize_image(source: Image.Image, request: Request, *, cancel: threading.
             if not request.model_pack:
                 raise OCRError("Choose a local vision model in Settings before using AI transcription.")
             result = vision.recognize(image_path, request.edition, request.model_pack, language=request.language,
+                                      backend=request.backend, cancel=cancel, progress=progress)
+        elif request.method.startswith("neural"):
+            from ocready.engines import neural
+            if not request.neural_pack:
+                raise OCRError("Choose a local neural OCR pack before recognizing text.")
+            result = neural.recognize(image_path, request.edition, request.neural_pack, language=request.language,
                                       backend=request.backend, cancel=cancel, progress=progress)
         elif request.method in {"tesseract-fast", "tesseract-best"}:
             quality = "best" if request.method == "tesseract-best" else "fast"

@@ -86,4 +86,4 @@ def recognize(image: Path, edition: Edition, pack: ModelPack, *, language: str =
     return OCRResult(clean_output(process.stdout), engine=f"vision:{pack.id}", language=language,
                      elapsed=time.monotonic() - started, peak_rss=process.peak_rss,
                      backend="CUDA" if cuda else "CPU", note=note, containment=process.containment,
-                     worker_limit=process.worker_limit, worker_peak=process.worker_peak)
+                     worker_limit=process.worker_limit, worker_peak=process.worker_peak, geometry="none")

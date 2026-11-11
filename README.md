@@ -34,6 +34,8 @@ Use **Ctrl+C** with the picture focused to copy its selected words. The text pan
 
 Everyday admits smaller local vision-language packs; Studio admits larger ones. Configure one or more packs under **Settings → Vision models**; see [setup and measured results](docs/VISION.md). Real CPU inference, CUDA inference, and a GPU-failure-to-CPU fallback have been exercised on Linux. Vision output has no invented source boxes or confidence. Arabic uses classical OCR by default; the tested tiny vision alternative is English-only.
 
+An additional [local neural OCR method](docs/NEURAL.md) uses PP-OCRv5 detection and Arabic/English recognition in a separate compiled worker. Its real detected lines can be selected and copied from the picture. Configure it under **Settings → Neural OCR**, or embed it with `--neural-pack`. Neural-only and combined variants are supported by the build tools and are undergoing complete packaged validation.
+
 Fresh Everyday/Studio GUI sessions prefer Precision for bilingual text. Your method choice is remembered separately for each edition, along with the last available edition, layout, language, and compute backend. An explicit `--edition` overrides the saved GUI edition; headless defaults remain the build's default.
 
 ## Compiling a single executable

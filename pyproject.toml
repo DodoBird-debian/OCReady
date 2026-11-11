@@ -16,8 +16,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8,<10", "ruff>=0.12,<1", "nuitka>=2.8,<5", "ordered-set>=4", "zstandard>=0.23", "patchelf>=0.17; sys_platform == 'linux'"]
+dev = ["pytest>=8,<10", "ruff>=0.12,<1", "nuitka>=2.8,<5", "ordered-set>=4", "zstandard>=0.23", "python-bidi==0.6.12", "patchelf>=0.17; sys_platform == 'linux'"]
 cuda-build = ["cmake>=3.28,<4", "ninja>=1.11,<2"]
+neural = ["rapidocr==3.10.0", "onnxruntime==1.31.1", "opencv-python-headless==5.0.0.93", "numpy>=2,<3", "python-bidi==0.6.12"]
 
 [project.scripts]
 ocready = "ocready.__main__:main"

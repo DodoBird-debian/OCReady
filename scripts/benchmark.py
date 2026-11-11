@@ -53,7 +53,8 @@ def make_image(path: Path, edition: str, dark=False, maximum=False) -> None:
     image.save(path)
 
 
-def gui_child(image_path: str, edition: str, output: str, loops: int, pack_path: Path | None = None) -> int:
+def gui_child(image_path: str, edition: str, output: str, loops: int, pack_path: Path | None = None,
+              neural_path: Path | None = None) -> int:
     from PySide6.QtCore import QTimer
     from PySide6.QtWidgets import QApplication
 
@@ -67,6 +68,11 @@ def gui_child(image_path: str, edition: str, output: str, loops: int, pack_path:
         pack = load_pack(pack_path)
         window.packs = [pack]
         window.refresh_methods()
+    if neural_path:
+        from ocready.core.neural_packs import load_neural_pack
+        neural_pack = load_neural_pack(neural_path)
+        window.neural_packs = [neural_pack]
+        window.refresh_methods()
     window.show()
     remaining = loops
     measurements = []
@@ -78,6 +84,8 @@ def gui_child(image_path: str, edition: str, output: str, loops: int, pack_path:
         window.open_path(image_path)
         if pack_path:
             window.method_combo.setCurrentIndex(window.method_combo.findData(f"vision:{pack.id}"))
+        elif neural_path:
+            window.method_combo.setCurrentIndex(window.method_combo.findData(f"neural:{neural_pack.id}"))
         elif edition != "pocket":
             window.method_combo.setCurrentIndex(1)
         window.recognize()
@@ -108,7 +116,19 @@ def gui_child(image_path: str, edition: str, output: str, loops: int, pack_path:
     timer.timeout.connect(poll)
     timer.start(50)
     QTimer.singleShot(0, run_next)
-    QTimer.singleShot(120_000, app.quit)
+    def timed_out():
+        nonlocal failed
+        failed = True
+        timer.stop()
+        if window.worker:
+            window.worker.cancel.set()
+            window.worker.wait(5000)
+        Path(output).write_text(json.dumps({"error": "GUI workload timed out", "completed_iterations": len(measurements)}), encoding="utf-8")
+        window.editor.document().setModified(False)
+        window.close()
+        app.quit()
+
+    QTimer.singleShot(120_000, timed_out)
     app.exec()
     return 2 if failed else 0
 
@@ -134,10 +154,19 @@ def observe(command: list[str], output: Path, budget: int) -> dict:
             process.wait()
         log.seek(0)
         error = log.read()[-3000:].decode("utf-8", errors="replace")
-    details = json.loads(output.read_text(encoding="utf-8")) if output.exists() else {"error": error}
+    exit_code = process.returncode
+    try:
+        details = json.loads(output.read_text(encoding="utf-8"))
+        if not isinstance(details, dict):
+            raise ValueError("expected a result object")
+    except (OSError, ValueError):
+        details = {"error": "The process did not produce a valid benchmark result."}
+        exit_code = exit_code or 2
+    if details.get("error"):
+        exit_code = exit_code or 2
     return {"peak_rss_bytes": peak, "budget_bytes": budget, "below_budget": peak < budget,
-            "elapsed_seconds": round(time.monotonic() - start, 3), "exit_code": process.returncode,
-            "details": details, "error": error if process.returncode else ""}
+            "elapsed_seconds": round(time.monotonic() - start, 3), "exit_code": exit_code,
+            "details": details, "error": error if exit_code else ""}
 
 
 def main() -> int:
@@ -145,18 +174,20 @@ def main() -> int:
     parser.add_argument("--edition", choices=["all", *EDITIONS], default="all")
     parser.add_argument("--output", type=Path, default=ROOT / "test-output" / "benchmarks.json")
     parser.add_argument("--binary", type=Path, help="Include onefile launcher overhead in headless scenarios")
-    parser.add_argument("--vision-pack", type=Path, help="Benchmark a local VLM pack instead of classical OCR")
+    local = parser.add_mutually_exclusive_group()
+    local.add_argument("--vision-pack", type=Path, help="Benchmark a local VLM pack instead of classical OCR")
+    local.add_argument("--neural-pack", type=Path, help="Benchmark a local neural OCR pack")
     parser.add_argument("--gui-child", nargs=4, metavar=("IMAGE", "EDITION", "OUTPUT", "LOOPS"), help=argparse.SUPPRESS)
     args = parser.parse_args()
     if args.gui_child:
         image, edition, output, loops = args.gui_child
-        return gui_child(image, edition, output, int(loops), args.vision_pack)
+        return gui_child(image, edition, output, int(loops), args.vision_pack, args.neural_pack)
     editions = list(EDITIONS) if args.edition == "all" else [args.edition]
     binary_profile = json.loads((args.binary.parent / "build-manifest.json").read_text(encoding="utf-8")) if args.binary else None
     if binary_profile and editions != [binary_profile["edition"]]:
         parser.error("--edition must match the compiled binary's edition")
-    if args.binary and args.vision_pack:
-        parser.error("Benchmark embedded vision packs through their binary's default method; --vision-pack is for source runs")
+    if args.binary and (args.vision_pack or args.neural_pack):
+        parser.error("Benchmark embedded packs through their binary's default method; pack paths are for source runs")
     source = source_record(ROOT)
     binary_hash = file_sha256(args.binary) if args.binary else None
     records = []
@@ -174,6 +205,10 @@ def main() -> int:
                     from ocready.core.models import load_pack
                     pack = load_pack(args.vision_pack)
                     command += ["--method", "vision", "--model-pack", str(args.vision_pack.resolve()), "--language", pack.languages]
+                elif args.neural_pack:
+                    from ocready.core.neural_packs import load_neural_pack
+                    pack = load_neural_pack(args.neural_pack)
+                    command += ["--method", "neural", "--neural-pack", str(args.neural_pack.resolve()), "--language", pack.languages]
                 elif edition != "pocket" and (not binary_profile or "tesseract-best" in binary_profile["methods"]):
                     command += ["--method", "tesseract-best"]
                 if scenario == "dark":
@@ -182,6 +217,8 @@ def main() -> int:
                     command = [sys.executable, str(Path(__file__).resolve()), "--gui-child", str(image), edition, str(output), "4"]
                     if args.vision_pack:
                         command += ["--vision-pack", str(args.vision_pack.resolve())]
+                    elif args.neural_pack:
+                        command += ["--neural-pack", str(args.neural_pack.resolve())]
                 elif scenario == "gui-onefile":
                     command = [*base, str(image), "--edition", edition, "--ui-smoke-output", str(output)]
                 result = observe(command, output, EDITIONS[edition].budget)

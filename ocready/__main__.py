@@ -11,11 +11,13 @@ from ocready.core.types import OCRError
 
 def diagnostics() -> dict:
     from ocready.core.models import load_packs
+    from ocready.core.neural_packs import load_neural_packs
     from ocready.engines.tesseract import data_dir, executable, readiness
     profile = build_profile()
     classical = any(method.startswith("tesseract") for method in profile["methods"])
     packs = load_packs()
-    ready, status = readiness() if classical else (bool(packs), "Local vision packs available" if packs else "No local vision pack configured")
+    neural_packs = load_neural_packs()
+    ready, status = readiness() if classical else (bool(packs or neural_packs), "Local OCR packs available" if packs or neural_packs else "No local OCR pack configured")
     return {
         "version": __version__, "platform": sys.platform,
         "runtime": str(runtime_root()), "tesseract": str(executable() or "missing"),
@@ -23,6 +25,7 @@ def diagnostics() -> dict:
         "best_data": str(data_dir("best") or "missing"),
         "ready": ready, "status": status, "methods": profile["methods"],
         "vision_models": [{"id": p.id, "languages": p.languages, "bundled": p.bundled} for p in packs],
+        "neural_models": [{"id": p.id, "languages": p.languages, "bundled": p.bundled, "geometry": "line"} for p in neural_packs],
         "build_source": profile.get("source", {}),
         "memory_policy": "whole-tree RSS sampled every 40 ms, plus worker cgroup-v2 allocation limits on delegated Linux desktops or Job Object committed-memory limits on Windows; these counters are not identical to RSS",
         "editions": {k: {"budget_bytes": v.budget, "max_pixels": v.max_pixels} for k, v in EDITIONS.items()},
@@ -36,8 +39,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--version", action="version", version=f"OCReady {__version__}")
     parser.add_argument("--edition", choices=profile["available_editions"], help="Memory edition; GUI restores the last available edition, CLI uses the build default")
     parser.add_argument("--language", choices=("ara+eng", "ara", "eng"))
-    parser.add_argument("--method", choices=("tesseract-fast", "tesseract-best", "vision"), default=profile["methods"][0])
+    parser.add_argument("--method", choices=("tesseract-fast", "tesseract-best", "vision", "neural"), default=profile["methods"][0])
     parser.add_argument("--model-pack", type=Path, help="Local vision model JSON manifest")
+    parser.add_argument("--neural-pack", type=Path, help="Local neural OCR JSON manifest")
     parser.add_argument("--backend", choices=("auto", "cpu", "cuda"), default="auto")
     parser.add_argument("--layout", choices=("auto", "block", "sparse"), default="auto")
     output = parser.add_mutually_exclusive_group()
@@ -74,8 +78,16 @@ def main(argv: list[str] | None = None) -> int:
                 packs = load_packs()
                 pack = next((p for p in packs if p.id == profile.get("default_model")), packs[0] if packs else None)
             language = args.language or (pack.languages if pack and args.method == "vision" else "ara+eng")
+            neural_pack = None
+            if args.method == "neural":
+                from ocready.core.neural_packs import load_neural_pack, load_neural_packs
+                neural_packs = load_neural_packs()
+                neural_pack = load_neural_pack(args.neural_pack) if args.neural_pack else next(
+                    (p for p in neural_packs if p.id == profile.get("default_neural")), next(iter(neural_packs), None))
+                if neural_pack and not args.language:
+                    language = neural_pack.languages
             result, _ = recognize_image(source, Request(edition, language, args.method, args.layout,
-                                                        recipe, args.compare, pack, args.backend))
+                                                        recipe, args.compare, pack, args.backend, neural_pack))
             encoded = json.dumps(result.to_dict(), ensure_ascii=False, indent=2) if args.json else result.text
         else:
             from ocready.ui.app import run

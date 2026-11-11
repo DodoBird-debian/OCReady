@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "family": "PP-OCRv5",
+  "license": "Apache-2.0",
+  "files": [
+    {"file": "det-inference.onnx", "repo": "PaddlePaddle/PP-OCRv5_mobile_det_onnx", "revision": "e6f4fa85f00e168c862bc462aebca69eef9b3d3d", "remote": "inference.onnx", "sha256": "a431985659dc921974177a95adcfbb90fd9e51989a5e04d70d0b75f597b6e61d"},
+    {"file": "det-inference.yml", "repo": "PaddlePaddle/PP-OCRv5_mobile_det_onnx", "revision": "e6f4fa85f00e168c862bc462aebca69eef9b3d3d", "remote": "inference.yml", "sha256": "98069072e1b6b37d727fd9d9f11725faa46d6ea0de012f2ed26caea011c37699"},
+    {"file": "rec-inference.onnx", "repo": "PaddlePaddle/arabic_PP-OCRv5_mobile_rec_onnx", "revision": "14aaedcd75825982689ecf5cd64ab33ee083215a", "remote": "inference.onnx", "sha256": "799113ebf267fbe742deb99eb36e8d42c9ddc5291ceacf92add41b4d52a59110"},
+    {"file": "rec-inference.yml", "repo": "PaddlePaddle/arabic_PP-OCRv5_mobile_rec_onnx", "revision": "14aaedcd75825982689ecf5cd64ab33ee083215a", "remote": "inference.yml", "sha256": "21368419e6c016c31db55d316d59e11c128e1913e6e6fe10287084710043d3a6"},
+    {"file": "PADDLE-LICENSE.txt", "url": "https://www.apache.org/licenses/LICENSE-2.0.txt", "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"}
+  ],
+  "derived_dictionary_sha256": "7f92f7dbb9b75a4787a83bfb4f6d14a8ab515525130c9d40a9036f61cf6999e9"
+}

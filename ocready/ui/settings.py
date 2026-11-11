@@ -24,7 +24,8 @@ from PySide6.QtWidgets import (
 )
 
 from ocready.__main__ import diagnostics
-from ocready.core.models import TRANSCRIPTION_PROMPT, ModelPack, load_pack, save_packs
+from ocready.core.models import TRANSCRIPTION_PROMPT, ModelPack, load_pack, load_packs, save_packs
+from ocready.ui.neural_settings import NeuralSettings
 
 
 class SettingsDialog(QDialog):
@@ -74,6 +75,7 @@ class SettingsDialog(QDialog):
         self.name.setPlaceholderText("e.g. GLM-OCR · local")
         form.addRow("Display name", self.name)
         self.fields = {}
+        self.browse_buttons = {}
         for key, title in (("runner", "CPU runner"), ("model", "Model GGUF"), ("projector", "Vision projector"), ("cuda_runner", "CUDA runner (optional)")):
             row = QHBoxLayout()
             field = QLineEdit()
@@ -81,6 +83,7 @@ class SettingsDialog(QDialog):
             self.fields[key] = field
             row.addWidget(field, 1)
             browse = QPushButton("Browse")
+            self.browse_buttons[key] = browse
             browse.clicked.connect(lambda _checked=False, k=key: self.browse(k))
             row.addWidget(browse)
             form.addRow(title, row)
@@ -117,7 +120,6 @@ class SettingsDialog(QDialog):
         for name, key in (("Automatic · CUDA when usable, otherwise CPU", "auto"), ("CPU", "cpu"), ("Prefer CUDA · fall back to CPU", "cuda")):
             self.backend.addItem(name, key)
         self.backend.setCurrentIndex(max(0, self.backend.findData(window.vision_backend)))
-        form.addRow("Compute", self.backend)
         self.languages = QComboBox()
         for name, key in (("Arabic + English", "ara+eng"), ("English only", "eng"), ("Arabic only", "ara")):
             self.languages.addItem(name, key)
@@ -141,9 +143,18 @@ class SettingsDialog(QDialog):
         scroll.setFrameShape(QFrame.Shape.NoFrame)
         scroll.setWidget(models)
         tabs.addTab(scroll, "Vision models")
+        neural_scroll = QScrollArea()
+        neural_scroll.setWidgetResizable(True)
+        neural_scroll.setFrameShape(QFrame.Shape.NoFrame)
+        neural_scroll.setWidget(NeuralSettings(window))
+        tabs.addTab(neural_scroll, "Neural OCR")
         done = QPushButton("Done")
         done.clicked.connect(self.accept)
-        outer.addWidget(done, 0, Qt.AlignmentFlag.AlignRight)
+        shared = QHBoxLayout()
+        shared.addWidget(QLabel("Compute"))
+        shared.addWidget(self.backend, 1)
+        shared.addWidget(done)
+        outer.addLayout(shared)
         self.refresh_list()
 
     def refresh_list(self) -> None:
@@ -163,6 +174,9 @@ class SettingsDialog(QDialog):
         self.name.clear()
         for field in self.fields.values():
             field.clear()
+            field.setReadOnly(False)
+        for browse in self.browse_buttons.values():
+            browse.setEnabled(True)
         self.memory.setValue(2800)
         self.tokens.setValue(512)
         self.pixels.setValue(1000)
@@ -177,6 +191,9 @@ class SettingsDialog(QDialog):
         self.name.setText(pack.name)
         for key, field in self.fields.items():
             field.setText(getattr(pack, key))
+            field.setReadOnly(pack.bundled)
+            self.browse_buttons[key].setEnabled(not pack.bundled)
+            field.setToolTip("Built-in assets are managed by this edition. Use New model for other external files." if pack.bundled else "")
         self.memory.setValue(pack.memory_mb)
         self.tokens.setValue(pack.tokens)
         self.pixels.setValue(pack.max_pixels // 1000)
@@ -209,8 +226,8 @@ class SettingsDialog(QDialog):
 
     def _persist(self, packs: list[ModelPack]) -> None:
         save_packs(packs)
-        self.packs = packs
-        self.window.packs = list(packs)
+        self.packs = load_packs()
+        self.window.packs = list(self.packs)
         self.window.refresh_methods()
         self.refresh_list()
 
@@ -218,7 +235,7 @@ class SettingsDialog(QDialog):
         path, _ = QFileDialog.getOpenFileName(self, "Import a model manifest", "", "JSON manifest (*.json)")
         if path:
             try:
-                pack = load_pack(Path(path))
+                pack = dataclasses.replace(load_pack(Path(path)), bundled=False)
                 pack.validate()
                 self._persist([p for p in self.packs if p.id != pack.id] + [pack])
                 self.message.setText("Local model imported. Its files were not moved or copied.")

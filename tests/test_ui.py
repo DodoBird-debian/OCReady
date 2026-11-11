@@ -243,7 +243,7 @@ def test_paste_image_from_native_clipboard(window, app):
 
 
 def test_settings_model_form_opens_without_a_configured_model(window, app):
-    from PySide6.QtWidgets import QScrollArea, QTabWidget
+    from PySide6.QtWidgets import QTabWidget
 
     from ocready.ui.settings import SettingsDialog
     dialog = SettingsDialog(window)
@@ -252,7 +252,7 @@ def test_settings_model_form_opens_without_a_configured_model(window, app):
     dialog.show()
     app.processEvents()
     assert dialog.height() == 560
-    scroll = dialog.findChild(QScrollArea)
+    scroll = dialog.findChild(QTabWidget).currentWidget()
     assert scroll.verticalScrollBar().maximum() > 0
     scroll.ensureWidgetVisible(dialog.prompt)
     app.processEvents()
@@ -443,6 +443,52 @@ def test_vision_text_can_be_copied_without_fabricating_source_boxes(window):
     assert not window.editor.linked
     assert not window.boxes.isEnabled()
     assert window.link_status.text() == "AI transcription"
+
+
+def test_neural_result_selects_and_copies_whole_detected_lines(window, app):
+    from ocready.core.types import Box, OCRResult, Word
+    window.load_example()
+    text = "مرحبا بالعالم"
+    line = Word(text, Box(100, 200, 300, 60), 93, 0, len(text), (1, 1, 1, 1))
+    result = OCRResult(text, [line], engine="neural:test", geometry="line")
+    window._recognized(window.job, result, [result])
+    assert window.boxes.text() == "Line boxes"
+    assert window.link_status.text() == "Linked lines"
+    point = window.canvas.mapFromScene(window.canvas.rect_for(line.box).center())
+    QTest.mouseClick(window.canvas.viewport(), Qt.MouseButton.LeftButton, pos=point)
+    app.processEvents()
+    assert window.canvas.selected == {0}
+    window.copy_image_selection()
+    assert QApplication.clipboard().text() == text
+    assert "line" in window.status.text()
+    assert window.editor.extraSelections()
+    window.editor.insertPlainText("edited")
+    assert not window.canvas.words
+    assert not window.boxes.isEnabled()
+
+
+def test_neural_pack_options_and_method_selection(window, tmp_path):
+    from ocready.core.neural_packs import NeuralPack
+    from ocready.ui.neural_settings import NeuralSettings
+    assets = []
+    for name in ("runner", "detector", "recognizer", "dictionary"):
+        path = tmp_path / name
+        path.write_text("a\nb\n")
+        assets.append(str(path))
+    window.edition_combo.setCurrentIndex(window.edition_combo.findData("everyday"))
+    window.neural_packs = [NeuralPack("test", "Neural test", *assets)]
+    window.refresh_methods()
+    window.method_combo.setCurrentIndex(window.method_combo.findData("neural:test"))
+    assert not window.layout_combo.isEnabled()
+    assert not window.compare_check.isEnabled()
+    settings = NeuralSettings(window)
+    settings.direction.setCurrentIndex(settings.direction.findData("ltr"))
+    settings.memory.setValue(350)
+    settings.save_options()
+    assert window.neural_packs[0].direction == "ltr"
+    assert window.neural_packs[0].memory_mb == 350
+    settings.close()
+    settings.deleteLater()
 
 
 def test_alternative_reads_update_text_geometry_and_preserve_unsaved_edits(window, monkeypatch):

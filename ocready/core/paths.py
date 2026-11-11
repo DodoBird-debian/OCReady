@@ -43,7 +43,7 @@ def build_profile() -> dict:
     if path.is_file():
         return json.loads(path.read_text(encoding="utf-8"))
     return {"edition": "pocket", "available_editions": ["pocket", "everyday", "studio"],
-            "methods": ["tesseract-fast", "tesseract-best", "vision"]}
+            "methods": ["tesseract-fast", "tesseract-best", "vision", "neural"]}
 
 
 def config_root() -> Path:

@@ -11,6 +11,7 @@ from PIL import Image
 from ocready.core.editions import EDITIONS
 from ocready.core.images import load_image
 from ocready.core.models import load_pack
+from ocready.core.neural_packs import load_neural_pack
 from ocready.core.pipeline import Request, recognize_image
 from ocready.core.preprocess import Recipe
 from scripts.provenance import file_sha256, source_record
@@ -111,11 +112,12 @@ def evaluate(args) -> int:
     corpus = json.loads(args.manifest.read_text(encoding="utf-8"))
     edition = EDITIONS[args.edition]
     methods = args.methods.split(",")
-    if not set(methods) <= {"fast", "best", "vision"} or ("vision" in methods and not args.model_pack):
-        raise ValueError("Choose fast,best,vision and supply --model-pack for vision.")
+    if not set(methods) <= {"fast", "best", "vision", "neural"} or ("vision" in methods and not args.model_pack) or ("neural" in methods and not args.neural_pack):
+        raise ValueError("Choose fast,best,vision,neural; supply --model-pack for vision and --neural-pack for neural.")
     if "best" in methods and not edition.best_data:
         raise ValueError("Precision evaluation requires Everyday or Studio.")
     pack = load_pack(args.model_pack) if args.model_pack else None
+    neural_pack = load_neural_pack(args.neural_pack) if args.neural_pack else None
     source = source_record(ROOT)
     rows = []
     for case in corpus["cases"]:
@@ -124,14 +126,15 @@ def evaluate(args) -> int:
             raise ValueError(f"Fixture changed without updating its reference: {case['id']}")
         for method in methods:
             row = {"case": case["id"], "language": case["language"], "method": method}
-            if method == "vision" and not set(case["language"].split("+")) <= set(pack.languages.split("+")):
+            method_pack = pack if method == "vision" else neural_pack if method == "neural" else None
+            if method_pack and not set(case["language"].split("+")) <= set(method_pack.languages.split("+")):
                 rows.append({**row, "status": "skipped", "reason": "Language unsupported by this pack"})
                 continue
             try:
                 image = load_image(path, edition)
-                result, _ = recognize_image(image, Request(edition, case["language"], "vision" if method == "vision" else f"tesseract-{method}",
+                result, _ = recognize_image(image, Request(edition, case["language"], method if method in {"vision", "neural"} else f"tesseract-{method}",
                                                            args.layout, Recipe(**case["recipe"]), args.compare,
-                                                           model_pack=pack, backend=args.backend))
+                                                           model_pack=pack, backend=args.backend, neural_pack=neural_pack))
                 metrics = error_metrics(case["expected"], result.text)
                 rows.append({**row, "status": "ok", "expected": case["expected"], "actual": result.text,
                              "elapsed": result.elapsed, "engine": result.engine, "backend": result.backend, **metrics})
@@ -169,6 +172,7 @@ def main() -> int:
     parser.add_argument("--layout", choices=("auto", "block", "sparse"), default="sparse")
     parser.add_argument("--compare", action="store_true")
     parser.add_argument("--model-pack", type=Path)
+    parser.add_argument("--neural-pack", type=Path)
     parser.add_argument("--backend", choices=("auto", "cpu", "cuda"), default="auto")
     args = parser.parse_args()
     try:

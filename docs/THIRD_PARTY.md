@@ -12,6 +12,13 @@ OCReady is GPL-3.0-or-later. Source and build instructions are public to permit 
 | psutil | Process-tree memory monitoring | BSD-3-Clause, https://github.com/giampaolo/psutil |
 | Nuitka | C compilation and onefile packaging | Apache-2.0, https://github.com/Nuitka/Nuitka |
 | llama.cpp (optional) | Local CPU / CUDA vision-language inference | MIT, https://github.com/ggml-org/llama.cpp |
+| RapidOCR (optional worker) | Neural text detection/recognition pipeline | Apache-2.0, https://github.com/RapidAI/RapidOCR |
+| PP-OCRv5 models (optional) | Mobile detection and Arabic/English recognition | Apache-2.0, https://huggingface.co/PaddlePaddle |
+| ONNX Runtime (optional worker) | Numerical inference | MIT, https://github.com/microsoft/onnxruntime |
+| OpenCV (optional worker) | Image geometry and neural preprocessing | Apache-2.0 and bundled notices, https://github.com/opencv/opencv-python |
+| NumPy / Shapely / pyclipper (optional worker) | Arrays and detected-region geometry | Retained distribution/vendor licenses in worker notices |
+| python-bidi (optional worker) | Visual CTC to logical Unicode order | Retained distribution license, https://github.com/MeirKriheli/python-bidi |
+| CPython | Embedded application/worker runtime | PSF and bundled notices, https://www.python.org/ |
 
 Model weights have independent licenses and are never assumed to inherit the runner license. User-supplied model packs must retain their model cards and redistribution notices. Runtime preparation preserves package copyright files; distribution must include them in the onefile payload.
 

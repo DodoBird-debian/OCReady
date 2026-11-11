@@ -1433,4 +1433,24 @@ KDE Spectacle invocation: https://docs.kde.org/trunk_kf6/en/spectacle/spectacle/
 Windows Snipping Tool protocol restrictions: https://learn.microsoft.com/en-us/windows/apps/develop/launch/launch-snipping-tool
 llama.cpp multimodal model and projector support: https://github.com/ggml-org/llama.cpp/blob/master/docs/multimodal.md
 PaddleOCR-VL original model card: https://huggingface.co/PaddlePaddle/PaddleOCR-VL
+
+## M53 — independent non-generative neural OCR
+
+- Responsibility: Add detected-line neural OCR alongside classical OCR and generative transcription.
+- M53.T1: Use a separate compiled numerical worker; keep Qt and heavy inference libraries isolated.
+- M53.T2: Pin official detector/recognizer configurations, model revisions, licenses and dictionary digest.
+- M53.T3: Preserve logical Arabic/English copy order and offer an explicit paragraph-base override.
+- M53.T4: Return actual detected polygons with line granularity; never fabricate word coordinates.
+- M53.T5: Admit complete runner memory, input buffers and resident application usage per edition.
+- M53.T6: Keep CPU inference and explicitly reported CUDA/CPU fallback within the worker contract.
+- M53.T7: Support external packs, embedded packs, neural-only and combined onefile variants.
+- M53.T8: Bundle only declared worker-distribution files and verify their hashes.
+- M53.T9: Keep model loading offline, block implicit downloads and retain third-party notices.
+- M53.V1: Copy a detected Arabic line from the native image pane.
+- M53.V2: Verify mixed Arabic/English digits and email punctuation against ground truth.
+- M53.V3: Compile and run the worker independently of its development environment.
+- M53.V4: Exercise GUI and cap-sized memory workloads with the complete embedded binary.
+- M53.V5: Compile and test Windows and Linux variants separately.
+- M53.V6: Test actual CUDA inference/failure fallback separately from provider-presence metadata.
+- Release gate: Real engine, Unicode, geometry and complete-process resource evidence for each published variant.
 Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-obligations

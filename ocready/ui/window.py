@@ -29,6 +29,7 @@ from ocready.core.geometry import words_on_source
 from ocready.core.images import load_image
 from ocready.core.memory import tree_rss
 from ocready.core.models import load_packs
+from ocready.core.neural_packs import load_neural_packs
 from ocready.core.paths import build_profile, resource_root
 from ocready.core.pipeline import Request, image_policy
 from ocready.core.preprocess import Recipe, preprocess
@@ -85,6 +86,7 @@ class MainWindow(QMainWindow):
         self.method_preferences = {key: value for key, value in saved_methods.items() if key in EDITIONS and isinstance(value, str)} if isinstance(saved_methods, dict) else {}
         self._method_edition = None
         self.packs = load_packs()
+        self.neural_packs = load_neural_packs()
         self.vision_backend = self.preferences.get("vision_backend", "auto")
         if self.vision_backend not in ("auto", "cpu", "cuda"):
             self.vision_backend = "auto"
@@ -579,7 +581,7 @@ class MainWindow(QMainWindow):
             words = words_on_source(self.result.words, self.source.size, self.preview.size, self.recipe) if original else self.result.words
             self.canvas.set_words(words)
         if original and self.recipe != Recipe():
-            message = "Original image. Recognized words stay linked through cleanup, crop, and rotation." if self.result and self.editor.linked else "Original image. Cleanup settings are retained for recognition."
+            message = "Original image. Recognized text stays linked through cleanup, crop, and rotation." if self.result and self.editor.linked else "Original image. Cleanup settings are retained for recognition."
             self._set_status(message)
 
     def _edition_changed(self, *_args) -> None:
@@ -603,6 +605,12 @@ class MainWindow(QMainWindow):
             item = self.method_combo.model().item(self.method_combo.count() - 1)
             item.setEnabled(allowed)
             item.setToolTip(reason)
+        for pack in self.neural_packs if "neural" in self.profile["methods"] else []:
+            self.method_combo.addItem(f"{pack.name} · Neural", f"neural:{pack.id}")
+            allowed, reason = pack.admission(self.edition)
+            item = self.method_combo.model().item(self.method_combo.count() - 1)
+            item.setEnabled(allowed)
+            item.setToolTip(reason)
         if not self.method_combo.count():
             self.method_combo.addItem("Configure a vision model in Settings", None)
             self.method_combo.model().item(0).setEnabled(False)
@@ -611,6 +619,8 @@ class MainWindow(QMainWindow):
             preferred = "tesseract-best" if self.edition.best_data and "tesseract-best" in self.profile["methods"] else "tesseract-fast"
             if self.profile["methods"][0] == "vision":
                 preferred = f"vision:{self.profile.get('default_model', '')}"
+            elif self.profile["methods"][0] == "neural":
+                preferred = f"neural:{self.profile.get('default_neural', '')}"
             index = self.method_combo.findData(preferred)
             if index < 0 or not self.method_combo.model().item(index).isEnabled():
                 index = next((i for i in range(self.method_combo.count()) if self.method_combo.model().item(i).isEnabled()), 0)
@@ -622,11 +632,13 @@ class MainWindow(QMainWindow):
     def _method_changed(self, *_args) -> None:
         if not hasattr(self, "compare_check"):
             return
-        vision = str(self.method_combo.currentData()).startswith("vision:")
-        self.compare_check.setEnabled(not vision and not self.worker)
-        self.layout_combo.setEnabled(not vision and not self.worker)
-        if vision:
-            pack = next((p for p in self.packs if self.method_combo.currentData() == f"vision:{p.id}"), None)
+        method = str(self.method_combo.currentData())
+        classical = method.startswith("tesseract-")
+        self.compare_check.setEnabled(classical and not self.worker)
+        self.layout_combo.setEnabled(classical and not self.worker)
+        if not classical:
+            pack = (next((p for p in self.neural_packs if method == f"neural:{p.id}"), None) if method.startswith("neural:")
+                    else next((p for p in self.packs if method == f"vision:{p.id}"), None))
             if pack and self.language_combo.currentData() != pack.languages and pack.languages != "ara+eng":
                 self.language_combo.setCurrentIndex(self.language_combo.findData(pack.languages))
         item = self.method_combo.model().item(self.method_combo.currentIndex())
@@ -639,7 +651,8 @@ class MainWindow(QMainWindow):
 
     def _image_policy(self):
         method = str(self.method_combo.currentData())
-        pack = next((p for p in self.packs if method == f"vision:{p.id}"), None)
+        pack = (next((p for p in self.neural_packs if method == f"neural:{p.id}"), None) if method.startswith("neural:")
+                else next((p for p in self.packs if method == f"vision:{p.id}"), None))
         return image_policy(self.edition, method, pack)
 
     def recognize(self) -> None:
@@ -661,9 +674,10 @@ class MainWindow(QMainWindow):
         self.job += 1
         method = self.method_combo.currentData()
         pack = next((p for p in self.packs if method == f"vision:{p.id}"), None)
+        neural_pack = next((p for p in self.neural_packs if method == f"neural:{p.id}"), None)
         request = Request(self.edition, self.language_combo.currentData(), method,
                           self.layout_combo.currentData(), self.recipe, self.compare_check.isChecked(),
-                          model_pack=pack, backend=self.vision_backend)
+                          model_pack=pack, backend=self.vision_backend, neural_pack=neural_pack)
         self.worker = RecognitionWorker(self.job, self.source, request, self)
         self.worker.resultReady.connect(self._recognized)
         self.worker.failed.connect(self._recognition_failed)
@@ -684,7 +698,7 @@ class MainWindow(QMainWindow):
         selected = 0
         for index, candidate in enumerate(self.alternatives):
             name = LAYOUTS.get(candidate.layout, (None, "AI transcription" if candidate.engine.startswith("vision:") else "OCR read"))[1]
-            engine = {"tesseract-fast": "Fast", "tesseract-best": "Precision"}.get(candidate.engine, "AI")
+            engine = {"tesseract-fast": "Fast", "tesseract-best": "Precision"}.get(candidate.engine, "Neural" if candidate.engine.startswith("neural:") else "AI")
             confidence = f" · {candidate.confidence:.0f}% OCR score" if candidate.confidence is not None else ""
             self.alternatives_combo.addItem(f"{engine} · {name} · {len(candidate.text)} characters{confidence}", index)
             if candidate is result:
@@ -716,9 +730,14 @@ class MainWindow(QMainWindow):
         if self.preview is not None:
             self.canvas.set_image(self.preview)
         self.canvas.set_words(result.words)
+        line_geometry = result.geometry == "line"
+        self.boxes.setText("Line boxes" if line_geometry else "Word boxes")
+        self.boxes.setToolTip("Show detected lines. Individual word coordinates are not provided." if line_geometry else "Show located words. AI transcription has no word coordinates.")
+        self.canvas.setAccessibleName("Source image. Click or drag over detected lines to select them." if line_geometry else "Source image. Click a word or drag over text to select it.")
         self.copy_selection.setEnabled(False)
         if result.text:
-            confidence = f" · {result.confidence:.0f}% OCR confidence" if result.confidence is not None else ""
+            score_label = "line recognition score" if result.geometry == "line" else "OCR confidence"
+            confidence = f" · {result.confidence:.0f}% {score_label}" if result.confidence is not None else ""
             suffix = " · AI transcription; verify against the image" if result.engine.startswith("vision:") else ""
             self._set_status(f"Ready to copy · {result.elapsed:.1f}s · {result.backend}{confidence}{suffix}")
         else:
@@ -760,7 +779,9 @@ class MainWindow(QMainWindow):
         self.editor.highlight_words(indices)
         self.copy_selection.setEnabled(bool(indices) and self.editor.linked)
         if indices:
-            self._set_status(f"{len(indices)} source words selected. Choose Copy selection to keep just these words.")
+            unit = "line" if self.result and self.result.geometry == "line" else "word"
+            unit += "s" if len(indices) != 1 else ""
+            self._set_status(f"{len(indices)} source {unit} selected. Choose Copy selection to copy.")
 
     def _editor_selected(self, indices: set[int]) -> None:
         self.canvas.set_selection(indices)
@@ -769,7 +790,7 @@ class MainWindow(QMainWindow):
     def _link_changed(self, linked: bool) -> None:
         text = self.editor.toPlainText()
         if linked:
-            status = "Linked to image"
+            status = "Linked lines" if self.result and self.result.geometry == "line" else "Linked to image"
         elif not text:
             status = ""
         elif self.editor.document().isModified():
@@ -780,7 +801,8 @@ class MainWindow(QMainWindow):
             status = "Source unlinked"
         self.link_status.setText(status)
         self.boxes.setEnabled(linked)
-        self.boxes.setToolTip("Show located words from Fast or Precision OCR. AI transcription has no word coordinates.")
+        self.boxes.setToolTip("Show detected lines. Individual word coordinates are not provided." if self.result and self.result.geometry == "line"
+                              else "Show located words from Fast or Precision OCR. AI transcription has no word coordinates.")
         if not linked:
             self.canvas.set_words([])
             self.copy_selection.setEnabled(False)
@@ -793,7 +815,9 @@ class MainWindow(QMainWindow):
         if self.result and self.editor.linked and self.canvas.selected:
             text = selected_text(self.result.words, self.canvas.selected)
             QApplication.clipboard().setText(text)
-            self._set_status(f"Copied {len(self.canvas.selected)} selected words.")
+            unit = "line" if self.result.geometry == "line" else "word"
+            unit += "s" if len(self.canvas.selected) != 1 else ""
+            self._set_status(f"Copied {len(self.canvas.selected)} selected {unit}.")
 
     def copy_all(self) -> None:
         text = self.editor.toPlainText()
