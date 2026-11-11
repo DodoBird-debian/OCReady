@@ -1697,3 +1697,25 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M69.V1: Exercise genuine process failures and preserve statuses after long diagnostic output.
 - M69.V2: Keep original failures and distinguish a passing reference from a reproduced failing artifact.
 - Release gate: Demonstrated cause/fix with fresh complete platform/model checks; a retry or improved error message alone is insufficient.
+
+## M70 — settings matched to available OCR methods
+
+- Responsibility: Keep settings useful for the actual installed composition rather than offering controls that cannot affect recognition.
+- M70.T1: Show vision/neural configuration only when that engine family is supported by the build.
+- M70.T2: Keep all supported families available in source/multi-edition sessions without confusing the current RAM choice with the installed composition.
+- M70.T3: Hide the compute selector for classical-only builds and retain saved model preferences for other editions.
+- M70.T4: Describe the actual available OCR options without claiming unavailable Precision, Arabic or GPU capabilities.
+- M70.V1: Inspect real Qt layouts for Pocket/classical, model-only and combined profiles.
+- M70.V2: Preserve normal model import/save behavior, scroll access and shared compute selection in model-capable builds.
+- Release gate: Clear settings for each composition with no changes to method admission or existing model configuration.
+
+## M71 — precise GPU fallback decisions
+
+- Responsibility: Retry genuine GPU initialization failures without hiding unrelated model, input or configuration failures.
+- M71.T1: Retain actual native driver/runtime errors before defining more precise classification rules.
+- M71.T2: Distinguish diagnostic mentions of CUDA devices/paths from an actual backend failure.
+- M71.T3: Recover to the intact CPU worker if an optional helper disappears after capability probing.
+- M71.T4: Preserve cancellation, budget failures and the single-retry limit across both engine families.
+- M71.V1: Exercise actual compatible/incompatible helpers as well as model errors whose paths/logs contain CUDA text.
+- M71.V2: Verify bounded diagnostic tails retain enough cause information for reliable decisions.
+- Release gate: Demonstrated CPU recovery for genuine initialization failures and no retry for unrelated failures.
