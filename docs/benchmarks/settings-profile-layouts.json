@@ -1,0 +1,50 @@
+[
+  {
+    "profile": "pocket",
+    "scope": "Source Qt layout with selected metadata; neural-only profile is simulated",
+    "visible_tabs": [
+      true,
+      false,
+      false
+    ],
+    "compute_visible": false,
+    "technical_toggle_verified": true,
+    "qt_platform": "xcb"
+  },
+  {
+    "profile": "vision",
+    "scope": "Source Qt layout with selected metadata; neural-only profile is simulated",
+    "visible_tabs": [
+      true,
+      true,
+      false
+    ],
+    "compute_visible": true,
+    "technical_toggle_verified": true,
+    "qt_platform": "xcb"
+  },
+  {
+    "profile": "neural-simulated",
+    "scope": "Source Qt layout with selected metadata; neural-only profile is simulated",
+    "visible_tabs": [
+      true,
+      false,
+      true
+    ],
+    "compute_visible": true,
+    "technical_toggle_verified": true,
+    "qt_platform": "xcb"
+  },
+  {
+    "profile": "studio",
+    "scope": "Source Qt layout with selected metadata; neural-only profile is simulated",
+    "visible_tabs": [
+      true,
+      true,
+      true
+    ],
+    "compute_visible": true,
+    "technical_toggle_verified": true,
+    "qt_platform": "xcb"
+  }
+]

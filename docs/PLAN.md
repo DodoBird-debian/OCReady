@@ -1705,6 +1705,7 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M70.T2: Keep all supported families available in source/multi-edition sessions without confusing the current RAM choice with the installed composition.
 - M70.T3: Hide the compute selector for classical-only builds and retain saved model preferences for other editions.
 - M70.T4: Describe the actual available OCR options without claiming unavailable Precision, Arabic or GPU capabilities.
+- M70.T5: Keep technical implementation diagnostics behind an explicit expander and present ordinary OCR shortcuts first.
 - M70.V1: Inspect real Qt layouts for Pocket/classical, model-only and combined profiles.
 - M70.V2: Preserve normal model import/save behavior, scroll access and shared compute selection in model-capable builds.
 - Release gate: Clear settings for each composition with no changes to method admission or existing model configuration.
