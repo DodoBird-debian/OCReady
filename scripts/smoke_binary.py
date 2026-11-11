@@ -22,8 +22,23 @@ def embedded_selections(profile: dict) -> list[tuple[str, str]]:
     return selections
 
 
-def run_checked(command: list[str], *, timeout: float | None = None, **kwargs) -> None:
+def run_checked(command: list[str], *, timeout: float | None = None, diagnostic: Path | None = None, **kwargs) -> None:
     """Keep diagnostic timeouts/interruption from orphaning a onefile child."""
+    if diagnostic is not None:
+        # Redirected handles also preserve diagnostics from Windows attach-mode
+        # executables when their CI parent has no usable console.
+        with tempfile.TemporaryFile() as log:
+            try:
+                run_checked(command, timeout=timeout, stdout=log, stderr=subprocess.STDOUT, **kwargs)
+            finally:
+                size = log.seek(0, 2)
+                log.seek(max(0, size - 65536))
+                tail = log.read(65536).decode("utf-8", errors="replace")
+                diagnostic.parent.mkdir(parents=True, exist_ok=True)
+                diagnostic.write_text(tail, encoding="utf-8")
+                if tail:
+                    print(tail.encode("ascii", errors="backslashreplace").decode("ascii"), flush=True)
+        return
     child = subprocess.Popen(command, **kwargs)
     try:
         code = child.wait(timeout=timeout)
@@ -56,12 +71,16 @@ def main() -> None:
         if pack_id:
             selection += ["--pack-id", pack_id]
         label = method + ("-" + pack_id if pack_id else "")
+        evidence_name = f"gui-{profile['edition']}" + ("-" + profile["variant"] if profile.get("variant") else "") + "-" + label
+        evidence = root / "test-output" / evidence_name
+        evidence.parent.mkdir(parents=True, exist_ok=True)
         deadline = observed_workload_timeout_seconds(method)
         with tempfile.TemporaryDirectory(prefix="ocready-smoke-") as temporary:
             env = runtime_test_environment(Path(temporary) / "runtime-العربية")
             output = Path(temporary) / "result.json"
             run_checked([str(binary), str(root / "assets/sample-bilingual.png"), "--json", "--layout", "sparse",
-                         "--output", str(output), *selection], cwd=temporary, env=env, timeout=deadline)
+                         "--output", str(output), *selection], cwd=temporary, env=env, timeout=deadline,
+                        diagnostic=evidence.with_name(evidence.name.replace("gui-", "cli-", 1)).with_suffix(".log"))
             result = json.loads(output.read_text(encoding="utf-8"))
             assert not result.get("error"), result
             assert result["engine"] == (f"{method}:{pack_id}" if pack_id else method) or not pack_id and result["engine"].startswith(method), result
@@ -75,12 +94,10 @@ def main() -> None:
             output = Path(temporary) / "gui-result.json"
             gui_env = {**env, "QT_QPA_PLATFORM": gui_test_platform(), "XDG_CONFIG_HOME": str(Path(temporary) / "config"),
                        "APPDATA": str(Path(temporary) / "config")}
-            evidence_name = f"gui-{profile['edition']}" + ("-" + profile["variant"] if profile.get("variant") else "") + "-" + label
-            evidence = root / "test-output" / evidence_name
-            evidence.parent.mkdir(parents=True, exist_ok=True)
             try:
                 run_checked([str(binary), str(root / "assets/sample-bilingual.png"),
-                             "--ui-smoke-output", str(output), *selection], cwd=temporary, env=gui_env, timeout=deadline)
+                             "--ui-smoke-output", str(output), *selection], cwd=temporary, env=gui_env, timeout=deadline,
+                            diagnostic=evidence.with_suffix(".log"))
             finally:
                 for suffix in (".json", ".png"):
                     if output.with_suffix(suffix).is_file():

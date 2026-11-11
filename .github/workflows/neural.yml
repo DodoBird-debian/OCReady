@@ -94,6 +94,8 @@ jobs:
             dist/${{ inputs.edition }}-${{ inputs.variant }}/compilation-report.xml
             build/${{ inputs.edition }}-${{ inputs.variant }}/payload/build-manifest.json
             test-output/packaged-*.json
+            test-output/cli-*.log
+            test-output/gui-*.log
             test-output/gui-*.json
             test-output/gui-*.png
           if-no-files-found: warn
@@ -108,6 +110,8 @@ jobs:
             dist/${{ inputs.edition }}-${{ inputs.variant }}/qt-*-runtime.json
             test-output/packaged-${{ inputs.edition }}-${{ inputs.variant }}-*.json
             test-output/neural-accuracy.json
+            test-output/cli-*.log
+            test-output/gui-*.log
             test-output/gui-*.json
             test-output/gui-*.png
           if-no-files-found: error

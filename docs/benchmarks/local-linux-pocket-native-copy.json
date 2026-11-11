@@ -1,0 +1,172 @@
+{
+  "sample_interval_ms": 10,
+  "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
+  "platform": "linux",
+  "python": "3.12.16",
+  "cpu_count": 12,
+  "binary": true,
+  "scenarios": [
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "sample",
+      "peak_rss_bytes": 106041344,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 1.166,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 0.7720687810069649,
+        "peak_rss": 105619456,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 280506368,
+        "worker_peak": 34516992,
+        "words": 31
+      },
+      "error": "",
+      "timeout_seconds": 270,
+      "timed_out": false
+    },
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "dark",
+      "peak_rss_bytes": 104943616,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 1.132,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 0.7388717819994781,
+        "peak_rss": 104521728,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 281772032,
+        "worker_peak": 34553856,
+        "words": 31
+      },
+      "error": "",
+      "timeout_seconds": 270,
+      "timed_out": false
+    },
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "max-pixels",
+      "peak_rss_bytes": 127430656,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 1.454,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 1.0445178539957851,
+        "peak_rss": 127430656,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 272465920,
+        "worker_peak": 48103424,
+        "words": 95
+      },
+      "error": "",
+      "timeout_seconds": 270,
+      "timed_out": false
+    },
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "gui-onefile",
+      "peak_rss_bytes": 260603904,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 2.076,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 1.0594223980006063,
+        "peak_rss": 260603904,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 139370496,
+        "worker_peak": 47890432,
+        "words": 95,
+        "qt_platform": "xcb",
+        "clipboard_copy_verified": true,
+        "source_selection_verified": true,
+        "deadline_seconds": 150
+      },
+      "error": "",
+      "timeout_seconds": 270,
+      "timed_out": false
+    }
+  ],
+  "execution_environment": {
+    "policy": "isolated-runtime-v1",
+    "path_scope": "OS system directories",
+    "unicode_runtime_temp": true,
+    "private_configuration": true,
+    "development_overrides_removed": true,
+    "gui_platform": "xcb"
+  },
+  "source": {
+    "revision": "b727c8e2c45202c3110ccab4be2e6f4093960d69",
+    "dirty": false,
+    "tree_sha256": "19ce36d7c004ff992d2e722ff748bf3710aa5d797c00aa4c89beea05e3e10bd8"
+  },
+  "sources_changed_during_run": false,
+  "binary_sha256": "40e91ad841153c28ec7780f3d29fb134618de70cc7fabef57429b218dc23b329",
+  "binary_changed_during_run": false,
+  "build_profile": {
+    "edition": "pocket",
+    "available_editions": [
+      "pocket"
+    ],
+    "methods": [
+      "tesseract-fast"
+    ],
+    "platform": "Linux-6.12.113+deb13-amd64-x86_64-with-glibc2.41",
+    "python": "3.12.16",
+    "embedded_models": [],
+    "default_model": "",
+    "embedded_neural": [],
+    "default_neural": "",
+    "variant": "native-copy",
+    "runtime_bundle_sha256": "621374cc10378e8a1f9175dd0a16e881916195067f0faaf4076d1778797aa0dd",
+    "source": {
+      "revision": "b727c8e2c45202c3110ccab4be2e6f4093960d69",
+      "dirty": false,
+      "tree_sha256": "19ce36d7c004ff992d2e722ff748bf3710aa5d797c00aa4c89beea05e3e10bd8"
+    },
+    "built_at_utc": "2026-11-11T15:20:13.568231+00:00",
+    "dependencies": {
+      "Nuitka": "4.3.5",
+      "Pillow": "12.3.0",
+      "psutil": "7.2.2",
+      "PySide6-Essentials": "6.8.3"
+    },
+    "onefile_compression": {
+      "policy": "Nuitka low-memory",
+      "level": 3,
+      "compiler_version": "4.3.5"
+    },
+    "memory_certification": "Uncertified; see docs/PROGRESS.md and benchmark evidence",
+    "validation_policy": {
+      "portable_runtime_environment": 1,
+      "native_gui_backend": true,
+      "unicode_paths": true
+    },
+    "payload_memory": {
+      "enabled": true,
+      "nuitka": "4.3.5",
+      "strategy": "drop-unused-launcher-pages-v1",
+      "original_bootstrap_sha256": "73e5da1368005fa1d8ac82c62269095bb26cf231604f260409533a8fb21eb827",
+      "helper_sha256": "c065722f1e62de5b6e6a3bdde8db51c90d58fa010b61a98297f44dee4e9fda7d",
+      "patched_bootstrap_sha256": "4108a89dd7633c1de00be0bc858022912fb83687ffa7b29bbf5dab5d27d573c1"
+    }
+  },
+  "requested_method": "tesseract-fast",
+  "requested_pack_id": null
+}

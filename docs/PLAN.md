@@ -1603,3 +1603,18 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M62.V2: Verify both external model families resolve relative assets without installing them.
 - M62.V3: Preserve configuration bytes after an invalid model/language launch.
 - Release gate: Explicit GUI choices reach inference; omitted choices retain user preferences and invalid requests remain actionable.
+
+## M63 — real worker-path compatibility and retained native errors
+
+- Responsibility: Distinguish application Unicode support from the path handling of each embedded native worker.
+- M63.T1: Exercise actual Windows classical workers using ASCII paths as a baseline.
+- M63.T2: Isolate Arabic runtime and temporary/input paths, then combine them.
+- M63.T3: Record the ANSI code page, exact source, exit codes and bounded worker errors.
+- M63.T4: Preserve console output from attach-mode compiled applications through explicit diagnostic handles.
+- M63.T5: Keep native CLI/GUI log tails on failures and timeouts alongside successful records.
+- M63.T6: Keep original Arabic document paths intact while investigating compatible worker-internal paths or native Unicode manifests.
+- M63.T7: Avoid system-wide locale changes and assumptions that short-path aliases are always available.
+- M63.V1: Prove a failing child retains its Unicode error and a bounded log tail.
+- M63.V2: Rerun genuine Windows source/compiled classical inference after a demonstrated fix.
+- M63.V3: Retain successful partial-method evidence without publishing a failed multi-method composition.
+- Release gate: Every embedded worker succeeds with Arabic runtime/input paths and all native resource scenarios; diagnostic hypotheses alone are insufficient.

@@ -10,6 +10,16 @@ from scripts.benchmark import check_requested_engine, observe, redact_details
 from scripts.smoke_binary import run_checked
 
 
+def test_failed_packaged_command_retains_bounded_unicode_diagnostics(tmp_path):
+    output = tmp_path / "error.log"
+    program = "import sys; sys.stdout.write('x'*90000); sys.stdout.flush(); sys.stderr.buffer.write('OCR failed: العربية\\n'.encode('utf-8')); sys.stderr.flush(); sys.exit(2)"
+    with pytest.raises(subprocess.CalledProcessError):
+        run_checked([sys.executable, "-c", program], diagnostic=output)
+    log = output.read_text(encoding="utf-8")
+    assert log.endswith("OCR failed: العربية\n")
+    assert len(log) <= 65536
+
+
 def test_resource_workload_cannot_pass_after_silently_selecting_another_engine():
     for method, pack, actual, expected_status in [("neural", "bilingual", "tesseract-best", 2),
                                                  ("vision", "large", "vision:small", 2),

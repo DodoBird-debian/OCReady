@@ -65,6 +65,8 @@ jobs:
             dist/${{ matrix.edition }}/compilation-report.xml
             build/${{ matrix.edition }}/payload/build-manifest.json
             test-output/packaged-${{ matrix.edition }}.json
+            test-output/cli-*.log
+            test-output/gui-*.log
             test-output/gui-*.json
             test-output/gui-*.png
           if-no-files-found: warn
@@ -78,6 +80,8 @@ jobs:
             dist/${{ matrix.edition }}/pe-layout.json
             dist/${{ matrix.edition }}/qt-*-runtime.json
             test-output/packaged-${{ matrix.edition }}.json
+            test-output/cli-*.log
+            test-output/gui-*.log
             test-output/gui-*.json
             test-output/gui-*.png
           if-no-files-found: error
