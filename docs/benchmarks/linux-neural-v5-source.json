@@ -1,0 +1,121 @@
+{
+  "sample_interval_ms": 10,
+  "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
+  "platform": "linux",
+  "python": "3.12.16",
+  "cpu_count": 12,
+  "binary": false,
+  "scenarios": [
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "sample",
+      "peak_rss_bytes": 321015808,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 1.551,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 1.427131331001874,
+        "peak_rss": 320950272,
+        "engine": "neural:ppocr-v5-arabic",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 952729600,
+        "worker_peak": 192655360,
+        "words": 6
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "dark",
+      "peak_rss_bytes": 315518976,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 1.44,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 1.3497710390001885,
+        "peak_rss": 315518976,
+        "engine": "neural:ppocr-v5-arabic",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 956088320,
+        "worker_peak": 185057280,
+        "words": 6
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "max-pixels",
+      "peak_rss_bytes": 396177408,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 3.131,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 2.943243549998442,
+        "peak_rss": 394067968,
+        "engine": "neural:ppocr-v5-arabic",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 903090176,
+        "worker_peak": 215384064,
+        "words": 60
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "gui-repeated",
+      "peak_rss_bytes": 591548416,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 12.961,
+      "exit_code": 0,
+      "details": {
+        "iterations": [
+          {
+            "characters": 1980,
+            "elapsed": 2.9845349099996383,
+            "worker_peak_rss": 514482176,
+            "idle_rss": 202702848
+          },
+          {
+            "characters": 1980,
+            "elapsed": 2.913441665994469,
+            "worker_peak_rss": 543756288,
+            "idle_rss": 241700864
+          },
+          {
+            "characters": 1980,
+            "elapsed": 2.8229964620040846,
+            "worker_peak_rss": 586518528,
+            "idle_rss": 273731584
+          },
+          {
+            "characters": 1980,
+            "elapsed": 2.9366705899956287,
+            "worker_peak_rss": 591548416,
+            "idle_rss": 288964608
+          }
+        ]
+      },
+      "error": ""
+    }
+  ],
+  "source": {
+    "revision": "b2576b9eab832bff76559b47287643db441a04b3",
+    "dirty": false,
+    "tree_sha256": "a388ea83fbefa59a068809e90149441cc0268ed5066c0874eab1dbad17fbe0de"
+  },
+  "sources_changed_during_run": false,
+  "binary_sha256": null,
+  "binary_changed_during_run": false,
+  "build_profile": null
+}

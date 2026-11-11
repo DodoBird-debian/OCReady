@@ -241,3 +241,11 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Fixed a onefile restart bug in both model families: built-in options no longer persist ephemeral asset paths. They are reapplied to freshly extracted assets, remain saved across editions, and protect built-in asset fields from accidental replacement.
 - All 140 tests and Ruff passed. Rebuilt the worker with offline loading/telemetry settings and declared runtime/Python notices. A real prefer-CUDA request on the CPU worker reported CPU fallback and preserved the expected mixed Arabic/English/digit text.
 - The previous launcher change is now green on all six Linux/Windows builds. The complete neural-only/combined application builds, cap-sized measurements and Windows worker packaging follow this source integration.
+
+## Iteration 25 — complete neural onefile evidence and platform workflow
+
+- Built the entire neural-only Everyday application from clean `b2576b9`: a 194.2 MB executable containing the compiled numerical worker, models and runtime notices. Real CLI and native GUI checks returned six linked line regions.
+- All four packaged resource scenarios passed, including cold startup and descendants. The 8 MP GUI peak was 531.1 MB. The separate four-job source GUI peak was 591.5 MB. Recorded binary/source identities and unchanged-source checks accompany the reports.
+- All eleven fixed synthetic accuracy cases completed: weighted CER 3.9%, WER 7.5%. Diacritic-heavy text remains a clear weakness (38.9% CER), so these results are not a general accuracy promise.
+- Added a manual Linux/Windows workflow that compiles the standalone worker, downloads checksum-locked official models, runs source tests and real neural accuracy, embeds the worker in a variant executable, then runs packaged GUI and memory checks before uploading artifacts.
+- Both platform source checks passed at `b2576b9`. Complete Windows neural packaging remains a separate gate under observation.

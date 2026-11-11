@@ -1,0 +1,152 @@
+{
+  "sample_interval_ms": 10,
+  "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
+  "platform": "linux",
+  "python": "3.12.16",
+  "cpu_count": 12,
+  "binary": true,
+  "scenarios": [
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "sample",
+      "peak_rss_bytes": 333385728,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 5.243,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 1.321711957003572,
+        "peak_rss": 333385728,
+        "engine": "neural:ppocr-v5-arabic",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 932581376,
+        "worker_peak": 185356288,
+        "words": 6
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "dark",
+      "peak_rss_bytes": 342519808,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 5.256,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 1.3176382910023676,
+        "peak_rss": 342519808,
+        "engine": "neural:ppocr-v5-arabic",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 935919616,
+        "worker_peak": 192647168,
+        "words": 6
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "max-pixels",
+      "peak_rss_bytes": 409153536,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 6.895,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 2.88984826199885,
+        "peak_rss": 405893120,
+        "engine": "neural:ppocr-v5-arabic",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 882577408,
+        "worker_peak": 207622144,
+        "words": 60
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "gui-onefile",
+      "peak_rss_bytes": 531132416,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 7.504,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 2.8092740689971833,
+        "peak_rss": 527601664,
+        "engine": "neural:ppocr-v5-arabic",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 767008768,
+        "worker_peak": 213790720,
+        "words": 60
+      },
+      "error": ""
+    }
+  ],
+  "source": {
+    "revision": "b2576b9eab832bff76559b47287643db441a04b3",
+    "dirty": false,
+    "tree_sha256": "a388ea83fbefa59a068809e90149441cc0268ed5066c0874eab1dbad17fbe0de"
+  },
+  "sources_changed_during_run": false,
+  "binary_sha256": "2c3fd40d8cf90146acc026d2a0ca45ac527e91a96e6fde188bdeb054a7671953",
+  "binary_changed_during_run": false,
+  "build_profile": {
+    "edition": "everyday",
+    "available_editions": [
+      "everyday"
+    ],
+    "methods": [
+      "neural"
+    ],
+    "platform": "Linux-6.12.113+deb13-amd64-x86_64-with-glibc2.41",
+    "python": "3.12.16",
+    "embedded_models": [],
+    "default_model": "",
+    "embedded_neural": [
+      {
+        "id": "ppocr-v5-arabic",
+        "name": "Neural OCR · Arabic + English",
+        "source": "https://huggingface.co/PaddlePaddle/arabic_PP-OCRv5_mobile_rec_onnx",
+        "license": "Apache-2.0",
+        "languages": "ara+eng",
+        "geometry": "line",
+        "detector_sha256": "a431985659dc921974177a95adcfbb90fd9e51989a5e04d70d0b75f597b6e61d",
+        "recognizer_sha256": "799113ebf267fbe742deb99eb36e8d42c9ddc5291ceacf92add41b4d52a59110",
+        "dictionary_sha256": "7f92f7dbb9b75a4787a83bfb4f6d14a8ab515525130c9d40a9036f61cf6999e9"
+      }
+    ],
+    "default_neural": "ppocr-v5-arabic",
+    "variant": "neural",
+    "runtime_bundle_sha256": "a00b2e67a9c44a50df4ba3eb2b915f0a2815b51e5ea0c60652d9c6a4fafc60ff",
+    "source": {
+      "revision": "b2576b9eab832bff76559b47287643db441a04b3",
+      "dirty": false,
+      "tree_sha256": "a388ea83fbefa59a068809e90149441cc0268ed5066c0874eab1dbad17fbe0de"
+    },
+    "built_at_utc": "2026-11-11T06:26:39.940376+00:00",
+    "dependencies": {
+      "Nuitka": "4.3.5",
+      "Pillow": "12.3.0",
+      "psutil": "7.2.2",
+      "PySide6-Essentials": "6.8.3"
+    },
+    "memory_certification": "Uncertified; see docs/PROGRESS.md and benchmark evidence",
+    "payload_memory": {
+      "enabled": true,
+      "nuitka": "4.3.5",
+      "strategy": "drop-unused-launcher-pages-v1",
+      "original_bootstrap_sha256": "73e5da1368005fa1d8ac82c62269095bb26cf231604f260409533a8fb21eb827",
+      "helper_sha256": "c065722f1e62de5b6e6a3bdde8db51c90d58fa010b61a98297f44dee4e9fda7d",
+      "patched_bootstrap_sha256": "4108a89dd7633c1de00be0bc858022912fb83687ffa7b29bbf5dab5d27d573c1"
+    }
+  }
+}

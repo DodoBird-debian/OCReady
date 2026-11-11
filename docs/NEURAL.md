@@ -47,4 +47,6 @@ uv run python -m scripts.benchmark --edition everyday \
   --neural-pack models/ppocr-v5/pack.json
 ```
 
-The small synthetic corpus is an engineering regression tool, not a real-world accuracy certification. Diacritics and mixed reading order still require inspection. Neural line recognition scores are not comparable to Tesseract confidence or VLM output.
+The clean `b2576b9` Linux neural-only executable is 194.2 MB on disk. Its four packaged workloads passed; the complete 8 MP GUI process tree peaked at 531.1 MB, including cold startup and descendants. The separate repeated source-GUI workload peaked at 591.5 MB. These measured configurations fit Everyday's 1 GB budget; they do not certify every model, image or machine. Raw reports: [packaged](benchmarks/linux-neural-v5-onefile.json), [source](benchmarks/linux-neural-v5-source.json).
+
+The same clean revision completed all eleven synthetic fixtures with 3.9% weighted character error and 7.5% word error ([raw accuracy report](accuracy/linux-neural-v5.json)). Diacritic-heavy text still had 38.9% character error. The small synthetic corpus is an engineering regression tool, not a real-world accuracy certification. Diacritics and mixed reading order still require inspection. Neural line recognition scores are not comparable to Tesseract confidence or VLM output.
