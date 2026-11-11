@@ -1,0 +1,198 @@
+{
+  "sample_interval_ms": 10,
+  "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
+  "platform": "linux",
+  "python": "3.12.16",
+  "cpu_count": 4,
+  "binary": true,
+  "scenarios": [
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "sample",
+      "peak_rss_bytes": 507645952,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 12.291,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 11.023791009999968,
+        "peak_rss": 143257600,
+        "engine": "tesseract-best",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 925294592,
+        "worker_peak": 71323648,
+        "words": 31
+      },
+      "error": "",
+      "timeout_seconds": 270,
+      "timed_out": false
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "dark",
+      "peak_rss_bytes": 507707392,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 12.135,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 10.879273683000065,
+        "peak_rss": 143347712,
+        "engine": "tesseract-best",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 925155328,
+        "worker_peak": 71286784,
+        "words": 31
+      },
+      "error": "",
+      "timeout_seconds": 270,
+      "timed_out": false
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "max-pixels",
+      "peak_rss_bytes": 507637760,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 17.345,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 15.933254482000052,
+        "peak_rss": 269844480,
+        "engine": "tesseract-best",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 879366144,
+        "worker_peak": 152023040,
+        "words": 309
+      },
+      "error": "",
+      "timeout_seconds": 270,
+      "timed_out": false
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "gui-onefile",
+      "peak_rss_bytes": 506253312,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 19.671,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 7.72415632000002,
+        "peak_rss": 483909632,
+        "engine": "tesseract-best",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 665333760,
+        "worker_peak": 152227840,
+        "words": 309,
+        "qt_platform": "xcb",
+        "clipboard_copy_verified": true,
+        "source_selection_verified": true,
+        "deadline_seconds": 150
+      },
+      "error": "",
+      "timeout_seconds": 270,
+      "timed_out": false
+    }
+  ],
+  "execution_environment": {
+    "policy": "isolated-runtime-v1",
+    "path_scope": "OS system directories",
+    "unicode_runtime_temp": true,
+    "private_configuration": true,
+    "development_overrides_removed": true,
+    "gui_platform": "xcb"
+  },
+  "source": {
+    "revision": "dac37a91dc11649ab7fa328f20cb177e44819506",
+    "dirty": false,
+    "tree_sha256": "a81b9cb21273cf88cbe8ab7a5e04104799d0df2ad32090921327ec41d95dfc8f"
+  },
+  "sources_changed_during_run": false,
+  "binary_sha256": "d6872fb7bf64ea95d037eeb73bc8b87811253c45db916e39bff8881f08aa8dbe",
+  "binary_changed_during_run": false,
+  "build_profile": {
+    "edition": "everyday",
+    "available_editions": [
+      "everyday"
+    ],
+    "methods": [
+      "neural",
+      "tesseract-fast",
+      "tesseract-best",
+      "vision"
+    ],
+    "platform": "Linux-6.8.0-1070-azure-x86_64-with-glibc2.35",
+    "python": "3.12.16",
+    "embedded_models": [
+      {
+        "id": "smolvlm-256m-q4-json",
+        "name": "SmolVLM 256M Q4 · English (experimental)",
+        "source": "https://huggingface.co/ggml-org/SmolVLM-256M-Instruct-GGUF",
+        "license": "Apache-2.0",
+        "languages": "eng",
+        "adapter": "json-cli-v1",
+        "model_sha256": "0574eaffbb56eea1b7eaddd6ed61e0b93ad5832fe3e939d272747faac94f4277",
+        "projector_sha256": "7e943f7c53f0382a6fc41b6ee0c2def63ba4fded9ab8ed039cc9e2ab905e0edd"
+      }
+    ],
+    "default_model": "smolvlm-256m-q4-json",
+    "embedded_neural": [
+      {
+        "id": "ppocr-v5-arabic",
+        "name": "Arabic + English",
+        "source": "https://huggingface.co/PaddlePaddle/arabic_PP-OCRv5_mobile_rec_onnx",
+        "license": "Apache-2.0",
+        "languages": "ara+eng",
+        "geometry": "line",
+        "detector_sha256": "a431985659dc921974177a95adcfbb90fd9e51989a5e04d70d0b75f597b6e61d",
+        "recognizer_sha256": "799113ebf267fbe742deb99eb36e8d42c9ddc5291ceacf92add41b4d52a59110",
+        "dictionary_sha256": "7f92f7dbb9b75a4787a83bfb4f6d14a8ab515525130c9d40a9036f61cf6999e9"
+      }
+    ],
+    "default_neural": "ppocr-v5-arabic",
+    "variant": "multimodal-json",
+    "runtime_bundle_sha256": "27d99e87aea23c62e6fccbb1fd97c3ecb8dfec04ff60d0c08439bb08f6b2f847",
+    "source": {
+      "revision": "dac37a91dc11649ab7fa328f20cb177e44819506",
+      "dirty": false,
+      "tree_sha256": "a81b9cb21273cf88cbe8ab7a5e04104799d0df2ad32090921327ec41d95dfc8f"
+    },
+    "built_at_utc": "2026-11-11T15:47:27.244378+00:00",
+    "dependencies": {
+      "Nuitka": "4.3.5",
+      "Pillow": "12.3.0",
+      "psutil": "7.2.2",
+      "PySide6-Essentials": "6.8.3"
+    },
+    "onefile_compression": {
+      "policy": "Nuitka low-memory",
+      "level": 3,
+      "compiler_version": "4.3.5"
+    },
+    "memory_certification": "Uncertified; see docs/PROGRESS.md and benchmark evidence",
+    "validation_policy": {
+      "portable_runtime_environment": 1,
+      "native_gui_backend": true,
+      "unicode_paths": true
+    },
+    "payload_memory": {
+      "enabled": true,
+      "nuitka": "4.3.5",
+      "strategy": "drop-unused-launcher-pages-v1",
+      "original_bootstrap_sha256": "73e5da1368005fa1d8ac82c62269095bb26cf231604f260409533a8fb21eb827",
+      "helper_sha256": "c065722f1e62de5b6e6a3bdde8db51c90d58fa010b61a98297f44dee4e9fda7d",
+      "patched_bootstrap_sha256": "4108a89dd7633c1de00be0bc858022912fb83687ffa7b29bbf5dab5d27d573c1"
+    }
+  },
+  "requested_method": "tesseract-best",
+  "requested_pack_id": null
+}
