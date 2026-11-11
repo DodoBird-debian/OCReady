@@ -1645,3 +1645,27 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M65.V2: Change the clipboard/original QImage after paste and complete real bilingual OCR from the retained source.
 - M65.V3: Measure reproducible conversion times on owned data, retaining source/dependency identity and exact-pixel checks.
 - Release gate: Correct pixels, lifetime, source linking and edition behavior; conversion timings do not certify OS transfer time or universal RAM limits.
+
+## M66 — optional GPU helpers for bundled models
+
+- Responsibility: Make compatible local GPU runtimes usable with embedded weights without duplicating model downloads.
+- M66.T1: Separate user-selected GPU helpers from immutable bundled CPU/model/projector assets.
+- M66.T2: Persist stable external helper choices by pack/adapter identity without saving temporary extraction paths.
+- M66.T3: Retain CPU fallback when a previously configured optional helper disappears or becomes incompatible.
+- M66.T4: Keep strict asset validation for compilation/import while allowing an intact CPU runtime to recover at recognition time.
+- M66.T5: Preserve adapter capability probing, cancellation, worker containment and driver-error classification.
+- M66.V1: Exercise fresh extraction paths, missing helpers, explicit CPU preference and genuine GPU/CPU fallback.
+- M66.V2: Verify complete host RAM, GPU VRAM and Windows PE layout for any published GPU composition.
+- Release gate: Actual compatible GPU execution and CPU recovery, with no automatic CUDA claim from a CPU-only packaged runtime.
+
+## M67 — measured Pocket local-model feasibility
+
+- Responsibility: Investigate small local-model configurations without inferring a 350 MB footprint from weight or parameter count.
+- M67.T1: Measure whole native workers, visual encoders/projectors, context and image-token workspace.
+- M67.T2: Evaluate compact native neural workers independently of the heavier Python-based worker.
+- M67.T3: Assess quantized visual components and bounded context only with real image/transcription checks.
+- M67.T4: Keep Arabic/English capabilities distinct; an English-only tiny model does not replace bilingual OCR.
+- M67.T5: Revisit hardcoded edition restrictions only after a complete configuration demonstrates the required budget.
+- M67.V1: Require clean Linux/Windows CLI, native clipboard GUI and cap-sized process-tree measurements below 350,000,000 bytes.
+- M67.V2: Evaluate actual supported-language accuracy and failure/fallback behavior before adding an enabled Pocket model choice.
+- Release gate: Measured complete configurations, otherwise retain the verified classical Pocket default and document the results.

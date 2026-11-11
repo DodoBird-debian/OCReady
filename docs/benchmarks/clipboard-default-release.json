@@ -1,0 +1,54 @@
+{
+  "source_revision": "51f1408b2e670eb4ab2fa5aecde485424278ed34",
+  "workflow_run_id": 43055836729,
+  "artifacts": [
+    {
+      "edition": "pocket",
+      "platform": "Linux",
+      "sha256": "b7a921de8bbe7ae02d6559fffb2e9f8d47babc1c40ef16e73ec41df82c67394d",
+      "peak_rss_bytes": 249655296,
+      "budget_bytes": 350000000,
+      "filename": "OCReady-pocket-linux-x86_64"
+    },
+    {
+      "edition": "pocket",
+      "platform": "Windows",
+      "sha256": "2b961d1f3716ec7959b5dc442ef573b089d6cae9732d6de7741632e4e1f25139",
+      "peak_rss_bytes": 241475584,
+      "budget_bytes": 350000000,
+      "filename": "OCReady-pocket-windows-amd64.exe"
+    },
+    {
+      "edition": "everyday",
+      "platform": "Linux",
+      "sha256": "8bda25a579ef51c61fdf52be652912e7646d44a70aeaf60f4b27c7d41ede2374",
+      "peak_rss_bytes": 484122624,
+      "budget_bytes": 1000000000,
+      "filename": "OCReady-everyday-linux-x86_64"
+    },
+    {
+      "edition": "everyday",
+      "platform": "Windows",
+      "sha256": "b79f7f980d1d33617ca397c82462e140dcc31764595de1df279a8d34d2434434",
+      "peak_rss_bytes": 405090304,
+      "budget_bytes": 1000000000,
+      "filename": "OCReady-everyday-windows-amd64.exe"
+    },
+    {
+      "edition": "studio",
+      "platform": "Linux",
+      "sha256": "09d2fac59347c25071c6cd94b42a6c008f85f6f610822cdce3487c5534e94ca1",
+      "peak_rss_bytes": 650403840,
+      "budget_bytes": 4000000000,
+      "filename": "OCReady-studio-linux-x86_64"
+    },
+    {
+      "edition": "studio",
+      "platform": "Windows",
+      "sha256": "afef5e3938a85da876fff497bc1288514ddce17987ed6398ef95509904e9a9d8",
+      "peak_rss_bytes": 621875200,
+      "budget_bytes": 4000000000,
+      "filename": "OCReady-studio-windows-amd64.exe"
+    }
+  ]
+}
