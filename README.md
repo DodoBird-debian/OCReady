@@ -49,6 +49,8 @@ Repeat `--model-pack` to embed multiple compatible models, or use `--methods fas
 
 Build manifests record the source revision, source-content digest, dirty state, dependency versions, and included asset hashes. Keep sources unchanged during compilation; the build rejects a changed source tree before producing distribution metadata. Benchmark reports identify the measured executable by SHA256.
 
+Tag builds can publish verified experimental prereleases after all six packaged checks pass. See [release evidence and preparation](docs/RELEASING.md).
+
 No document content is uploaded. Vision inference is a local subprocess. Model installation is explicit.
 
 ## Editions

@@ -177,3 +177,11 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Published the raw report with executable SHA256, model hashes and build metadata. Both source and executable remained unchanged during measurement.
 - Integrated and pushed iteration 16 after the clean build and benchmark finished. Its 104-test validation used the same prepared real OCR runtime. The newer source CI and default six-build matrix remain under observation.
 - The tested compact model remains English-only. Open priorities include broader Arabic/English accuracy evaluation, actual KDE/Windows 11 interactive capture, Windows GPU/VLM packaging, downloadable prerelease assets, and continued UI/resource review. The goal remains active.
+
+## Iteration 18 — verified downloadable release preparation
+
+- Added release preparation that requires all six default platform/edition artifacts, their exact clean source revision, matching executable checksums and benchmark provenance, and four numerically passing packaged memory scenarios.
+- Prepared distribution files include binaries, individual/aggregate checksums, build manifests, benchmark reports, a release evidence index, and generated notes with measured peaks and remaining validation limits. Existing output files are preserved rather than overwritten.
+- Added a tag-only prerelease job after the six-build matrix. Only that job receives release-write permission; ordinary pushes keep read-only build permissions. Existing releases are not replaced.
+- Added six tests covering complete preparation and rejection of modified executables, mismatched source, failed GUI runs, numeric budget exceedance and changed measurement sources.
+- Validation: all 110 local tests and Ruff passed. The complete six-build matrix at `e9cdf23` is now green with provenance enabled. The newer `1192174` builds, including the crop/editing fixes, are still running; release publication waits for verified candidate artifacts.
