@@ -1,0 +1,91 @@
+{
+  "source": {
+    "revision": "150ef2fb2aedc54711ce553bf1f8de6c5a2ce3d2",
+    "dirty": false,
+    "tree_sha256": "4c6ddae868af8f7e8e953789e226dc84d2559dbca8aa53854a29c09d61a4a313"
+  },
+  "scope": "In-process pixel conversion; excludes OS clipboard transfer, OCR and packaged memory certification",
+  "seed": 42,
+  "repeats": 3,
+  "dependencies": {
+    "Pillow": "12.3.0",
+    "PySide6-Essentials": "6.8.3"
+  },
+  "cases": [
+    {
+      "edition": "pocket",
+      "size": [
+        2000,
+        1000
+      ],
+      "alpha": false,
+      "identical_rgb": true,
+      "seconds": {
+        "png": [
+          0.2147729470016202,
+          0.20169879200693686,
+          0.20732078899163753
+        ],
+        "direct": [
+          0.00447949800582137,
+          0.003140470988000743,
+          0.0035096840001642704
+        ]
+      },
+      "median_seconds": {
+        "png": 0.20732078899163753,
+        "direct": 0.0035096840001642704
+      }
+    },
+    {
+      "edition": "everyday",
+      "size": [
+        3200,
+        2500
+      ],
+      "alpha": false,
+      "identical_rgb": true,
+      "seconds": {
+        "png": [
+          0.8262987089983653,
+          0.8422229459974915,
+          0.8292641650041332
+        ],
+        "direct": [
+          0.012514671005192213,
+          0.019654598989291117,
+          0.012152839000918902
+        ]
+      },
+      "median_seconds": {
+        "png": 0.8292641650041332,
+        "direct": 0.012514671005192213
+      }
+    },
+    {
+      "edition": "pocket",
+      "size": [
+        17,
+        19
+      ],
+      "alpha": true,
+      "identical_rgb": true,
+      "seconds": {
+        "png": [
+          0.000515602994710207,
+          0.00019704199803527445,
+          0.0001877210015663877
+        ],
+        "direct": [
+          4.3539999751374125e-05,
+          2.58899963228032e-05,
+          2.7789996238425374e-05
+        ]
+      },
+      "median_seconds": {
+        "png": 0.00019704199803527445,
+        "direct": 2.7789996238425374e-05
+      }
+    }
+  ]
+}
