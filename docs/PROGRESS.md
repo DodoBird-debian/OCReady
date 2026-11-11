@@ -339,3 +339,11 @@ The plan describes both the implementation sequence and release gates. Pending i
 - The result retained the expected English sample text and explicitly reported runtime `json-cli-v1`, CPU backend and cgroup-v2 containment. Observed development-run tree peak was 522.5 MB in 4.3 seconds; this is a source/client probe, not a complete outer onefile resource certification.
 - Runtime copying now preserves shared-library aliases as hard links where supported, with a copy fallback. This prevents needless duplication of large native GPU libraries in worker distributions and their onefile archives. Existing stale-runtime cleanup and nested-file hash verification remain in place.
 - The complete clean `3d2adb7` Studio binary built at 2062.8 MB. It has begun real per-method CLI/GUI and resource validation on disk-backed temporary storage. First neural CLI recognition returned six real linked lines; full evidence remains pending.
+
+## Iteration 38 — actual CUDA and relocation through the second interface
+
+- Compiled a separate JSON worker around the verified CUDA 12.4 native SM75 runtime from clean `1bc6e76`. Qwen ran through `json-cli-v1` on actual CUDA and retained the entire bilingual sample, reporting 1.45 GB observed host tree RSS in this development probe.
+- Ran the CPU worker directly from a different working directory without virtual-environment/PYTHONPATH settings. Its standalone Python/native runtime returned the expected SmolVLM transcription.
+- Created an archive using the production declared-distribution bundler, extracted it to another directory and performed actual SmolVLM inference from the relocated manifest. Nested native dependencies resolved without referring to the original worker directory.
+- Published raw functional outputs and both worker source identities. These probes are distinct from complete outer onefile resource or Windows GPU certification. All 185 tests and Ruff passed at the preceding implementation checkpoint.
+- Studio's first packaged resource scenarios include its cold 2 GB launcher and remain below 4 GB. Startup is noticeably dominated by archive extraction; the next packaging iteration addresses the measured extra traversal without changing model behavior.

@@ -1,0 +1,78 @@
+{
+  "scope": "Functional development probes on the public sample, not full-package resource certification. CUDA ran alongside Studio startup checks and disk I/O.",
+  "image": "assets/sample-bilingual.png",
+  "adapter_file_sha256": "4678516692c9358340b44ccf6c3993a6c698391a9caf0478f2e96e997e9819f7",
+  "worker_sources": {
+    "CPU": {
+      "revision": "edfd7db2f8235199b352cc8c9348064cf6ddb1fb",
+      "dirty": false,
+      "tree_sha256": "e50e85b81a13e8c1363b5446edca2e7d2157cc994ac412c9afab0b8142cdcae2"
+    },
+    "CUDA": {
+      "revision": "1bc6e765a753945afbb72a6259d47df4444bdc67",
+      "dirty": false,
+      "tree_sha256": "c0d2bc04923dccbdcc85a1699e9ec4fde3eda51d9c6e761e2c8d0ba97f1b5e49"
+    }
+  },
+  "smol_cpu": {
+    "text": "A little less typing. Turn your screenshots into something useful. Select a word. Copy a sentence. Keep going.",
+    "words": [],
+    "engine": "vision:smolvlm-256m-q8",
+    "language": "eng",
+    "elapsed": 4.319237648000126,
+    "peak_rss": 522518528,
+    "backend": "CPU",
+    "recipe": "Original",
+    "note": "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR.",
+    "containment": "cgroup-v2",
+    "worker_limit": 954011648,
+    "worker_peak": 286937088,
+    "layout": "",
+    "geometry": "none",
+    "runtime": "json-cli-v1",
+    "confidence": null
+  },
+  "qwen_cuda": {
+    "text": "A little less typing.\nTurn your screenshots into something useful.\nSelect a word. Copy a sentence. Keep going.\nمرحبا بالعالم\nاللغة العربية واللغة الإنجليزية\nOCReady / Local. Private. Ready to copy.",
+    "words": [],
+    "engine": "vision:qwen3-vl-2b-q4",
+    "language": "ara+eng",
+    "elapsed": 25.575966885000526,
+    "peak_rss": 1453871104,
+    "backend": "CUDA",
+    "recipe": "Original",
+    "note": "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR.",
+    "containment": "cgroup-v2",
+    "worker_limit": 3953577984,
+    "worker_peak": 1828212736,
+    "layout": "",
+    "geometry": "none",
+    "runtime": "json-cli-v1",
+    "confidence": null
+  },
+  "independent_worker_without_virtualenv": {
+    "schema": 1,
+    "width": 1100,
+    "height": 720,
+    "text": "A little less typing. Turn your screenshots into something useful. Select a word. Copy a sentence. Keep going.",
+    "backend": "CPU"
+  },
+  "relocated_archive": {
+    "text": "A little less typing. Turn your screenshots into something useful. Select a word. Copy a sentence. Keep going.",
+    "words": [],
+    "engine": "vision:smolvlm-256m-q8",
+    "language": "eng",
+    "elapsed": 3.4439400990013382,
+    "peak_rss": 520814592,
+    "backend": "CPU",
+    "recipe": "Original",
+    "note": "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR.",
+    "containment": "cgroup-v2",
+    "worker_limit": 953962496,
+    "worker_peak": 286441472,
+    "layout": "",
+    "geometry": "none",
+    "runtime": "json-cli-v1",
+    "confidence": null
+  }
+}

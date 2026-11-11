@@ -1472,3 +1472,20 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M54.V4: Fail unsupported adapters, protocol versions and malformed output before displaying a result.
 - M54.V5: Exercise real CPU/GPU fallback with cancellation and memory failure exclusions retained.
 - Release gate: At least two concrete adapter implementations, backward compatibility and per-pack packaged evidence.
+
+## M55 — bounded, efficient model-rich startup
+
+- Responsibility: Reduce avoidable startup work while preserving portable onefile behavior and exact runtime provenance.
+- M55.T1: Measure cold launcher, extraction, GUI and inference separately for complete multi-model binaries.
+- M55.T2: Validate and extract runtime archives in one forward pass into private staging.
+- M55.T3: Reject unsafe members/links before writing them; remove partial staging on failure and publish only a complete runtime.
+- M55.T4: Preserve internal shared-library aliases and declared nested worker dependencies.
+- M55.T5: Use supported compiler memory/compression controls before introducing additional compiler patches.
+- M55.T6: Record packaging choices in build provenance and preserve old benchmark identities.
+- M55.T7: Keep temporary runtime storage separate from source images and user configuration.
+- M55.V1: Extract real archives with safe aliases and all worker families.
+- M55.V2: Reject a late malformed member without publishing a partial runtime.
+- M55.V3: Verify complete Linux/Windows executables after extraction or compression changes.
+- M55.V4: Re-measure cold startup RSS for each RAM edition; model disk size is not memory certification.
+- M55.V5: Investigate persistent caching only with per-build identities, private storage, atomic publication and explicit cache lifecycle.
+- Release gate: Measured complete-package startup/resource evidence with preserved safety and portability checks.
