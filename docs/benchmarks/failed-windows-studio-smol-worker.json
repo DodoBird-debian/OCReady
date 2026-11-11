@@ -1,0 +1,39 @@
+{
+  "workflow_run_id": 43055841931,
+  "source": {
+    "revision": "51f1408b2e670eb4ab2fa5aecde485424278ed34",
+    "dirty": false,
+    "tree_sha256": "b66f10e09594ae29768348f751b51bb3a390e33959fdce768497ad4f551e52d4"
+  },
+  "platform": "Windows",
+  "edition": "studio",
+  "variant": "multimodal",
+  "status": "failed; no paired release",
+  "failure_phase": "initial CLI inference for vision:smolvlm-256m-q4; before clipboard GUI",
+  "native_exit_status": null,
+  "cause": "unresolved; original application did not retain the native status",
+  "log": "failed-windows-studio-smol-worker.log",
+  "completed_resource_cases": [
+    {
+      "report": "packaged-studio-multimodal-neural-ppocr-v5-arabic.json",
+      "method": "neural",
+      "pack": "ppocr-v5-arabic",
+      "cases": 4,
+      "peak_rss_bytes": 1956540416
+    },
+    {
+      "report": "packaged-studio-multimodal-tesseract-best.json",
+      "method": "tesseract-best",
+      "pack": null,
+      "cases": 4,
+      "peak_rss_bytes": 1956569088
+    },
+    {
+      "report": "packaged-studio-multimodal-tesseract-fast.json",
+      "method": "tesseract-fast",
+      "pack": null,
+      "cases": 4,
+      "peak_rss_bytes": 1956274176
+    }
+  ]
+}

@@ -1681,3 +1681,15 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M68.V1: Reject missing declared-language output and unavailable/invalid selected-pack metadata.
 - M68.V2: Audit native Linux/Windows sample differences even when shared model hashes match.
 - Release gate: Explicit language-capability proof, with full accuracy claims only for the actual evaluated configuration/corpus.
+
+## M69 — actionable native worker exits
+
+- Responsibility: Preserve native failure identity before changing runtimes or resource policies.
+- M69.T1: Retain numeric process status alongside bounded stderr, including Windows hexadecimal statuses.
+- M69.T2: Preserve descendant status through JSON protocol workers that return a generic outer error.
+- M69.T3: Observe only owned process trees and stable process identities in Windows diagnostic probes.
+- M69.T4: Record actual CPU identity, private memory and RSS as separate counters without inferring one from another.
+- M69.T5: Compare ASCII/Arabic paths and automatic/CPU selection on a checksum-bound reference executable.
+- M69.V1: Exercise genuine process failures and preserve statuses after long diagnostic output.
+- M69.V2: Keep original failures and distinguish a passing reference from a reproduced failing artifact.
+- Release gate: Demonstrated cause/fix with fresh complete platform/model checks; a retry or improved error message alone is insufficient.

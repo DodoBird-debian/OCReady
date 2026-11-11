@@ -80,6 +80,10 @@ def main(argv: list[str] | None = None) -> int:
         result = subprocess.run(command, capture_output=True, timeout=300, env=environment(runner))
         if result.returncode:
             sys.stderr.write(result.stderr.decode("utf-8", errors="replace")[-16_000:])
+            status = str(result.returncode)
+            if os.name == "nt":
+                status += f" (0x{result.returncode & 0xFFFFFFFF:08X})"
+            sys.stderr.write(f"\nNative vision runner exited with code {status}.\n")
             return 2
         text = re.sub(r"\x1b\[[0-9;]*[A-Za-z]", "", result.stdout.decode("utf-8", errors="strict")).strip()
         for token in ("<|im_end|>", "<|endoftext|>", "<|eot_id|>"):

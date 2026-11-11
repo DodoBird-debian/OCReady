@@ -1,3 +1,4 @@
+import os
 import tempfile
 import threading
 import time
@@ -66,8 +67,11 @@ def run_process(
             if guard.oom:
                 raise BudgetExceeded("The operating system stopped the OCR worker at its memory allowance. Try a smaller crop or a larger edition.")
             if exit_code:
-                detail = error.strip()[-1600:] or f"exit code {exit_code}"
-                raise OCRError(f"OCR engine failed: {detail}")
+                status = f"exit code {exit_code}"
+                if os.name == "nt":
+                    status += f" (0x{exit_code & 0xFFFFFFFF:08X})"
+                detail = error.strip()[-1600:]
+                raise OCRError(f"OCR engine failed, {status}" + (f": {detail}" if detail else "."))
             return ProcessResult(output, error, peak, time.monotonic() - started,
                                  guard.mode, guard.limit_bytes, guard.peak_bytes)
         finally:
