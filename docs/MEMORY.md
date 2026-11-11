@@ -21,6 +21,8 @@ The compiled Linux Pocket onefile artifact at `65bd416` passed four cases while 
 
 A separate real GLM-OCR Q8 CPU run on the small bilingual image observed 1.86 GB total RSS. A compatible locally built CUDA runner completed the same image in 6.9 seconds with 1.24 GB host RSS; an incompatible upstream runner had already exercised real CPU fallback. These are different workloads from the table and do not certify large-image VLM inference.
 
+An Everyday vision-only onefile build from clean source `e9cdf23` contains the CPU runner, SmolVLM Q4 model and projector in a 269.7 MB executable. All four external memory scenarios passed, including **921.2 MB for the 8 MP GUI case** and 826.7 MB for cap-sized headless input. The report includes the executable SHA256, clean source revision, included model hashes, dependency versions and distinct worker allocation counters. [Raw embedded-vision measurements](benchmarks/linux-everyday-smolvlm-q4-onefile.json). This tiny model supports English; these numbers are memory evidence, not evidence of Arabic transcription quality.
+
 Raw reports: [source scenarios](benchmarks/linux-source.json), [Pocket onefile scenarios](benchmarks/linux-pocket-onefile.json). Recognition text is omitted from benchmark reports.
 
 ## Reproducing the measurements

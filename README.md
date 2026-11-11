@@ -45,7 +45,9 @@ uv run python scripts/build.py --edition everyday --methods vision \
   --model-pack /absolute/path/to/pack.json
 ```
 
-Repeat `--model-pack` to embed multiple compatible models, or use `--methods fast,best,vision` for a combined build. Installed models run sequentially. A local Linux vision-only executable has passed real inference and GUI checks. GitHub Actions builds the default Linux and Windows editions separately; artifacts remain prereleases until their platform and resource gates pass.
+Repeat `--model-pack` to embed multiple compatible models, or use `--methods fast,best,vision` for a combined build. Installed models run sequentially. A 269.7 MB Linux vision-only executable with an English-only small model passed real CLI/GUI inference and its full 8 MP GUI memory workload at 921 MB. GitHub Actions builds the default Linux and Windows editions separately; artifacts remain prereleases until their platform and resource gates pass.
+
+Build manifests record the source revision, source-content digest, dirty state, dependency versions, and included asset hashes. Keep sources unchanged during compilation; the build rejects a changed source tree before producing distribution metadata. Benchmark reports identify the measured executable by SHA256.
 
 No document content is uploaded. Vision inference is a local subprocess. Model installation is explicit.
 
@@ -53,7 +55,7 @@ No document content is uploaded. Vision inference is a local subprocess. Model i
 
 | Edition | Whole application + child-process RAM budget | Default methods |
 | --- | --- | --- |
-| Pocket | below 350,000,000 bytes | Tesseract fast, sparse text, automatic preprocessing |
+| Pocket | below 350,000,000 bytes | Tesseract fast, sparse text, reversible image cleanup |
 | Everyday | below 1,000,000,000 bytes | Pocket methods, best language data, comparison, admissible small vision packs |
 | Studio | below 4,000,000,000 bytes | Everyday methods, optional local GGUF vision inference |
 

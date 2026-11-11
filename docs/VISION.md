@@ -32,7 +32,7 @@ Four Everyday source workloads passed with this pack, including an 8 MP tiled-im
 
 With the shared one-million-pixel preview/input limit, the Q4 model passed the same four source workloads. Its repeated 8 MP GUI peak was **735.0 MB**. See [the Q4 bounded-input report](benchmarks/linux-everyday-smolvlm-q4-bounded.json). This measures memory and successful inference, not transcription accuracy on the tiled stress image.
 
-A Q4 variant of the language model was also tested in an **entirely embedded, vision-only executable**: a 269.6 MB Linux binary containing the runner, model and projector. Its real small-image headless run observed **775 MB**, including the onefile launcher, and its native GUI also passed transcription checks. This validates single-method/all-in-one packaging. Cap-sized embedded-vision workloads still need further tuning and verification; an oversized job is refused rather than bypassing the memory budget.
+A Q4 variant was tested in an **entirely embedded, vision-only executable** built from clean source `e9cdf23`: a 269.7 MB Linux binary containing the runner, model and projector. It passed small-image CLI and native GUI transcription checks. All four packaged memory workloads also passed: 780.9 MB sample, 777.2 MB inverted image, 826.7 MB cap-sized headless input, and **921.2 MB for the full 8 MP GUI workflow**, including the onefile launcher. See [the binary-identified report](benchmarks/linux-everyday-smolvlm-q4-onefile.json). This validates the tested Linux single-method packaging and memory workload. It does not establish Arabic accuracy, Windows VLM behavior, or a universal allocation ceiling.
 
 ## Building a compatible CUDA runner
 

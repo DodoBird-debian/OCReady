@@ -169,3 +169,11 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Added picture-focused Ctrl+C for selected source words while retaining native text-pane copying.
 - Automatic paragraph direction now follows newly typed/pasted Arabic and English, not only the initial OCR result. Direction formatting joins the text operation so one Undo/Redo restores both content and layout; explicit direction choices remain respected.
 - Native GUI validation covers the reproduced crop race, pending-text protection, focus-sensitive copying, mixed-language paste, and undo/redo. All 104 tests and Ruff passed in the isolated worktree, using the real prepared OCR runtime. Work was isolated while the clean embedded vision build completed its source check.
+
+## Iteration 17 — embedded vision headroom verified
+
+- The clean `e9cdf23` Everyday vision-only build completed with provenance enabled. Verified its clean source record, dependency versions, selected methods, safe runtime-manifest subset and gate protocol.
+- Real compiled CLI/native GUI transcription checks passed. Four externally observed packaged scenarios passed: sample 780.9 MB, dark/inverted 777.2 MB, 8 MP headless 826.7 MB, and 8 MP native GUI 921.2 MB. Counts include the resident onefile launcher and all OCR descendants.
+- Published the raw report with executable SHA256, model hashes and build metadata. Both source and executable remained unchanged during measurement.
+- Integrated and pushed iteration 16 after the clean build and benchmark finished. Its 104-test validation used the same prepared real OCR runtime. The newer source CI and default six-build matrix remain under observation.
+- The tested compact model remains English-only. Open priorities include broader Arabic/English accuracy evaluation, actual KDE/Windows 11 interactive capture, Windows GPU/VLM packaging, downloadable prerelease assets, and continued UI/resource review. The goal remains active.

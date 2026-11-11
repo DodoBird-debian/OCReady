@@ -1,0 +1,139 @@
+{
+  "sample_interval_ms": 10,
+  "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
+  "platform": "linux",
+  "python": "3.12.16",
+  "cpu_count": 12,
+  "binary": true,
+  "scenarios": [
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "sample",
+      "peak_rss_bytes": 780881920,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 6.573,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 3.2637797390016203,
+        "peak_rss": 780881920,
+        "engine": "vision:smolvlm-256m-q4",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 663117824,
+        "worker_peak": 342290432,
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "dark",
+      "peak_rss_bytes": 777170944,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 6.542,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 3.263065833998553,
+        "peak_rss": 777170944,
+        "engine": "vision:smolvlm-256m-q4",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 666214400,
+        "worker_peak": 339021824,
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "max-pixels",
+      "peak_rss_bytes": 826662912,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 8.516,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 5.174772866001149,
+        "peak_rss": 826662912,
+        "engine": "vision:smolvlm-256m-q4",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 621998080,
+        "worker_peak": 349151232,
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "gui-onefile",
+      "peak_rss_bytes": 921194496,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 9.226,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 5.180057561003196,
+        "peak_rss": 921194496,
+        "engine": "vision:smolvlm-256m-q4",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 527552512,
+        "worker_peak": 347660288,
+        "words": 0
+      },
+      "error": ""
+    }
+  ],
+  "source": {
+    "revision": "e9cdf23f2ac2857639f50741f25056d8f5b3d9bd",
+    "dirty": false,
+    "tree_sha256": "af747bee65548710a8001817b6ddc960c6600790d8d4d72700c33b3980729e9d"
+  },
+  "sources_changed_during_run": false,
+  "binary_sha256": "c8c57d121ddb371e39c0de1f207c5ee0c82cc3ab863b04862c328c6e9fa90172",
+  "binary_changed_during_run": false,
+  "build_profile": {
+    "edition": "everyday",
+    "available_editions": [
+      "everyday"
+    ],
+    "methods": [
+      "vision"
+    ],
+    "platform": "Linux-6.12.113+deb13-amd64-x86_64-with-glibc2.41",
+    "python": "3.12.16",
+    "embedded_models": [
+      {
+        "id": "smolvlm-256m-q4",
+        "name": "SmolVLM 256M Q4 (English, experimental)",
+        "source": "https://huggingface.co/HuggingFaceTB/SmolVLM-256M-Instruct",
+        "license": "Apache-2.0",
+        "languages": "eng",
+        "model_sha256": "0574eaffbb56eea1b7eaddd6ed61e0b93ad5832fe3e939d272747faac94f4277",
+        "projector_sha256": "7e943f7c53f0382a6fc41b6ee0c2def63ba4fded9ab8ed039cc9e2ab905e0edd"
+      }
+    ],
+    "default_model": "smolvlm-256m-q4",
+    "runtime_bundle_sha256": "babdb2cc5a735df55d551aae0bad19c1b37102e6d0f2d7bf651c1bbbcaac0709",
+    "source": {
+      "revision": "e9cdf23f2ac2857639f50741f25056d8f5b3d9bd",
+      "dirty": false,
+      "tree_sha256": "af747bee65548710a8001817b6ddc960c6600790d8d4d72700c33b3980729e9d"
+    },
+    "built_at_utc": "2026-11-11T04:43:39.762137+00:00",
+    "dependencies": {
+      "Nuitka": "4.3.5",
+      "Pillow": "12.3.0",
+      "psutil": "7.2.2",
+      "PySide6-Essentials": "6.8.3"
+    },
+    "memory_certification": "Uncertified; see docs/PROGRESS.md and benchmark evidence"
+  }
+}
