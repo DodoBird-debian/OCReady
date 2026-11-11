@@ -1,0 +1,113 @@
+{
+  "source": {
+    "revision": "0ed066a4b8eb368faf534c1072c9fc4d31dc504e",
+    "dirty": false,
+    "tree_sha256": "78fcd5c9593063dccb0bb0b82eebc58f62a6566a3444371b3bd8aac2f1ad1361"
+  },
+  "sources_changed_during_run": false,
+  "platform": "linux",
+  "corpus_sha256": "dd9b0057a39309b0194bbb8767fe9e7e56c3297832412619dfefe4fc34394f39",
+  "corpus_content_sha256": "f2c0e972d023b685362f87376ae941accc2c2167a634728fc1cc157cf8537fbd",
+  "edition": "everyday",
+  "normalization": "NFC and collapsed whitespace only; diacritics/digits/punctuation are preserved",
+  "layout": "sparse",
+  "compare": false,
+  "summaries": {
+    "vision": {
+      "completed": 1,
+      "cer": 0.0,
+      "wer": 0.0,
+      "skipped": 10,
+      "errors": 0
+    }
+  },
+  "cases": [
+    {
+      "case": "english-ui",
+      "language": "eng",
+      "method": "vision",
+      "status": "ok",
+      "expected": "Your screenshots are ready to copy.\nOrder 12345 costs 25.00 USD.\nKeep punctuation, numbers, and paragraphs.",
+      "actual": "Your screenshots are ready to copy. Order 12345 costs 25.00 USD. Keep punctuation, numbers, and paragraphs.",
+      "elapsed": 3.4425457199977245,
+      "engine": "vision:smolvlm-256m-q4",
+      "backend": "CPU",
+      "character_errors": 0,
+      "reference_characters": 107,
+      "word_errors": 0,
+      "reference_words": 16,
+      "cer": 0.0,
+      "wer": 0.0
+    },
+    {
+      "case": "arabic-ui",
+      "language": "ara",
+      "method": "vision",
+      "status": "skipped",
+      "reason": "Language unsupported by this pack"
+    },
+    {
+      "case": "bilingual-ui",
+      "language": "ara+eng",
+      "method": "vision",
+      "status": "skipped",
+      "reason": "Language unsupported by this pack"
+    },
+    {
+      "case": "arabic-naskh",
+      "language": "ara",
+      "method": "vision",
+      "status": "skipped",
+      "reason": "Language unsupported by this pack"
+    },
+    {
+      "case": "arabic-kufi",
+      "language": "ara",
+      "method": "vision",
+      "status": "skipped",
+      "reason": "Language unsupported by this pack"
+    },
+    {
+      "case": "arabic-diacritics",
+      "language": "ara",
+      "method": "vision",
+      "status": "skipped",
+      "reason": "Language unsupported by this pack"
+    },
+    {
+      "case": "mixed-digits",
+      "language": "ara+eng",
+      "method": "vision",
+      "status": "skipped",
+      "reason": "Language unsupported by this pack"
+    },
+    {
+      "case": "small-arabic",
+      "language": "ara",
+      "method": "vision",
+      "status": "skipped",
+      "reason": "Language unsupported by this pack"
+    },
+    {
+      "case": "dark-bilingual",
+      "language": "ara+eng",
+      "method": "vision",
+      "status": "skipped",
+      "reason": "Language unsupported by this pack"
+    },
+    {
+      "case": "low-contrast",
+      "language": "ara+eng",
+      "method": "vision",
+      "status": "skipped",
+      "reason": "Language unsupported by this pack"
+    },
+    {
+      "case": "rotated-bilingual",
+      "language": "ara+eng",
+      "method": "vision",
+      "status": "skipped",
+      "reason": "Language unsupported by this pack"
+    }
+  ]
+}

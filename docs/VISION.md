@@ -52,6 +52,8 @@ The manifests are `models/vision/<preset>/pack.json`. Available presets are `smo
 
 The compact `smol-q4` preset derives a 107,777,728-byte Q4_0 model from the locked official Q8 input using the pinned CPU release's `llama-quantize --allow-requantize`. Both the input and the derived output are verified against exact size/SHA256 before publishing the pack; a differing platform output fails preparation. This is a local requantization with possible quality loss, not a separately released upstream model. The curated Studio multimodal build uses this smaller English model alongside bilingual Qwen; Everyday retains Q8. The changed Studio combination requires fresh platform/resource verification.
 
+Clean `0ed066a` evaluated the compact Q4 preset on the fixed corpus: its one English-only fixture completed with zero character/word errors, while all ten Arabic or bilingual fixtures were explicitly skipped because this model declares English only ([raw evaluation](accuracy/linux-smol-q4.json)). This narrow result must not be presented as an eleven-case pass or Arabic support.
+
 SmolVLM and GLM presets expose English. SmolVLM declares English only. GLM-OCR's upstream card lists eight languages but does not list Arabic; Arabic text occasionally read in experiments does not establish supported Arabic transcription. These presets supply CPU inference; `--cuda-runner` can add a separately provisioned compatible runner. A preset's disk size and memory estimate are not packaged resource certification.
 
 ## An experimental bilingual Studio candidate

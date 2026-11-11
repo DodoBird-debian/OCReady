@@ -1,0 +1,131 @@
+{
+  "source": {
+    "revision": "5911af86530495936a7d8bd30ec89fa19e537f6e",
+    "dirty": false,
+    "tree_sha256": "9788955ecdd4548e712da6d3b22d959a0ff0c4b2c1ed43ea8f331be73bfe0312"
+  },
+  "platform": "Linux-6.12.113+deb13-amd64-x86_64-with-glibc2.41",
+  "python": "3.12.16",
+  "nuitka": "4.3.5",
+  "payload_bytes": 134217728,
+  "scope": "Synthetic developer probe only; not OCReady startup, memory or platform certification.",
+  "cache_policy": "Supported cached mode with archive payload; default comparison uses temporary streaming mode.",
+  "payload_memory": {
+    "enabled": true,
+    "nuitka": "4.3.5",
+    "strategy": "drop-unused-launcher-pages-v1",
+    "original_bootstrap_sha256": "73e5da1368005fa1d8ac82c62269095bb26cf231604f260409533a8fb21eb827",
+    "helper_sha256": "c065722f1e62de5b6e6a3bdde8db51c90d58fa010b61a98297f44dee4e9fda7d",
+    "patched_bootstrap_sha256": "4108a89dd7633c1de00be0bc858022912fb83687ffa7b29bbf5dab5d27d573c1"
+  },
+  "asset_sha256": "fdb7a7ec191c461d7a10c117f7884af8e707c30ade8e04ae1072a4ffced7df4b",
+  "binaries": {
+    "temporary": {
+      "sha256": "2c52820e042037be48ef4bd6f18360f83f910425d5531048898938efda6bed2f",
+      "bytes": 146783000
+    },
+    "cached": {
+      "sha256": "507a9ae2c3f36025deed1c639d70b67a679466750e636b373937272a9ee9e129",
+      "bytes": 146766584
+    }
+  },
+  "temporary_runs": [
+    {
+      "elapsed_seconds": 0.28453963799984194,
+      "exit_code": 0,
+      "payload_matches": true,
+      "error": ""
+    },
+    {
+      "elapsed_seconds": 0.2890534600010142,
+      "exit_code": 0,
+      "payload_matches": true,
+      "error": ""
+    },
+    {
+      "elapsed_seconds": 0.2815897370019229,
+      "exit_code": 0,
+      "payload_matches": true,
+      "error": ""
+    }
+  ],
+  "cached_cold": {
+    "elapsed_seconds": 0.28455506700265687,
+    "exit_code": 0,
+    "payload_matches": true,
+    "error": ""
+  },
+  "cached_warm_runs": [
+    {
+      "elapsed_seconds": 0.16655427899968345,
+      "exit_code": 0,
+      "payload_matches": true,
+      "error": ""
+    },
+    {
+      "elapsed_seconds": 0.16869133099680766,
+      "exit_code": 0,
+      "payload_matches": true,
+      "error": ""
+    },
+    {
+      "elapsed_seconds": 0.1670023049955489,
+      "exit_code": 0,
+      "payload_matches": true,
+      "error": ""
+    }
+  ],
+  "cached_repair": {
+    "elapsed_seconds": 2.6825789870053995,
+    "exit_code": 0,
+    "payload_matches": true,
+    "error": ""
+  },
+  "concurrent_cold_pairs": [
+    [
+      {
+        "elapsed_seconds": 3.475384140998358,
+        "exit_code": 0,
+        "payload_matches": true,
+        "error": ""
+      },
+      {
+        "elapsed_seconds": 3.305090394002036,
+        "exit_code": 0,
+        "payload_matches": true,
+        "error": ""
+      }
+    ],
+    [
+      {
+        "elapsed_seconds": 4.569542573997751,
+        "exit_code": 0,
+        "payload_matches": true,
+        "error": ""
+      },
+      {
+        "elapsed_seconds": 4.777259205002338,
+        "exit_code": 0,
+        "payload_matches": true,
+        "error": ""
+      }
+    ],
+    [
+      {
+        "elapsed_seconds": 3.202785123998183,
+        "exit_code": 0,
+        "payload_matches": true,
+        "error": ""
+      },
+      {
+        "elapsed_seconds": 2.935099740003352,
+        "exit_code": 0,
+        "payload_matches": true,
+        "error": ""
+      }
+    ]
+  ],
+  "sources_changed_during_run": false,
+  "sequential_payloads_valid": true,
+  "concurrent_failures": 0
+}

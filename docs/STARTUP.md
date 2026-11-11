@@ -23,6 +23,8 @@ The script compiles two minimal native onefiles containing the same incompressib
 
 The report identifies source/compiler, payload, native binaries and trim overlay. A synthetic result does not establish full OCReady startup time, whole-application RAM, model correctness, cross-platform cache safety or resistance to deliberately malicious filesystem changes. The measurement includes the child's asset hash verification. A failed concurrency experiment is retained as evidence rather than treated as a reason to enable caching.
 
+The first clean `5911af8` Linux probe used a 128 MiB payload. Three temporary launches took 0.282–0.289 seconds; a newly empty cached directory took 0.285 seconds, and three warm cached launches took 0.167–0.169 seconds. Changed-byte repair returned the correct payload in 2.68 seconds. All six launches in three simultaneous cold pairs returned the expected SHA256, taking 2.94–4.78 seconds each. [Unchanged raw result](benchmarks/linux-onefile-startup-cache-probe.json). Here “cold” means a fresh extraction directory; OS file caches were not flushed. These small synthetic timings are not estimates for the large Studio application. Successful race samples do not supply the missing process coordination or Windows locking evidence.
+
 ## Conditions for an application implementation
 
 - Use a private, per-user cache namespace with an identity covering source, dependencies, platform, runtime bundle and compiled packaging policy.

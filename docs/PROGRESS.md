@@ -400,3 +400,12 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Kept caching out of application defaults. Reviewed pinned compiler code and official guidance: cached archive entries can skip decompression after checksum validation, but there is no first-extraction inter-process serialization. OCReady's current runtime extraction also needs additional process coordination before sharing a persistent directory.
 - Added a modular implementation/release gate covering build identities, private storage, atomic stages, interruption/repair, Windows locks, document separation, bounded disk lifecycle and full platform/RAM validation. Documented existing observed startup/recognition times without calling their difference a pure extraction measurement.
 - Probe CLI and Ruff passed. Actual native measurements follow this clean checkpoint; no performance improvement or cache safety is claimed from implementing a benchmark wrapper.
+
+## Iteration 46 — measured cache prototype and compact-model accuracy
+
+- Ran the native startup probe from clean `5911af8` with a 128 MiB incompressible asset. All sequential payload checks and changed-byte repair passed. Temporary launches took 0.282–0.289 s, a fresh cached directory 0.285 s and warm cached launches 0.167–0.169 s. Repair took 2.68 s. These are synthetic timings including child SHA256 verification, not whole-app performance claims.
+- All six launches across three concurrent cold pairs returned the correct payload, with 2.94–4.78 s wall times. Preserved the raw report without turning finite successful race samples into a concurrency guarantee. “Cold” is explicitly an empty extraction directory; OS page caches were not flushed. Application cache defaults remain unchanged.
+- Hardened the probe controller to clean its own launcher/descendants and close pipes on timeout or interruption; added the cold-cache definition to future reports.
+- Verified the controller against real child output, mismatched output and a timed-out process with its own sleeping descendant; the descendant was terminated. All 218 tests and Ruff passed after the final controller change.
+- Preserved clean `0ed066a` compact SmolVLM Q4 corpus evidence: one supported English fixture completed with zero CER/WER; ten unsupported Arabic/bilingual fixtures were skipped. This is not bilingual accuracy certification.
+- Studio platform/resource validation and the subsequent gated release run remain active independently of these developer experiments.

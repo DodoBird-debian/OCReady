@@ -16,26 +16,34 @@ import tempfile
 import time
 from pathlib import Path
 
+from ocready.core.memory import stop_tree
 from scripts.payload_memory import compiler_overlay, overlay_environment
 from scripts.provenance import file_sha256, require_unchanged, source_record
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def launch(binary: Path, expected: str) -> dict:
+def launch(binary: Path, expected: str, *, timeout: float = 120) -> dict:
     started = time.perf_counter()
+    child = subprocess.Popen([str(binary)], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     try:
-        result = subprocess.run([str(binary)], capture_output=True, text=True, timeout=120)
+        stdout, stderr = child.communicate(timeout=timeout)
         try:
-            value = json.loads(result.stdout)
+            value = json.loads(stdout)
         except ValueError:
             value = {}
-        return {"elapsed_seconds": time.perf_counter() - started, "exit_code": result.returncode,
-                "payload_matches": result.returncode == 0 and value.get("sha256") == expected,
-                "error": result.stderr[-4000:] if result.returncode else ""}
+        return {"elapsed_seconds": time.perf_counter() - started, "exit_code": child.returncode,
+                "payload_matches": child.returncode == 0 and value.get("sha256") == expected,
+                "error": stderr[-4000:] if child.returncode else ""}
     except subprocess.TimeoutExpired:
         return {"elapsed_seconds": time.perf_counter() - started, "exit_code": None,
-                "payload_matches": False, "error": "Probe exceeded 120 seconds."}
+                "payload_matches": False, "error": f"Probe exceeded {timeout:g} seconds."}
+    finally:
+        if child.poll() is None:
+            stop_tree(child.pid)
+        child.wait()
+        child.stdout.close()
+        child.stderr.close()
 
 
 def probe(output: Path, size_mib: int, rounds: int, jobs: int) -> dict:
@@ -44,6 +52,7 @@ def probe(output: Path, size_mib: int, rounds: int, jobs: int) -> dict:
     report = {"source": source, "platform": platform.platform(), "python": platform.python_version(),
               "nuitka": importlib.metadata.version("Nuitka"), "payload_bytes": size_mib * 1024 * 1024,
               "scope": "Synthetic developer probe only; not OCReady startup, memory or platform certification.",
+              "cold_definition": "Empty extraction directory; the operating-system filesystem cache is not flushed.",
               "cache_policy": "Supported cached mode with archive payload; default comparison uses temporary streaming mode."}
     with tempfile.TemporaryDirectory(prefix="startup-probe-", dir=output.parent) as temporary:
         work = Path(temporary).resolve()
