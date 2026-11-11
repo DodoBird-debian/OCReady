@@ -1,0 +1,158 @@
+{
+  "sample_interval_ms": 10,
+  "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
+  "platform": "linux",
+  "python": "3.12.16",
+  "cpu_count": 12,
+  "binary": true,
+  "scenarios": [
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "sample",
+      "peak_rss_bytes": 550055936,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 6.24,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 3.182927916001063,
+        "peak_rss": 550055936,
+        "engine": "vision:smolvlm-256m-q4-json",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 920977408,
+        "worker_peak": 350773248,
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "dark",
+      "peak_rss_bytes": 550400000,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 5.972,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 3.330739638004161,
+        "peak_rss": 550400000,
+        "engine": "vision:smolvlm-256m-q4-json",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 920621056,
+        "worker_peak": 351186944,
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "max-pixels",
+      "peak_rss_bytes": 589553664,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 7.966,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 5.062185921000491,
+        "peak_rss": 589553664,
+        "engine": "vision:smolvlm-256m-q4-json",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 886112256,
+        "worker_peak": 358174720,
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "everyday",
+      "max_pixels": 8000000,
+      "scenario": "gui-onefile",
+      "peak_rss_bytes": 679141376,
+      "budget_bytes": 1000000000,
+      "below_budget": true,
+      "elapsed_seconds": 9.064,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 5.263428712001769,
+        "peak_rss": 679141376,
+        "engine": "vision:smolvlm-256m-q4-json",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 796622848,
+        "worker_peak": 358662144,
+        "words": 0
+      },
+      "error": ""
+    }
+  ],
+  "source": {
+    "revision": "af3baa9806c8df26287ecb663e8fd275a2a49a44",
+    "dirty": false,
+    "tree_sha256": "94e12f40ef4547bb382065e3ed66762f27d0262364cf749082db92ff52c53c17"
+  },
+  "sources_changed_during_run": false,
+  "binary_sha256": "2863898595a16b140b53ee5d82bbdf050c5846b381853ee616f0ef6af4559ab7",
+  "binary_changed_during_run": false,
+  "build_profile": {
+    "edition": "everyday",
+    "available_editions": [
+      "everyday"
+    ],
+    "methods": [
+      "vision"
+    ],
+    "platform": "Linux-6.12.113+deb13-amd64-x86_64-with-glibc2.41",
+    "python": "3.12.16",
+    "embedded_models": [
+      {
+        "id": "smolvlm-256m-q4-json",
+        "name": "SmolVLM Q4 · JSON worker",
+        "source": "https://huggingface.co/ggml-org/SmolVLM-256M-Instruct-GGUF",
+        "license": "Apache-2.0",
+        "languages": "eng",
+        "adapter": "json-cli-v1",
+        "model_sha256": "0574eaffbb56eea1b7eaddd6ed61e0b93ad5832fe3e939d272747faac94f4277",
+        "projector_sha256": "7e943f7c53f0382a6fc41b6ee0c2def63ba4fded9ab8ed039cc9e2ab905e0edd"
+      }
+    ],
+    "default_model": "smolvlm-256m-q4-json",
+    "embedded_neural": [],
+    "default_neural": "",
+    "variant": "json-smol-q4",
+    "runtime_bundle_sha256": "9585994f4d224b10536dad08ef8a679b9256edcf7e2e29f0d8dc5e6c04158a54",
+    "source": {
+      "revision": "af3baa9806c8df26287ecb663e8fd275a2a49a44",
+      "dirty": false,
+      "tree_sha256": "94e12f40ef4547bb382065e3ed66762f27d0262364cf749082db92ff52c53c17"
+    },
+    "built_at_utc": "2026-11-11T11:18:40.488063+00:00",
+    "dependencies": {
+      "Nuitka": "4.3.5",
+      "Pillow": "12.3.0",
+      "psutil": "7.2.2",
+      "PySide6-Essentials": "6.8.3"
+    },
+    "onefile_compression": {
+      "policy": "Nuitka low-memory",
+      "level": 3,
+      "compiler_version": "4.3.5"
+    },
+    "memory_certification": "Uncertified; see docs/PROGRESS.md and benchmark evidence",
+    "payload_memory": {
+      "enabled": true,
+      "nuitka": "4.3.5",
+      "strategy": "drop-unused-launcher-pages-v1",
+      "original_bootstrap_sha256": "73e5da1368005fa1d8ac82c62269095bb26cf231604f260409533a8fb21eb827",
+      "helper_sha256": "c065722f1e62de5b6e6a3bdde8db51c90d58fa010b61a98297f44dee4e9fda7d",
+      "patched_bootstrap_sha256": "4108a89dd7633c1de00be0bc858022912fb83687ffa7b29bbf5dab5d27d573c1"
+    }
+  },
+  "requested_method": "vision",
+  "requested_pack_id": "smolvlm-256m-q4-json"
+}
