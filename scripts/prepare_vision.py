@@ -111,7 +111,8 @@ def prepare_runner(lock: dict, runtime: Path) -> Path:
     return destination / relative
 
 
-def prepare_pack(preset: dict, runner: Path, folder: Path, cuda_runner: Path | None = None) -> Path:
+def prepare_pack(preset: dict, runner: Path, folder: Path, cuda_runner: Path | None = None,
+                 adapter: str = "llama.cpp") -> Path:
     folder.mkdir(parents=True, exist_ok=True)
     for record in preset["files"]:
         fetch(record, folder / record["file"])
@@ -120,7 +121,7 @@ def prepare_pack(preset: dict, runner: Path, folder: Path, cuda_runner: Path | N
                      str(projector.resolve()), cuda_runner=str(cuda_runner.resolve()) if cuda_runner else "",
                      memory_mb=preset["memory_mb"], tokens=preset["tokens"], prompt=preset["prompt"],
                      languages=preset["languages"], source=f"https://huggingface.co/{preset['repo']}",
-                     license=preset["license"])
+                     license=preset["license"], adapter=adapter)
     pack.validate()
     record = pack.to_dict()
     for key in ("runner", "model", "projector", "cuda_runner"):
@@ -143,11 +144,15 @@ def main() -> None:
     parser.add_argument("--runtime-dir", type=Path, default=ROOT / "runtime/vision-cpu")
     parser.add_argument("--model-dir", type=Path, default=ROOT / "models/vision")
     parser.add_argument("--cuda-runner", type=Path, help="Optional separately provisioned compatible CUDA runner")
+    parser.add_argument("--runner", type=Path, help="Use an existing compatible CPU worker instead of provisioning the CPU CLI")
+    parser.add_argument("--adapter", choices=("llama.cpp", "json-cli-v1"), default="llama.cpp")
     args = parser.parse_args()
     lock = json.loads((ROOT / "assets/vision-lock.json").read_text(encoding="utf-8"))
-    runner = prepare_runner(lock["runner"], args.runtime_dir.resolve())
+    if args.adapter != "llama.cpp" and not args.runner:
+        parser.error("Supply --runner for the selected adapter; see scripts.build_vision_bridge.")
+    runner = args.runner.resolve() if args.runner else prepare_runner(lock["runner"], args.runtime_dir.resolve())
     for name in dict.fromkeys(args.preset):
-        print(prepare_pack(lock["packs"][name], runner, args.model_dir.resolve() / name, args.cuda_runner))
+        print(prepare_pack(lock["packs"][name], runner, args.model_dir.resolve() / name, args.cuda_runner, args.adapter))
 
 
 if __name__ == "__main__":

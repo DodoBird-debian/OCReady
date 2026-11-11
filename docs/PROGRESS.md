@@ -324,3 +324,11 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Wired an exact-key, platform-specific Actions cache for only the compiled worker distribution. No prefix restore is used. Fresh/reused workers are verified and run against the corpus before caching; outer executables still require full per-method platform/resource verification before publication.
 - Pinned the official cache action's verified v5 commit. Reusing the independent worker is intended to avoid recompiling numerical libraries for UI/model-pack changes; no cache-hit timing improvement is claimed before the new workflow exercises it.
 - All 182 tests and Ruff passed, including modified executable/library content, entrypoint/builder changes, dependency/Python/protocol mismatches, unclean source state and escaping inventory paths.
+
+## Iteration 36 — compiled JSON vision reference worker
+
+- Added a standalone, stdlib-only JSON v1 reference worker around a selected native multimodal CLI. It returns logical Unicode, exact processed-PNG dimensions and backend identity, with explicit CPU offload disabling and native error forwarding. Its descendants stay under the parent application's containment/cancellation policy.
+- Added a cross-platform worker compiler that retains Python/OCReady/native notices, source/native-runner hashes and a declared nested-file inventory. Copying a different runtime removes stale libraries from the owned native subdirectory.
+- Added optional runner/adapter selection to pinned vision preparation. Model weights/prompts remain separate from the worker interface, so the same model can be evaluated through either adapter without pipeline/UI changes.
+- Consolidated declared-distribution bundling for neural and JSON workers, preserving nested native descendants and excluding undeclared siblings. Protocol/input, CPU-only flags, stale-library cleanup, declared nesting and tamper rejection are covered by focused tests.
+- Compilation and actual-model validation of this second adapter follow the clean checkpoint; unit protocol tests are not presented as real OCR proof.

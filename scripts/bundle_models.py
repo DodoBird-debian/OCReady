@@ -17,6 +17,27 @@ def file_digest(path: Path) -> str:
     return digest.hexdigest()
 
 
+def bundle_distribution(archive: tarfile.TarFile, runner: Path, prefix: Path, marker_name: str,
+                        adapter: str | None = None) -> None:
+    marker = runner.parent / marker_name
+    if not marker.is_file() or marker.stat().st_size > 1_000_000:
+        raise ValueError("Embedding this worker requires its compiled standalone distribution manifest.")
+    metadata = json.loads(marker.read_text(encoding="utf-8"))
+    files = metadata.get("files", {}) if isinstance(metadata, dict) else {}
+    if (not isinstance(metadata, dict) or type(metadata.get("protocol")) is not int or metadata["protocol"] != 1
+            or not isinstance(files, dict) or runner.name not in files or adapter and metadata.get("adapter") != adapter):
+        raise ValueError("The worker distribution manifest is invalid.")
+    for relative, digest in sorted(files.items()):
+        path = Path(relative)
+        source = runner.parent / path
+        if path.is_absolute() or ".." in path.parts or not source.resolve().is_relative_to(runner.parent):
+            raise ValueError("The worker distribution contains an escaping path.")
+        if not source.is_file() or file_digest(source) != digest:
+            raise ValueError(f"The worker distribution changed: {relative}")
+        archive.add(source.resolve(), arcname=(prefix / path).as_posix(), recursive=False)
+    archive.add(marker, arcname=(prefix / marker.name).as_posix(), recursive=False)
+
+
 def bundle_pack(archive: tarfile.TarFile, pack: ModelPack) -> dict:
     pack.validate()
     prefix = Path("vision") / pack.id
@@ -33,6 +54,10 @@ def bundle_pack(archive: tarfile.TarFile, pack: ModelPack) -> dict:
             continue
         source = Path(getattr(pack, key)).expanduser().resolve()
         folder = "cpu" if key == "runner" else "cuda"
+        if pack.adapter == "json-cli-v1" and (source.parent / "vision-build.json").exists():
+            bundle_distribution(archive, source, prefix / folder, "vision-build.json", pack.adapter)
+            values[key] = (Path(folder) / source.name).as_posix()
+            continue
         files = {source, *source.parent.glob("*.dll"), *source.parent.glob("*.so*")}
         libdir = source.parent.parent / "lib"
         if libdir.is_dir():
@@ -80,22 +105,7 @@ def bundle_neural_pack(archive: tarfile.TarFile, pack: NeuralPack) -> dict:
         folder = "cpu" if key == "runner" else "cuda"
         # Embed the declared standalone distribution, not arbitrary files a user
         # might have stored beside an executable in e.g. /usr/bin or Downloads.
-        marker = runner.parent / "neural-build.json"
-        if not marker.is_file() or marker.stat().st_size > 1_000_000:
-            raise ValueError("Embedding neural OCR requires the standalone worker directory produced by build_neural_runner.py.")
-        metadata = json.loads(marker.read_text(encoding="utf-8"))
-        files = metadata.get("files", {})
-        if metadata.get("protocol") != 1 or not isinstance(files, dict) or runner.name not in files:
-            raise ValueError("The neural worker distribution manifest is invalid.")
-        for relative, digest in sorted(files.items()):
-            path = Path(relative)
-            source = runner.parent / path
-            if path.is_absolute() or ".." in path.parts or not source.resolve().is_relative_to(runner.parent):
-                raise ValueError("The neural worker distribution contains an escaping path.")
-            if not source.is_file() or file_digest(source) != digest:
-                raise ValueError(f"The neural worker distribution changed: {relative}")
-            archive.add(source.resolve(), arcname=(prefix / folder / path).as_posix(), recursive=False)
-        archive.add(marker, arcname=(prefix / folder / marker.name).as_posix(), recursive=False)
+        bundle_distribution(archive, runner, prefix / folder, "neural-build.json")
         values[key] = (Path(folder) / runner.name).as_posix()
     for pattern in ("*LICENSE*", "NOTICE*", "README*", "*-inference.yml"):
         for notice in Path(pack.recognizer).parent.glob(pattern):
