@@ -39,7 +39,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--version", action="version", version=f"OCReady {__version__}")
     parser.add_argument("--edition", choices=profile["available_editions"], help="Memory edition; GUI restores the last available edition, CLI uses the build default")
     parser.add_argument("--language", choices=("ara+eng", "ara", "eng"))
-    parser.add_argument("--method", choices=("tesseract-fast", "tesseract-best", "vision", "neural"), default=profile["methods"][0])
+    parser.add_argument("--method", choices=("tesseract-fast", "tesseract-best", "vision", "neural"), help="OCR method; GUI otherwise restores the saved choice")
+    parser.add_argument("--pack-id", help="Select an installed vision/neural pack by ID, together with --method")
     parser.add_argument("--model-pack", type=Path, help="Local vision model JSON manifest")
     parser.add_argument("--neural-pack", type=Path, help="Local neural OCR JSON manifest")
     parser.add_argument("--backend", choices=("auto", "cpu", "cuda"), default="auto")
@@ -58,7 +59,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--ui-smoke-output", type=Path, help=argparse.SUPPRESS)
     args = parser.parse_args(argv)
     try:
-        if args.method not in profile["methods"] and (args.text or args.json):
+        method = args.method or profile["methods"][0]
+        if args.pack_id and (args.method not in {"vision", "neural"} or args.model_pack or args.neural_pack):
+            raise OCRError("Use --pack-id with --method vision or neural, without an external pack path.")
+        if method not in profile["methods"]:
             raise OCRError("This OCR method is not included in this build.")
         if args.diagnostics:
             encoded = json.dumps(diagnostics(), ensure_ascii=False, indent=2)
@@ -74,24 +78,30 @@ def main(argv: list[str] | None = None) -> int:
                             threshold=args.threshold, rotation=args.rotate)
             from ocready.core.models import load_pack, load_packs
             pack = load_pack(args.model_pack) if args.model_pack else None
-            if args.method == "vision" and not pack:
+            if method == "vision" and not pack:
                 packs = load_packs()
-                pack = next((p for p in packs if p.id == profile.get("default_model")), packs[0] if packs else None)
-            language = args.language or (pack.languages if pack and args.method == "vision" else "ara+eng")
+                pack = next((p for p in packs if p.id == (args.pack_id or profile.get("default_model"))),
+                            None if args.pack_id else packs[0] if packs else None)
+                if args.pack_id and not pack:
+                    raise OCRError(f"No installed vision pack has ID {args.pack_id}.")
+            language = args.language or (pack.languages if pack and method == "vision" else "ara+eng")
             neural_pack = None
-            if args.method == "neural":
+            if method == "neural":
                 from ocready.core.neural_packs import load_neural_pack, load_neural_packs
                 neural_packs = load_neural_packs()
                 neural_pack = load_neural_pack(args.neural_pack) if args.neural_pack else next(
-                    (p for p in neural_packs if p.id == profile.get("default_neural")), next(iter(neural_packs), None))
+                    (p for p in neural_packs if p.id == (args.pack_id or profile.get("default_neural"))),
+                    None if args.pack_id else next(iter(neural_packs), None))
+                if args.pack_id and not neural_pack:
+                    raise OCRError(f"No installed neural pack has ID {args.pack_id}.")
                 if neural_pack and not args.language:
                     language = neural_pack.languages
-            result, _ = recognize_image(source, Request(edition, language, args.method, args.layout,
+            result, _ = recognize_image(source, Request(edition, language, method, args.layout,
                                                         recipe, args.compare, pack, args.backend, neural_pack))
             encoded = json.dumps(result.to_dict(), ensure_ascii=False, indent=2) if args.json else result.text
         else:
             from ocready.ui.app import run
-            return run(args.image, args.edition, smoke_output=args.ui_smoke_output)
+            return run(args.image, args.edition, smoke_output=args.ui_smoke_output, method=args.method, pack_id=args.pack_id)
         if args.output:
             args.output.write_text(encoded + "\n", encoding="utf-8")
         else:

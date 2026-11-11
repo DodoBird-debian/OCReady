@@ -174,6 +174,9 @@ def main() -> int:
     parser.add_argument("--edition", choices=["all", *EDITIONS], default="all")
     parser.add_argument("--output", type=Path, default=ROOT / "test-output" / "benchmarks.json")
     parser.add_argument("--binary", type=Path, help="Include onefile launcher overhead in headless scenarios")
+    parser.add_argument("--method", choices=("tesseract-fast", "tesseract-best", "vision", "neural"),
+                        help="Explicit embedded method; requires --binary")
+    parser.add_argument("--pack-id", help="Explicit embedded vision/neural pack ID; requires --binary and --method")
     local = parser.add_mutually_exclusive_group()
     local.add_argument("--vision-pack", type=Path, help="Benchmark a local VLM pack instead of classical OCR")
     local.add_argument("--neural-pack", type=Path, help="Benchmark a local neural OCR pack")
@@ -188,6 +191,11 @@ def main() -> int:
         parser.error("--edition must match the compiled binary's edition")
     if args.binary and (args.vision_pack or args.neural_pack):
         parser.error("Benchmark embedded packs through their binary's default method; pack paths are for source runs")
+    if args.method and not args.binary or args.pack_id and (not args.binary or args.method not in {"vision", "neural"}):
+        parser.error("Explicit methods/pack IDs require --binary; pack IDs also require --method vision or neural")
+    selection = ["--method", args.method] if args.method else []
+    if args.pack_id:
+        selection += ["--pack-id", args.pack_id]
     source = source_record(ROOT)
     binary_hash = file_sha256(args.binary) if args.binary else None
     records = []
@@ -201,7 +209,9 @@ def main() -> int:
                 make_image(image, edition, dark=scenario == "dark", maximum=scenario in {"max-pixels", "gui-repeated", "gui-onefile"})
                 base = [str(args.binary.resolve())] if args.binary else [sys.executable, "-m", "ocready"]
                 command = [*base, str(image), "--json", "--layout", "sparse", "--edition", edition, "--output", str(output)]
-                if args.vision_pack:
+                if selection:
+                    command += selection
+                elif args.vision_pack:
                     from ocready.core.models import load_pack
                     pack = load_pack(args.vision_pack)
                     command += ["--method", "vision", "--model-pack", str(args.vision_pack.resolve()), "--language", pack.languages]
@@ -220,7 +230,7 @@ def main() -> int:
                     elif args.neural_pack:
                         command += ["--neural-pack", str(args.neural_pack.resolve())]
                 elif scenario == "gui-onefile":
-                    command = [*base, str(image), "--edition", edition, "--ui-smoke-output", str(output)]
+                    command = [*base, str(image), "--edition", edition, "--ui-smoke-output", str(output), *selection]
                 result = observe(command, output, EDITIONS[edition].budget)
                 result = {"edition": edition, "max_pixels": EDITIONS[edition].max_pixels, "scenario": scenario, **result}
                 # Preserve evidence without copying all recognized document contents into reports.
@@ -234,7 +244,7 @@ def main() -> int:
               "source": source, "sources_changed_during_run": source_record(ROOT) != source,
               "binary_sha256": binary_hash,
               "binary_changed_during_run": bool(args.binary and file_sha256(args.binary) != binary_hash),
-              "build_profile": binary_profile}
+              "build_profile": binary_profile, "requested_method": args.method, "requested_pack_id": args.pack_id}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return 0 if (all(row["below_budget"] and row["exit_code"] == 0 for row in records)

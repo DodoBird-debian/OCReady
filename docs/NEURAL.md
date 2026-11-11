@@ -28,6 +28,17 @@ uv run python -m scripts.smoke_binary dist/everyday-neural --benchmark
 
 For a combined build use `--methods fast,best,vision,neural`, with `--model-pack` and `--neural-pack` as needed. Repeat pack arguments to include multiple compatible choices. Separate variants keep custom outputs from replacing the default-edition artifacts. Each complete combination must pass its own packaged memory checks.
 
+After preparing the runtime and neural pack, curated builds are also available:
+
+```sh
+uv run python -m scripts.build_variant --edition everyday --variant multimodal
+uv run python -m scripts.smoke_binary dist/everyday-multimodal --all-methods --benchmark
+```
+
+`neural` embeds only the bilingual neural method; `combined` adds classical engines; `multimodal` also provisions the locked English SmolVLM preset, plus GLM-OCR in Studio. The latter downloads large model files during explicit preparation. It does not yet imply a published, validated combined executable. The all-methods smoke check runs actual CLI, native GUI and four resource workloads for each embedded choice, preserving separate variant/method reports.
+
+Both CLI and GUI accept an explicit installed choice, for example `--method vision --pack-id smolvlm-256m-q8`. A missing or inadmissible choice fails rather than silently testing another model. Normal GUI launches preserve the saved method.
+
 Import an external pack using **Settings → Neural OCR → Import local pack**. Built-in packs appear automatically. The settings retain options without moving or deleting model files. The shared Compute selector applies to neural and vision methods. The tested worker is CPU-based; it reports CPU when CUDA is not usable. A CUDA-capable compatible worker may be supplied separately, and backend initialization failures can fall back to CPU. Actual neural CUDA inference remains a separate validation task.
 
 ## Copy order and model provenance

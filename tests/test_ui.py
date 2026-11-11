@@ -107,6 +107,38 @@ def test_gui_entrypoint_preserves_saved_edition_unless_explicitly_overridden(win
     assert calls == [None, "studio"]
 
 
+def test_explicit_gui_method_preserves_preferences_unless_requested(window):
+    from ocready.core.models import ModelPack
+    from ocready.core.types import OCRError
+    from ocready.ui.app import select_method
+    window.edition_combo.setCurrentIndex(window.edition_combo.findData("everyday"))
+    original = window.method_combo.currentData()
+    select_method(window, None)
+    assert window.method_combo.currentData() == original
+    window.packs = [ModelPack("small", "Small English", "runner", "model", "projector", memory_mb=500, languages="eng"),
+                    ModelPack("large", "Large", "runner", "model", "projector", memory_mb=2800)]
+    window.refresh_methods()
+    select_method(window, "vision", "small")
+    assert window.method_combo.currentData() == "vision:small"
+    assert window.language_combo.currentData() == "eng"
+    for invalid in ("missing", "large"):
+        with pytest.raises(OCRError, match="unavailable"):
+            select_method(window, "vision", invalid)
+        assert window.method_combo.currentData() == "vision:small"
+    select_method(window, "tesseract-fast")
+    assert window.method_combo.currentData() == "tesseract-fast"
+
+
+def test_cli_pack_selection_never_silently_uses_another_model(window, monkeypatch):
+    from ocready.__main__ import main
+    from ocready.core.models import ModelPack
+    pack = ModelPack("available", "Available", "runner", "model", "projector", memory_mb=500, languages="eng")
+    monkeypatch.setattr("ocready.core.models.load_packs", lambda: [pack])
+    monkeypatch.setattr("ocready.core.pipeline.recognize_image", lambda *_args: pytest.fail("Must reject missing ID before inference"))
+    assert main(["assets/sample-bilingual.png", "--edition", "everyday", "--method", "vision", "--pack-id", "missing", "--json"]) == 2
+    assert main(["--method", "tesseract-fast", "--pack-id", "available"]) == 2
+
+
 def test_clicking_arabic_source_word_copies_logical_text(recognized, app):
     window = recognized
     index = next(i for i, word in enumerate(window.result.words) if word.text == "مرحبا")

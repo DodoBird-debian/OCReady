@@ -8,6 +8,14 @@ import pytest
 from ocready.core import paths
 from ocready.core.models import ModelPack, load_pack
 from scripts.bundle_models import bundle_neural_pack, bundle_pack
+from scripts.smoke_binary import embedded_selections
+
+
+def test_combined_binary_validation_covers_every_embedded_method_and_model():
+    profile = {"methods": ["tesseract-fast", "tesseract-best", "vision", "neural"],
+               "embedded_models": [{"id": "small"}, {"id": "large"}], "embedded_neural": [{"id": "bilingual"}]}
+    assert embedded_selections(profile) == [("tesseract-fast", ""), ("tesseract-best", ""),
+                                            ("vision", "small"), ("vision", "large"), ("neural", "bilingual")]
 
 
 def test_embedded_model_pack_contains_relative_paths_and_real_assets(tmp_path):

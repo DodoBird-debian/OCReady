@@ -256,3 +256,11 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Downloads require the exact locked size and SHA256 before atomic publication. Runtime extraction checks paths, links, entry counts and unpacked size; verified archives are re-extracted rather than trusting a stale marker.
 - Prepared both real presets locally and verified all locked assets. Upstream language declarations are now explicit: these vision presets expose English; Arabic remains served by the tested classical/neural engines. CPU presets do not claim validated CUDA packaging.
 - Added regression checks for oversized/corrupt download rejection, valid-cache reuse, Windows archive paths and Linux shared-library links. Three focused tests and Ruff passed. Complete combinations still require their own executable and per-method resource evidence.
+
+## Iteration 27 — verify every embedded engine choice
+
+- Added explicit installed pack selection for CLI and native GUI. Ordinary GUI launches retain preferences; explicit requests select the requested method/pack and reject missing or inadmissible choices before inference.
+- Extended packaged smoke checks to enumerate every embedded classical/neural/vision choice, verify the actual returned engine in CLI and GUI, and run all four resource scenarios separately. Reports include requested method/pack IDs and distinct variant/method filenames.
+- Added curated neural, classical-plus-neural, and multimodal build commands. Everyday multimodal includes SmolVLM; Studio includes both SmolVLM and GLM-OCR. Their Windows/Linux workflow runs per-method validation before uploading artifacts.
+- Both real curated CPU runners completed bilingual-image input locally, reporting CPU and their exact model IDs. SmolVLM omitted Arabic; GLM-OCR repeated its known Arabic word error, consistent with the retained language limitations.
+- All 146 tests and Ruff passed, including preference preservation, exact GUI selection, rejection of missing/oversized packs, and complete embedded-choice enumeration. Full multimodal binaries are the next measured gate.
