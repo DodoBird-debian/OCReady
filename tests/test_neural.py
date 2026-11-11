@@ -8,7 +8,7 @@ from native.neural_runner import logical_text
 from ocready.core.editions import EDITIONS
 from ocready.core.neural_packs import NeuralPack, load_neural_pack
 from ocready.core.process import ProcessResult
-from ocready.core.types import OCRError
+from ocready.core.types import BudgetExceeded, Cancelled, OCRError
 from ocready.engines import neural
 from ocready.engines.neural import parse_output
 
@@ -68,6 +68,33 @@ def test_removed_optional_neural_helper_uses_intact_cpu_worker(neural_pack, tmp_
     with pytest.raises(OCRError, match="detector file does not exist"):
         neural.recognize(image, EDITIONS["everyday"], pack, backend=backend)
     assert len(calls) == 1
+
+
+@pytest.mark.parametrize("failure,retry", [(OCRError("CUDA error: unsupported toolchain"), True),
+                                         (OCRError("CUDA0 device found\nInvalid model /models/cuda/rec.onnx"), False),
+                                         (Cancelled("cancelled"), False), (BudgetExceeded("budget"), False)])
+def test_neural_cpu_retries_require_a_backend_failure(neural_pack, tmp_path, monkeypatch, failure, retry):
+    from PIL import Image
+    helper = tmp_path / "cuda-worker"
+    helper.write_bytes(b"helper")
+    pack = dataclasses.replace(neural_pack, cuda_runner=str(helper))
+    image = tmp_path / "input.png"
+    Image.new("RGB", (100, 80), "white").save(image)
+    calls = []
+    def execute(args, **kwargs):
+        calls.append(args)
+        if len(calls) == 1:
+            raise failure
+        return ProcessResult(json.dumps({"schema": 1, "width": 100, "height": 80, "backend": "CPU", "lines": []}), "", 300_000_000, 1)
+    monkeypatch.setattr(neural, "run_process", execute)
+    if retry:
+        result = neural.recognize(image, EDITIONS["everyday"], pack)
+        assert result.backend == "CPU" and len(calls) == 2
+        assert calls[-1][0] == pack.runner and calls[-1][calls[-1].index("--backend") + 1] == "cpu"
+    else:
+        with pytest.raises(type(failure)) as caught:
+            neural.recognize(image, EDITIONS["everyday"], pack)
+        assert caught.value is failure and len(calls) == 1
 
 
 @pytest.mark.parametrize("raw,expected", [("ملاعلاب ابحرم", "مرحبا بالعالم"),

@@ -6,10 +6,11 @@ Heavy numerical libraries are imported only inside this worker process.
 import argparse
 import gc
 import json
-import re
 import sys
 import unicodedata
 from pathlib import Path
+
+from ocready.core.backend_errors import is_cuda_backend_error
 
 
 def logical_text(text: str, *, decode: str = "visual", direction: str = "auto") -> str:
@@ -69,7 +70,7 @@ def infer(args) -> dict:
     try:
         result = engine(image)
     except Exception as exc:
-        if not want_cuda or not re.search(r"cuda|cudnn|cublas|gpu", str(exc), re.IGNORECASE):
+        if not want_cuda or not is_cuda_backend_error(exc):
             raise
         retry = True
         engine = None

@@ -1,0 +1,21 @@
+{
+  "scope": "Actual Linux source recovery with precise CUDA classification; development source, not packaged or Windows GPU proof",
+  "source": {
+    "revision": "0ad91ab85be4d526954f972d76812ce307492699",
+    "dirty": true,
+    "tree_sha256": "0c5e15ad0585bfe24fd08433ee1457b7edb2dc4b368b55e15b37ed523e8d3d3a"
+  },
+  "native_failures": [
+    {
+      "error": "OCR engine failed, exit code -6: 0.00.608.276 I cmn          init: llama threadpool init, n_threads = 8\n0.00.622.306 W load_tensors: ffn up/down are swapped\n0.00.946.542 I mtmd_cli_context: chat template example:\n<|im_start|>You are a helpful assistant\n\nUser: Hello<end_of_utterance>\nAssistant: Hi there<end_of_utterance>\nUser: How are you?<end_of_utterance>\nAssistant:\n0.00.946.545 I main: loading model: /home/dodobird/Dev/OCReady/models/vision/smol-q4/SmolVLM-256M-Instruct-Q4_0.gguf\n0.00.946.824 W WARN: This is an experimental CLI for testing multimodal capability.\n0.00.946.826 W       For normal use cases, please use the standard llama-cli\n/__w/llama.cpp/llama.cpp/ggml/src/ggml-cuda/ggml-cuda.cu:111: CUDA error\n0.01.025.818 E CUDA error: the provided PTX was compiled with an unsupported toolchain.\n0.01.025.822 E   current device: 0, in function ggml_cuda_kernel_can_use_pdl at /__w/llama.cpp/llama.cpp/ggml/src/ggml-cuda/common.cuh:1692\n0.01.025.822 E   cudaFuncGetAttributes(&attr, kernel)",
+      "exit_code": -6,
+      "cuda_failure": true
+    }
+  ],
+  "result": {
+    "backend": "CPU",
+    "note": "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR. CUDA failed to initialize; retried on CPU.",
+    "text": "Turn your screenshots into something useful. Select a word. Copy a sentence. Keep going.",
+    "peak_rss": 477614080
+  }
+}

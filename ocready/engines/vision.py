@@ -1,8 +1,8 @@
-import re
 import threading
 import time
 from pathlib import Path
 
+from ocready.core.backend_errors import is_cuda_backend_error
 from ocready.core.editions import Edition
 from ocready.core.memory import tree_rss
 from ocready.core.models import ModelPack
@@ -66,7 +66,8 @@ def recognize(image: Path, edition: Edition, pack: ModelPack, *, language: str =
         raise
     except OCRError as exc:
         # Retry only backend-initialization failures, never an arbitrary model/configuration error.
-        if not cuda or not re.search(r"cuda|cublas|gpu.*memory|out of memory", str(exc), re.IGNORECASE):
+        helper_disappeared = bool(pack.cuda_runner and not Path(pack.cuda_runner).expanduser().is_file())
+        if not cuda or not (helper_disappeared or is_cuda_backend_error(exc)):
             raise
         progress("CUDA could not initialize. Retrying on CPU…")
         process = run_process(command(pack, image, cuda=False), budget=edition.budget, cancel=cancel,

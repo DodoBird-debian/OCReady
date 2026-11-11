@@ -9,7 +9,6 @@ import unicodedata
 from pathlib import Path
 
 from ocready.core.timeouts import observed_workload_timeout_seconds
-from scripts.host_diagnostics import host_identity
 from scripts.packaged_environment import gui_test_platform, runtime_test_environment
 from scripts.provenance import file_sha256, source_record
 
@@ -82,6 +81,8 @@ def run_checked(command: list[str], *, timeout: float | None = None, diagnostic:
 
 
 def main() -> None:
+    from scripts.host_diagnostics import host_identity
+
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("directory", type=Path)
     parser.add_argument("--benchmark", action="store_true")

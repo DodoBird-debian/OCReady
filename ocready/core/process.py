@@ -5,12 +5,20 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
+from ocready.core.backend_errors import cuda_failure_detail
 from ocready.core.containment import start_worker
 from ocready.core.memory import stop_tree, tree_rss
 from ocready.core.timeouts import PROCESS_TIMEOUT_SECONDS
 from ocready.core.types import BudgetExceeded, Cancelled, OCRError
 
 MAX_OUTPUT = 8_000_000
+
+
+class WorkerFailed(OCRError):
+    def __init__(self, message: str, *, exit_code: int, cuda_failure: bool):
+        super().__init__(message)
+        self.exit_code = exit_code
+        self.cuda_failure = cuda_failure
 
 
 @dataclass(frozen=True)
@@ -71,7 +79,11 @@ def run_process(
                 if os.name == "nt":
                     status += f" (0x{exit_code & 0xFFFFFFFF:08X})"
                 detail = error.strip()[-1600:]
-                raise OCRError(f"OCR engine failed, {status}" + (f": {detail}" if detail else "."))
+                gpu_detail = cuda_failure_detail(error)
+                if gpu_detail and gpu_detail not in detail:
+                    detail = gpu_detail + "\n" + detail[-1200:]
+                raise WorkerFailed(f"OCR engine failed, {status}" + (f": {detail}" if detail else "."),
+                                   exit_code=exit_code, cuda_failure=bool(gpu_detail))
             return ProcessResult(output, error, peak, time.monotonic() - started,
                                  guard.mode, guard.limit_bytes, guard.peak_bytes)
         finally:

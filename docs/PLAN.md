@@ -1717,6 +1717,7 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M71.T2: Distinguish diagnostic mentions of CUDA devices/paths from an actual backend failure.
 - M71.T3: Recover to the intact CPU worker if an optional helper disappears after capability probing.
 - M71.T4: Preserve cancellation, budget failures and the single-retry limit across both engine families.
+- M71.T5: Bind shared error-classification code to compiled worker manifests and cache identities before reusing standalone helpers.
 - M71.V1: Exercise actual compatible/incompatible helpers as well as model errors whose paths/logs contain CUDA text.
 - M71.V2: Verify bounded diagnostic tails retain enough cause information for reliable decisions.
 - Release gate: Demonstrated CPU recovery for genuine initialization failures and no retry for unrelated failures.

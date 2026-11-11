@@ -1,11 +1,11 @@
 import json
 import math
-import re
 import threading
 from pathlib import Path
 
 from PIL import Image
 
+from ocready.core.backend_errors import is_cuda_backend_error
 from ocready.core.editions import Edition
 from ocready.core.memory import tree_rss
 from ocready.core.neural_packs import NeuralPack
@@ -84,7 +84,8 @@ def recognize(image: Path, edition: Edition, pack: NeuralPack, *, language: str 
     except (Cancelled, BudgetExceeded):
         raise
     except OCRError as exc:
-        if runner == pack.runner or not re.search(r"cuda|cudnn|cublas|gpu.*memory", str(exc), re.IGNORECASE):
+        helper_disappeared = runner != pack.runner and not Path(runner).expanduser().is_file()
+        if runner == pack.runner or not (helper_disappeared or is_cuda_backend_error(exc)):
             raise
         progress("CUDA could not initialize. Retrying neural OCR on CPU…")
         process = run_process(command(pack.runner, "cpu"), budget=edition.budget, cancel=cancel,

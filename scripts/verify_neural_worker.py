@@ -23,6 +23,7 @@ def verify_worker(folder: Path, *, source_root: Path = ROOT, dependencies: dict 
     if (not isinstance(metadata, dict) or type(metadata.get("protocol")) is not int or metadata["protocol"] != 1
             or metadata.get("entrypoint_sha256") != file_sha256(source_root / "native/neural_runner.py")
             or metadata.get("builder_sha256") != file_sha256(source_root / "scripts/build_neural_runner.py")
+            or metadata.get("backend_errors_sha256") != file_sha256(source_root / "ocready/core/backend_errors.py")
             or metadata.get("dependencies") != versions
             or metadata.get("python") != (python_version or sys.version.split()[0])
             or not isinstance(source_record, dict) or source_record.get("dirty") is not False):

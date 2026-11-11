@@ -12,6 +12,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from ocready.core.backend_errors import cuda_failure_detail
+
 
 def runner_path() -> Path:
     return Path(__file__).resolve().parent / "llama" / ("llama-mtmd-cli.exe" if os.name == "nt" else "llama-mtmd-cli")
@@ -79,7 +81,12 @@ def main(argv: list[str] | None = None) -> int:
             command.append("--no-mmproj-offload")
         result = subprocess.run(command, capture_output=True, timeout=300, env=environment(runner))
         if result.returncode:
-            sys.stderr.write(result.stderr.decode("utf-8", errors="replace")[-16_000:])
+            error = result.stderr.decode("utf-8", errors="replace")
+            tail = error[-16_000:]
+            sys.stderr.write(tail)
+            gpu_detail = cuda_failure_detail(error)
+            if gpu_detail and gpu_detail not in tail:
+                sys.stderr.write("\n" + gpu_detail + "\n")
             status = str(result.returncode)
             if os.name == "nt":
                 status += f" (0x{result.returncode & 0xFFFFFFFF:08X})"

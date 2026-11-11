@@ -34,11 +34,12 @@ def test_reference_worker_protocol_preserves_arabic_and_cpu_request(tmp_path, mo
     assert calls[0][calls[0].index("-ngl") + 1] == "0"
     assert "--no-mmproj-offload" in calls[0]
     monkeypatch.setattr(vision_bridge.subprocess, "run", lambda args, **_kwargs:
-                        subprocess.CompletedProcess(args, 17, b"", b"x" * 20000))
+                        subprocess.CompletedProcess(args, 17, b"", b"CUDA error: unsupported PTX toolchain\n" + b"x" * 20000))
     assert vision_bridge.main(["--ocready-vision-v1", "--image", str(image), "--model", "model.gguf",
                                "--projector", "projector.gguf", "--prompt", "Read it"]) == 2
     error = capsys.readouterr().err
     assert "Native vision runner exited with code 17" in error[-1600:]
+    assert "CUDA error: unsupported PTX" in error[-1600:]
     assert len(error) < 17000
     image.write_bytes(b"not an image")
     assert vision_bridge.main(["--ocready-vision-v1", "--image", str(image), "--model", "model.gguf",

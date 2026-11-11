@@ -142,6 +142,37 @@ def test_cuda_initialization_failure_retries_cpu(pack, tmp_path, monkeypatch):
     assert "retried on CPU" in result.note
 
 
+def test_cuda_device_mentions_do_not_retry_unrelated_model_errors(pack, tmp_path, monkeypatch):
+    calls = []
+    monkeypatch.setattr(vision, "has_cuda", lambda *_args: True)
+    def execute(*args, **kwargs):
+        calls.append(args)
+        raise OCRError("CUDA0 device found\nCould not read /models/cuda/invalid.gguf")
+    monkeypatch.setattr(vision, "run_process", execute)
+    with pytest.raises(OCRError, match="invalid.gguf"):
+        vision.recognize(tmp_path / "image.png", EDITIONS["studio"], pack)
+    assert len(calls) == 1
+
+
+def test_helper_removed_after_probe_still_recovers_on_cpu(pack, tmp_path, monkeypatch):
+    helper = tmp_path / "cuda-helper"
+    helper.write_bytes(b"helper")
+    pack = dataclasses.replace(pack, cuda_runner=str(helper))
+    def probe(*_args):
+        helper.unlink()
+        return True
+    monkeypatch.setattr(vision, "has_cuda", probe)
+    calls = []
+    def execute(args, **kwargs):
+        calls.append(args)
+        if len(calls) == 1:
+            raise OCRError("Could not start the OCR engine: file missing")
+        return ProcessResult("Read text", "", 500_000_000, 1)
+    monkeypatch.setattr(vision, "run_process", execute)
+    result = vision.recognize(tmp_path / "image.png", EDITIONS["studio"], pack)
+    assert len(calls) == 2 and calls[-1][0] == pack.runner and result.backend == "CPU"
+
+
 @pytest.mark.parametrize("error", [Cancelled("cancelled"), BudgetExceeded("budget")])
 def test_cancellation_or_budget_never_retried_as_cpu(pack, tmp_path, monkeypatch, error):
     calls = []

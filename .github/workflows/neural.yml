@@ -55,7 +55,7 @@ jobs:
         uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25
         with:
           path: runtime/neural-runner/cpu/neural_runner.dist
-          key: neural-worker-v1-${{ runner.os }}-${{ runner.arch }}-py${{ steps.python.outputs.python-version }}-${{ hashFiles('uv.lock', 'native/neural_runner.py', 'scripts/build_neural_runner.py', 'scripts/verify_neural_worker.py') }}
+          key: neural-worker-v1-${{ runner.os }}-${{ runner.arch }}-py${{ steps.python.outputs.python-version }}-${{ hashFiles('uv.lock', 'native/neural_runner.py', 'scripts/build_neural_runner.py', 'scripts/verify_neural_worker.py', 'ocready/core/backend_errors.py') }}
       - name: Compile standalone neural worker
         if: steps.worker-cache.outputs.cache-hit != 'true'
         run: uv run python -m scripts.build_neural_runner --jobs 2

@@ -73,6 +73,7 @@ def main() -> None:
     shutil.copy2(ROOT / "LICENSE", distribution / "LICENSE-OCReady.txt")
     require_unchanged(ROOT, source)
     metadata = {"protocol": 1, "adapter": "json-cli-v1", "source": source,
+                "backend_errors_sha256": file_sha256(ROOT / "ocready/core/backend_errors.py"),
                 "entrypoint_sha256": file_sha256(entrypoint), "python": sys.version.split()[0],
                 "native_runner_sha256": file_sha256(distribution / "llama" / runner.name),
                 "files": {p.relative_to(distribution).as_posix(): file_sha256(p) for p in sorted(distribution.rglob("*"))

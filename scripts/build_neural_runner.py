@@ -71,6 +71,7 @@ def main() -> None:
     require_unchanged(ROOT, source)
     metadata = {"source": source, "entrypoint_sha256": digest, "dependencies": versions,
                 "builder_sha256": file_sha256(Path(__file__)),
+                "backend_errors_sha256": file_sha256(ROOT / "ocready/core/backend_errors.py"),
                 "protocol": 1, "model_family": "PP-OCRv5", "python": sys.version.split()[0],
                 "files": {file.relative_to(distribution).as_posix(): file_sha256(file) for file in sorted(distribution.rglob("*"))
                           if file.is_file() and file.relative_to(distribution).as_posix() != "neural-build.json"}}

@@ -10,6 +10,8 @@ For built-in models, the CPU runner, weights and projector stay managed by the a
 
 The app probes the selected CUDA runner's actual devices. Auto mode uses CUDA only when that runner reports a CUDA device; initialization failures retry once with the CPU runner, all GPU layers disabled, and the projector on CPU. Cancellation and RAM-budget failures never trigger an additional inference attempt.
 
+CPU retry requires an explicit GPU backend failure, such as a CUDA initialization/driver error or GPU allocation failure. A CUDA filename or device listing alongside an unrelated model/input error does not trigger another attempt. The failure's native status and a bounded GPU-cause excerpt survive long diagnostic logs. If an optional helper disappears after its successful probe, the intact CPU runner can still recover.
+
 If an optional CUDA runner is removed after configuration, recognition uses the intact CPU runner and reports that fallback. Explicit CPU selection does not depend on the optional helper. Importing a manifest and preparing a build still require every configured file to exist; missing CPU runners, weights or projectors remain errors.
 
 Vision results are marked as AI transcription. They have no invented confidence or word coordinates. Use Fast or Precision OCR when you need to select individual words in the picture. Generative transcription can hallucinate, and model quality varies by language.
