@@ -153,3 +153,11 @@ The plan describes both the implementation sequence and release gates. Pending i
 - The newly compiled 269.7 MB vision-only Everyday binary passed small-image CLI/native GUI and all three headless memory cases (largest 826.4 MB). Its 8 MP GUI case was safely refused at an estimated 1,037 MB; admission reserves still need review. This is not a passing embedded large-GUI result.
 - Downloaded all six successful `65bd416` CI artifacts and independently verified their binary checksums and benchmark success. Largest observed peaks: Linux Pocket 301.6 MB, Everyday 549.3 MB, Studio 739.3 MB; Windows Pocket 306.9 MB, Everyday 495.1 MB, Studio 672.6 MB. These are the documented classical workloads.
 - Validation: 99 local tests and Ruff passed after the provenance/reporting fixes. Fresh builds are required to exercise the new manifest controls; the shared-preview source CI was already green on both platforms.
+
+## Iteration 15 — reserve image memory according to actual policy
+
+- Replaced the fixed extra 80 MB vision admission reserve with 16 MB plus 24 bytes per bounded input pixel. The runner estimate continues to cover weights, encoder, context and workspace; the additional application reserve covers six pixel buffers and the fixed safety margin.
+- A default 1 MP pack now reserves 40 MB, while a 2.56 MP pack reserves 77.4 MB. This avoids reserving almost the larger input allowance after the UI and engine have both been limited to 1 MP.
+- Added boundary tests: the compact policy admits a 500 MB runner beside a 457 MB resident app, refuses the same app with the larger image policy, and still refuses the compact policy if resident usage rises too far.
+- This is a conservative admission heuristic followed by native worker limits and RSS monitoring, not a claim that future allocations are known. A fresh clean-source embedded build is required to validate the previously refused GUI workload.
+- Validation: the 100-test suite exposed one old test's fixed-reserve assumption; its refusal case was updated to remain above the new budget boundary and the vision suite was rerun. Ruff passed.

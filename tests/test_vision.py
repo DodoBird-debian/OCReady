@@ -26,7 +26,7 @@ def test_model_validation_and_admission(pack):
     assert pack.admission(EDITIONS["studio"])[0]
     assert not pack.admission(EDITIONS["pocket"])[0]
     assert dataclasses.replace(pack, memory_mb=500).admission(EDITIONS["everyday"])[0]
-    assert not dataclasses.replace(pack, memory_mb=3799).admission(EDITIONS["studio"])[0]
+    assert not dataclasses.replace(pack, memory_mb=3800).admission(EDITIONS["studio"], 170_000_000)[0]
     Path(pack.projector).write_bytes(b"not GGUF")
     with pytest.raises(OCRError, match="not a GGUF"):
         pack.validate()
@@ -36,6 +36,14 @@ def test_model_validation_and_admission(pack):
 def test_invalid_vision_image_limits_are_rejected(pack, changes):
     with pytest.raises(OCRError):
         ModelPack.from_dict({**pack.to_dict(), **changes})
+
+
+def test_admission_reserves_space_for_the_selected_image_policy(pack):
+    compact = dataclasses.replace(pack, memory_mb=500)
+    assert compact.admission(EDITIONS["everyday"], 457_000_000)[0]
+    assert not compact.admission(EDITIONS["everyday"], 465_000_000)[0]
+    larger_input = dataclasses.replace(compact, max_pixels=2_560_000)
+    assert not larger_input.admission(EDITIONS["everyday"], 457_000_000)[0]
 
 
 def test_model_manifest_resolves_relative_paths(pack, tmp_path):

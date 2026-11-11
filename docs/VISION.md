@@ -71,4 +71,4 @@ A manifest uses these fields (paths may be relative to the manifest):
 }
 ```
 
-The memory estimate covers the complete runner, including both weight files, image encoder, cache, and working buffers. The app adds its current resident memory and another reserve. Estimates below raw weight sizes are raised to a minimum lower bound. Download size is never treated as a measured inference footprint.
+The memory estimate covers the complete runner, including both weight files, image encoder, cache, and working buffers. The app adds its current resident memory and an application reserve: 16 MB plus 24 bytes per bounded input pixel (six 4-byte pixel buffers). Estimates below raw weight sizes are raised to a minimum lower bound. This reserve is an admission heuristic, not an allocation proof; runtime worker limits and process-tree monitoring remain active. Download size is never treated as a measured inference footprint.

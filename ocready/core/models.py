@@ -64,7 +64,12 @@ class ModelPack:
             return False, "Local vision inference needs Everyday or Studio. Pocket uses compact classical OCR."
         # The estimate must include all runner buffers; raw model sizes are only a lower bound.
         weight_bytes = sum(Path(p).stat().st_size for p in (self.model, self.projector) if Path(p).is_file())
-        required = max(self.memory_mb * 1_000_000, weight_bytes + 128_000_000) + resident_bytes + 80_000_000
+        # The runner estimate already includes encoder/context/workspace. Keep
+        # a separate application reserve tied to the bounded preview/input,
+        # allowing six 4-byte pixel buffers plus the fixed worker safety margin.
+        pixels = min(edition.max_pixels, self.max_pixels, self.max_edge ** 2)
+        reserve = 16_000_000 + pixels * 24
+        required = max(self.memory_mb * 1_000_000, weight_bytes + 128_000_000) + resident_bytes + reserve
         if required >= edition.budget:
             return False, f"This pack needs an estimated {required / 1_000_000:.0f} MB including the app. It exceeds {edition.name}'s budget."
         return True, f"Estimated {required / 1_000_000:.0f} MB total; runtime memory is monitored. This estimate is not certification."
