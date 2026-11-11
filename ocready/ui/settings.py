@@ -24,6 +24,7 @@ from PySide6.QtWidgets import (
 )
 
 from ocready.__main__ import diagnostics
+from ocready.core.cuda_helpers import cuda_helper, save_cuda_helper
 from ocready.core.models import TRANSCRIPTION_PROMPT, ModelPack, load_pack, load_packs, save_packs
 from ocready.engines.vision_adapters import ADAPTERS
 from ocready.ui.neural_settings import NeuralSettings
@@ -40,8 +41,10 @@ class SettingsDialog(QDialog):
         outer = QVBoxLayout(self)
         outer.setContentsMargins(20, 20, 20, 20)
         tabs = QTabWidget()
+        tabs.setObjectName("SettingsTabs")
         outer.addWidget(tabs)
         runtime = QWidget()
+        runtime.setObjectName("SettingsPage")
         layout = QVBoxLayout(runtime)
         title = QLabel("Everything stays on your device.")
         title.setObjectName("PaneTitle")
@@ -55,6 +58,7 @@ class SettingsDialog(QDialog):
         layout.addWidget(details)
         tabs.addTab(runtime, "Offline OCR & diagnostics")
         models = QWidget()
+        models.setObjectName("SettingsPage")
         layout = QVBoxLayout(models)
         intro = QLabel("Add or swap local vision models. Everyday admits compact packs; Studio admits larger ones.\nChoose the runner's runtime and compatible model files. llama.cpp uses GGUF weights and a matching projector. Nothing is uploaded.")
         intro.setWordWrap(True)
@@ -182,6 +186,8 @@ class SettingsDialog(QDialog):
         for field in self.fields.values():
             field.clear()
             field.setReadOnly(False)
+            field.setToolTip("")
+            field.setPlaceholderText("")
         for browse in self.browse_buttons.values():
             browse.setEnabled(True)
         self.memory.setValue(2800)
@@ -202,10 +208,14 @@ class SettingsDialog(QDialog):
         self.adapter.setCurrentIndex(self.adapter.findData(pack.adapter))
         self.adapter.setEnabled(not pack.bundled)
         for key, field in self.fields.items():
-            field.setText(getattr(pack, key))
-            field.setReadOnly(pack.bundled)
-            self.browse_buttons[key].setEnabled(not pack.bundled)
-            field.setToolTip("Built-in assets are managed by this edition. Use New model for other external files." if pack.bundled else "")
+            helper = key == "cuda_runner" and pack.bundled
+            locked = pack.bundled and not helper
+            field.setText(cuda_helper("vision", pack.id, pack.adapter) if helper else getattr(pack, key))
+            field.setReadOnly(locked)
+            self.browse_buttons[key].setEnabled(not locked)
+            field.setPlaceholderText("Use the built-in runner" if helper else "")
+            field.setToolTip("Choose a compatible external CUDA runner, or clear to use the built-in runner. CPU fallback keeps the embedded weights." if helper else
+                             "Built-in assets are managed by this edition. Use New model for other external files." if locked else "")
         self.memory.setValue(pack.memory_mb)
         self.tokens.setValue(pack.tokens)
         self.pixels.setValue(pack.max_pixels // 1000)
@@ -224,11 +234,13 @@ class SettingsDialog(QDialog):
             existing = next((pack for pack in self.packs if pack.id == self.pack_id), None)
             base = existing or ModelPack(self.pack_id, self.name.text().strip(), "", "", "")
             pack = dataclasses.replace(base, name=self.name.text().strip(),
-                                       **{key: str(Path(field.text()).expanduser().resolve()) if field.text().strip() else "" for key, field in self.fields.items()},
+                                       **({} if base.bundled else {key: str(Path(field.text()).expanduser().resolve()) if field.text().strip() else "" for key, field in self.fields.items()}),
                                        memory_mb=self.memory.value(), tokens=self.tokens.value(), prompt=self.prompt.toPlainText(),
-                                       languages=self.languages.currentData(), adapter=self.adapter.currentData())
+                                       languages=self.languages.currentData(), adapter=base.adapter if base.bundled else self.adapter.currentData())
             pack = dataclasses.replace(pack, max_pixels=self.pixels.value() * 1000, max_edge=self.edge.value())
-            pack.validate()
+            pack.validate(require_cuda=not pack.bundled)
+            if pack.bundled:
+                save_cuda_helper("vision", pack.id, pack.adapter, self.fields["cuda_runner"].text())
             self._persist([p for p in self.packs if p.id != pack.id] + [pack])
             self.window.vision_backend = self.backend.currentData()
             self.list.setCurrentRow(next(i for i, p in enumerate(self.packs) if p.id == pack.id))

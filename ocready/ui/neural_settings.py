@@ -1,12 +1,14 @@
 import dataclasses
 from pathlib import Path
 
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QComboBox,
     QFileDialog,
     QFormLayout,
     QHBoxLayout,
     QLabel,
+    QLineEdit,
     QListWidget,
     QPlainTextEdit,
     QPushButton,
@@ -15,12 +17,15 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from ocready.core.cuda_helpers import NEURAL_ADAPTER, cuda_helper, save_cuda_helper
 from ocready.core.neural_packs import load_neural_pack, load_neural_packs, save_neural_packs
 
 
 class NeuralSettings(QWidget):
     def __init__(self, window):
         super().__init__()
+        self.setObjectName("SettingsPage")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.window = window
         self.packs = list(window.neural_packs)
         layout = QVBoxLayout(self)
@@ -41,7 +46,19 @@ class NeuralSettings(QWidget):
         self.details.setReadOnly(True)
         self.details.setMaximumHeight(115)
         layout.addWidget(self.details)
-        form = QFormLayout()
+        self.options = QWidget()
+        form = QFormLayout(self.options)
+        form.setContentsMargins(0, 0, 0, 0)
+        helper_row = QHBoxLayout()
+        self.cuda_runner = QLineEdit()
+        self.cuda_runner.setAccessibleName("Optional neural CUDA runner")
+        self.cuda_runner.setPlaceholderText("Use the pack's built-in runner")
+        self.cuda_runner.setToolTip("Choose a compatible external CUDA worker, or clear to use the built-in runner. The embedded model files are reused.")
+        helper_row.addWidget(self.cuda_runner, 1)
+        browse = QPushButton("Browse")
+        browse.clicked.connect(self.browse_cuda)
+        helper_row.addWidget(browse)
+        form.addRow("CUDA runner (optional)", helper_row)
         self.memory = QSpinBox()
         self.memory.setRange(100, 3800)
         self.memory.setSuffix(" MB")
@@ -64,10 +81,10 @@ class NeuralSettings(QWidget):
         self.decode.addItem("Visual order · tested Arabic PP-OCRv5 pack", "visual")
         self.decode.addItem("Already logical · advanced compatible models", "logical")
         form.addRow("Model text encoding", self.decode)
-        layout.addLayout(form)
-        save = QPushButton("Save pack options")
-        save.clicked.connect(self.save_options)
-        layout.addWidget(save)
+        layout.addWidget(self.options)
+        self.save_button = QPushButton("Save pack options")
+        self.save_button.clicked.connect(self.save_options)
+        layout.addWidget(self.save_button)
         self.message = QLabel("Import the pack.json supplied with a compatible local worker and models. Files remain on this device. Estimates are not memory certifications.")
         self.message.setWordWrap(True)
         layout.addWidget(self.message)
@@ -80,6 +97,8 @@ class NeuralSettings(QWidget):
         for pack in self.packs:
             self.list.addItem(pack.name)
         self.list.blockSignals(False)
+        self.options.setEnabled(bool(self.packs))
+        self.save_button.setEnabled(bool(self.packs))
         if self.packs:
             self.list.setCurrentRow(0)
         else:
@@ -95,6 +114,12 @@ class NeuralSettings(QWidget):
         self.edge.setValue(pack.max_edge)
         self.direction.setCurrentIndex(self.direction.findData(pack.direction))
         self.decode.setCurrentIndex(self.decode.findData(pack.decode))
+        self.cuda_runner.setText(cuda_helper("neural", pack.id, NEURAL_ADAPTER) if pack.bundled else pack.cuda_runner)
+
+    def browse_cuda(self):
+        path, _ = QFileDialog.getOpenFileName(self, "Choose a compatible neural CUDA worker", self.cuda_runner.text(), "All files (*)")
+        if path:
+            self.cuda_runner.setText(path)
 
     def persist(self, packs):
         save_neural_packs(packs)
@@ -132,7 +157,11 @@ class NeuralSettings(QWidget):
         try:
             pack = dataclasses.replace(self.packs[row], memory_mb=self.memory.value(), max_pixels=self.pixels.value() * 1000,
                                        max_edge=self.edge.value(), direction=self.direction.currentData(), decode=self.decode.currentData())
-            pack.validate()
+            if not pack.bundled:
+                pack = dataclasses.replace(pack, cuda_runner=str(Path(self.cuda_runner.text()).expanduser().resolve()) if self.cuda_runner.text().strip() else "")
+            pack.validate(require_cuda=not pack.bundled)
+            if pack.bundled:
+                save_cuda_helper("neural", pack.id, NEURAL_ADAPTER, self.cuda_runner.text())
             self.persist([pack if i == row else p for i, p in enumerate(self.packs)])
             self.list.setCurrentRow(row)
             self.message.setText("Pack options saved. Reading order affects newly recognized text.")

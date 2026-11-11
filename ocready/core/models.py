@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from ocready.core.admission import local_engine_admission
+from ocready.core.cuda_helpers import cuda_helper
 from ocready.core.editions import Edition
 from ocready.core.paths import build_profile, config_root, runtime_root
 from ocready.core.types import OCRError
@@ -150,7 +151,8 @@ def load_packs() -> list[ModelPack]:
                 packs[pack.id] = dataclasses.replace(packs[pack.id], **{key: getattr(pack, key) for key in PACK_OPTIONS})
         else:
             packs[pack.id] = pack
-    return list(packs.values())
+    return [dataclasses.replace(pack, cuda_runner=helper) if pack.bundled and
+            (helper := cuda_helper("vision", pack.id, pack.adapter)) else pack for pack in packs.values()]
 
 
 def save_packs(packs: list[ModelPack]) -> None:

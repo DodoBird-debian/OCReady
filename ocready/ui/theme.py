@@ -7,6 +7,14 @@ from ocready.core.paths import resource_root
 LIGHT = """
 QWidget { color: #25344c; font-size: 13px; }
 QMainWindow, QDialog { background: #f5f7fb; }
+QWidget#SettingsPage { background: #ffffff; }
+QTabWidget#SettingsTabs::pane { background: #ffffff; border: 1px solid #dce3ed; border-radius: 8px; }
+QTabWidget#SettingsTabs QTabBar::tab { background: #edf2fa; color: #57708f; border: 1px solid #dce3ed; border-bottom: none; border-top-left-radius: 7px; border-top-right-radius: 7px; padding: 10px 14px; margin-right: 4px; }
+QTabWidget#SettingsTabs QTabBar::tab:selected { background: #ffffff; color: #25344c; font-weight: 650; }
+QTabWidget#SettingsTabs QTabBar::tab:hover { color: #386bdf; }
+QTabWidget#SettingsTabs QListWidget { background: #ffffff; border: 1px solid #dce3ed; border-radius: 6px; padding: 4px; }
+QTabWidget#SettingsTabs QListWidget::item { padding: 5px; border-radius: 4px; }
+QTabWidget#SettingsTabs QListWidget::item:selected { background: #e6efff; color: #183d76; }
 QLabel#Brand { font-size: 22px; font-weight: 750; letter-spacing: -0.8px; }
 QLabel#Eyebrow { color: #57708f; font-size: 11px; font-weight: 700; letter-spacing: 1px; }
 QLabel#Hero { font-size: 28px; font-weight: 700; letter-spacing: -0.7px; }

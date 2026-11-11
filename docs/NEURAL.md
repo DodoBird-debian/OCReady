@@ -55,6 +55,8 @@ Import an external pack using **Settings → Neural OCR → Import local pack**.
 
 If an optional CUDA worker disappears after configuration, recognition selects the intact CPU worker with an explicit CPU request. CPU selection also remains available without that helper. Manifest import and build preparation still validate configured helpers strictly; missing CPU workers or model/dictionary files remain errors.
 
+The optional CUDA runner is editable under **Settings → Neural OCR**, including for built-in packs. Choose an external worker implementing the same neural protocol and save the pack options; the bundled detector, recognizer and dictionary are reused. Clearing the field restores the built-in runner. This selection remains separate from vision-model helpers and survives fresh application extractions. Configuring a helper does not establish that it supports CUDA or that its complete footprint fits an edition.
+
 ## Copy order and model provenance
 
 The tested Arabic CTC recognizer emits visual scan order. The worker converts it into logical Unicode for copying. Automatic conversion uses an Arabic paragraph base when Arabic is present; English-only runs keep their normal order, digits, punctuation and email addresses. For English-led paragraphs containing inline Arabic, choose **English paragraph base** in pack options. Bidi inversion is ambiguous for some mixed layouts; this option is explicit rather than silently reversing all text. Models that already emit logical text can disable the conversion.

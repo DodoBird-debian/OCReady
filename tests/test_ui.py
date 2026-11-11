@@ -930,6 +930,60 @@ def test_external_vision_runtime_can_be_swapped_in_native_settings(window, tmp_p
     dialog.close()
 
 
+@pytest.mark.parametrize("kind", ["vision", "neural"])
+def test_builtin_cuda_helper_can_be_saved_and_cleared_in_settings(window, tmp_path, monkeypatch, kind):
+    import json
+
+    from ocready.core import cuda_helpers, models, neural_packs
+    from ocready.ui.neural_settings import NeuralSettings
+    from ocready.ui.settings import SettingsDialog
+
+    module = models if kind == "vision" else neural_packs
+    runtime = tmp_path / "managed-runtime"
+    folder = runtime / kind / "builtin"
+    folder.mkdir(parents=True)
+    names = ("runner", "model", "projector") if kind == "vision" else ("runner", "detector", "recognizer", "dictionary")
+    for name in (*names, "cuda_runner"):
+        (folder / name).write_bytes(b"GGUFdata\n")
+    pack = (models.ModelPack("builtin", "Built in", *names, cuda_runner="cuda_runner", memory_mb=500) if kind == "vision"
+            else neural_packs.NeuralPack("builtin", "Built in", *names, cuda_runner="cuda_runner"))
+    (folder / "pack.json").write_text(json.dumps(pack.to_dict()))
+    monkeypatch.setattr(module, "runtime_root", lambda: runtime)
+    monkeypatch.setattr(cuda_helpers, "runtime_root", lambda: runtime)
+    monkeypatch.setattr(module, "build_profile", lambda: {"methods": [kind]})
+    external = tmp_path / "مسرع CUDA"
+    external.write_bytes(b"compatible helper")
+    load = models.load_packs if kind == "vision" else neural_packs.load_neural_packs
+    if kind == "vision":
+        window.packs = load()
+        settings = SettingsDialog(window)
+        settings.select_pack(0)
+        assert settings.fields["runner"].isReadOnly()
+        field = settings.fields["cuda_runner"]
+        assert not field.isReadOnly() and settings.browse_buttons["cuda_runner"].isEnabled()
+        # Managed asset identity is preserved even if a widget value is altered.
+        settings.fields["runner"].setText(str(tmp_path / "unwanted CPU override"))
+        save = settings.save_model
+    else:
+        window.neural_packs = load()
+        settings = NeuralSettings(window)
+        settings.select_pack(0)
+        field, save = settings.cuda_runner, settings.save_options
+    assert field.text() == ""
+    field.setText(str(external))
+    save()
+    assert load()[0].cuda_runner == str(external)
+    assert load()[0].runner == str(folder / "runner")
+    config = "".join(path.read_text() for path in module.config_root().glob("*.json"))
+    assert "managed-runtime" not in config
+    assert field.text() == str(external)
+    field.clear()
+    save()
+    assert load()[0].cuda_runner == str(folder / "cuda_runner")
+    assert field.text() == ""
+    settings.close()
+
+
 def test_switching_limited_models_restores_user_language_choice(window):
     from ocready.core.models import ModelPack
     window.edition_combo.setCurrentIndex(window.edition_combo.findData("everyday"))

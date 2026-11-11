@@ -1,0 +1,32 @@
+{
+  "scope": "Linux source bundled-model configuration with existing developer assets; not packaged or Windows GPU certification",
+  "source": {
+    "revision": "1d0ae47128da2435913d1e57fdc2acdf972cff4a",
+    "dirty": true,
+    "tree_sha256": "ebdb91ad4a4e4f416979b372c51432ac4fc64528e95097f3329121f6a20bd8a9"
+  },
+  "assets": {
+    "runner": "d1ba0e89d3c2938b1300193f674efd2eeadb6b5ef7539a07d7c9c98303e3e20d",
+    "model": "0574eaffbb56eea1b7eaddd6ed61e0b93ad5832fe3e939d272747faac94f4277",
+    "projector": "7e943f7c53f0382a6fc41b6ee0c2def63ba4fded9ab8ed039cc9e2ab905e0edd"
+  },
+  "helper_sha256": "baf8ce68e3aaae53d588a84b9b7bc03dd045c0dafcb48a745add2a64ca28976c",
+  "cases": [
+    {
+      "requested": "cuda",
+      "actual": "CUDA",
+      "text": "Turn your screenshots into something useful. Select a word. Copy a sentence. Keep going.",
+      "note": "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR.",
+      "elapsed": 1.964238023996586,
+      "peak_rss": 446025728
+    },
+    {
+      "requested": "cpu",
+      "actual": "CPU",
+      "text": "Turn your screenshots into something useful. Select a word. Copy a sentence. Keep going.",
+      "note": "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR.",
+      "elapsed": 3.1202103850082494,
+      "peak_rss": 479399936
+    }
+  ]
+}

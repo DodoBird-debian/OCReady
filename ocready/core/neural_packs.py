@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from ocready.core.admission import local_engine_admission
+from ocready.core.cuda_helpers import NEURAL_ADAPTER, cuda_helper
 from ocready.core.editions import Edition
 from ocready.core.paths import build_profile, config_root, runtime_root
 from ocready.core.types import OCRError
@@ -130,7 +131,8 @@ def load_neural_packs() -> list[NeuralPack]:
                 packs[pack.id] = dataclasses.replace(packs[pack.id], **{key: getattr(pack, key) for key in PACK_OPTIONS})
         else:
             packs[pack.id] = pack
-    return list(packs.values())
+    return [dataclasses.replace(pack, cuda_runner=helper) if pack.bundled and
+            (helper := cuda_helper("neural", pack.id, NEURAL_ADAPTER)) else pack for pack in packs.values()]
 
 
 def save_neural_packs(packs: list[NeuralPack]) -> None:

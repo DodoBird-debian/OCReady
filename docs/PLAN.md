@@ -1656,6 +1656,7 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M66.T5: Preserve adapter capability probing, cancellation, worker containment and driver-error classification.
 - M66.V1: Exercise fresh extraction paths, missing helpers, explicit CPU preference and genuine GPU/CPU fallback.
 - M66.V2: Verify complete host RAM, GPU VRAM and Windows PE layout for any published GPU composition.
+- M66.V3: Keep helper choices isolated by engine/model/adapter, reject managed extraction paths and restore built-in defaults when cleared.
 - Release gate: Actual compatible GPU execution and CPU recovery, with no automatic CUDA claim from a CPU-only packaged runtime.
 
 ## M67 — measured Pocket local-model feasibility
