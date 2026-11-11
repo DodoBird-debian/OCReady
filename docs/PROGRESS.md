@@ -129,3 +129,12 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Unlocated AI output now says “AI transcription” and disables unavailable word-box controls while preserving whole-text copying. It no longer masquerades as manually edited text.
 - The cgroup compatibility fix from iteration 10 is now green in both Linux and Windows CI, including native allocation/descendant tests.
 - Validation: 90 local tests and Ruff passed. Next priorities are fresh packaged builds, embedded-model image headroom, release artifacts, and continued capture/accuracy review.
+
+## Iteration 12 — shared vision preview and input limits
+
+- All six default Linux/Windows builds at `65bd416` passed packaged CLI, native GUI, and cap-sized memory checks. The corresponding local Pocket executable also passed, with a 313.6 MB maximum observed GUI RSS including its launcher.
+- Added per-pack image limits shared by preview and inference, defaulting to 1 MP / 1600-pixel longest edge. Switching methods refreshes only when the image policy changes; returning to classical OCR restores its larger preview. Original working pixels remain available for crop/view operations.
+- Reduced temporary preprocessing copies and fit images before color-filter buffers are allocated. Native tests verify exact preview/engine pixels and source preservation across cleanup, method changes, and settings edits.
+- Added model image-limit controls and manifest validation. Corrected the compiled benchmark's method selection for vision-only binaries and rejected unsupported benchmark combinations explicitly.
+- Real Q4 SmolVLM source inference passed four fresh-process scenarios, including four repeated 8 MP GUI jobs; maximum observed peak was 735.0 MB. These stress cases validate memory/inference, not tiled-image transcription accuracy.
+- Validation: 96 tests and Ruff passed. The updated embedded Everyday vision-only binary is compiling for its own cap-sized checks. Settings now need a scrollable layout for small screens; broader bilingual accuracy and real desktop capture remain open priorities.

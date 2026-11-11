@@ -32,6 +32,12 @@ def test_model_validation_and_admission(pack):
         pack.validate()
 
 
+@pytest.mark.parametrize("changes", [{"max_pixels": True}, {"max_pixels": 1}, {"max_edge": "1600"}, {"max_edge": 5000}])
+def test_invalid_vision_image_limits_are_rejected(pack, changes):
+    with pytest.raises(OCRError):
+        ModelPack.from_dict({**pack.to_dict(), **changes})
+
+
 def test_model_manifest_resolves_relative_paths(pack, tmp_path):
     record = pack.to_dict()
     for key in ("runner", "model", "projector"):

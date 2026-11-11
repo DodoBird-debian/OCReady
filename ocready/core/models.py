@@ -30,6 +30,8 @@ class ModelPack:
     license: str = "See the model's license"
     languages: str = "ara+eng"
     bundled: bool = False
+    max_pixels: int = 1_000_000
+    max_edge: int = 1600
 
     def validate(self) -> None:
         if not re.fullmatch(r"[a-zA-Z0-9_-]{1,60}", self.id):
@@ -40,6 +42,8 @@ class ModelPack:
             raise OCRError("The generation limit must be between 64 and 2048 tokens.")
         if not 100 <= self.memory_mb <= 3800:
             raise OCRError("Set a runner memory estimate between 100 and 3800 MB.")
+        if not 250_000 <= self.max_pixels <= 2_560_000 or not 512 <= self.max_edge <= 1600:
+            raise OCRError("Vision input limits must be 0.25–2.56 million pixels and 512–1600 pixels per edge.")
         if not self.prompt.strip() or len(self.prompt) > 4000:
             raise OCRError("Set a nonempty transcription prompt shorter than 4000 characters.")
         if self.languages not in {"ara+eng", "ara", "eng"}:
@@ -78,8 +82,10 @@ class ModelPack:
             if not all(isinstance(getattr(pack, field), str) for field in
                        ("id", "name", "runner", "model", "projector", "cuda_runner", "prompt", "source", "license", "languages")):
                 raise ValueError("paths and names must be strings")
-            if type(pack.memory_mb) is not int or type(pack.tokens) is not int:
-                raise ValueError("memory and token limits must be integers")
+            if any(type(getattr(pack, key)) is not int for key in ("memory_mb", "tokens", "max_pixels", "max_edge")):
+                raise ValueError("memory, token and image limits must be integers")
+            if not 250_000 <= pack.max_pixels <= 2_560_000 or not 512 <= pack.max_edge <= 1600:
+                raise ValueError("vision image limits are out of range")
             if type(pack.bundled) is not bool:
                 raise ValueError("bundled must be a boolean")
             return pack

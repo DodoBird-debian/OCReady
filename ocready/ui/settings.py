@@ -96,6 +96,21 @@ class SettingsDialog(QDialog):
         self.tokens.setSuffix(" tokens")
         row.addWidget(self.tokens)
         form.addRow("Runner RAM estimate", row)
+        row = QHBoxLayout()
+        self.pixels = QSpinBox()
+        self.pixels.setRange(250, 2560)
+        self.pixels.setSingleStep(250)
+        self.pixels.setValue(1000)
+        self.pixels.setSuffix(" thousand pixels")
+        self.pixels.setToolTip("Bounds both the preview and AI input. Smaller values reserve RAM; crop the original to keep small text readable.")
+        row.addWidget(self.pixels)
+        row.addWidget(QLabel("Longest edge"))
+        self.edge = QSpinBox()
+        self.edge.setRange(512, 1600)
+        self.edge.setValue(1600)
+        self.edge.setSuffix(" px")
+        row.addWidget(self.edge)
+        form.addRow("AI image limit", row)
         self.backend = QComboBox()
         for name, key in (("Automatic · CUDA when usable, otherwise CPU", "auto"), ("CPU", "cpu"), ("Prefer CUDA · fall back to CPU", "cuda")):
             self.backend.addItem(name, key)
@@ -144,6 +159,8 @@ class SettingsDialog(QDialog):
             field.clear()
         self.memory.setValue(2800)
         self.tokens.setValue(512)
+        self.pixels.setValue(1000)
+        self.edge.setValue(1600)
         self.prompt.setPlainText(TRANSCRIPTION_PROMPT)
 
     def select_pack(self, row: int) -> None:
@@ -156,6 +173,8 @@ class SettingsDialog(QDialog):
             field.setText(getattr(pack, key))
         self.memory.setValue(pack.memory_mb)
         self.tokens.setValue(pack.tokens)
+        self.pixels.setValue(pack.max_pixels // 1000)
+        self.edge.setValue(pack.max_edge)
         self.prompt.setPlainText(pack.prompt)
         self.languages.setCurrentIndex(self.languages.findData(pack.languages))
 
@@ -173,6 +192,7 @@ class SettingsDialog(QDialog):
                                        **{key: str(Path(field.text()).expanduser().resolve()) if field.text().strip() else "" for key, field in self.fields.items()},
                                        memory_mb=self.memory.value(), tokens=self.tokens.value(), prompt=self.prompt.toPlainText(),
                                        languages=self.languages.currentData())
+            pack = dataclasses.replace(pack, max_pixels=self.pixels.value() * 1000, max_edge=self.edge.value())
             pack.validate()
             self._persist([p for p in self.packs if p.id != pack.id] + [pack])
             self.window.vision_backend = self.backend.currentData()

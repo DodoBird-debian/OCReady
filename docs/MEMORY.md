@@ -17,7 +17,7 @@ Machine: AMD Ryzen 5 3600, Debian 13, Python 3.12.16, Qt/PySide 6.8.3, Tesseract
 
 Everyday and Studio used Precision (best language data); Pocket used Fast. The repeated GUI workload includes loading, display, recognition, and retained buffers between four documents. It does not prove an absence of leaks over an unlimited session. These runs passed their respective budgets.
 
-The current compiled Linux Pocket onefile artifact also passed four cases while an external observer included the onefile launcher and extraction overhead: 198.3 MB sample, 199.9 MB inverted image, 198.2 MB cap-sized image, and **311.9 MB for the full cap-sized GUI**. The prior 3 MP Pocket cap reached 347.3 MB. Reducing it to 2 MP restored about 35 MB of measured headroom. The internal governor now also counts Nuitka's actual parent launcher, after verifying the environment PID is the real OS parent.
+The compiled Linux Pocket onefile artifact at `65bd416` passed four cases while an external observer included the onefile launcher and extraction overhead: 200.1 MB sample, 200.2 MB inverted image, 200.0 MB cap-sized image, and **313.6 MB for the full cap-sized GUI**. The prior 3 MP Pocket cap reached 347.3 MB. Reducing it to 2 MP restored useful headroom. The internal governor also counts Nuitka's actual parent launcher, after verifying the environment PID is the real OS parent.
 
 A separate real GLM-OCR Q8 CPU run on the small bilingual image observed 1.86 GB total RSS. A compatible locally built CUDA runner completed the same image in 6.9 seconds with 1.24 GB host RSS; an incompatible upstream runner had already exercised real CPU fallback. These are different workloads from the table and do not certify large-image VLM inference.
 
@@ -36,7 +36,7 @@ The benchmark emits a nonzero exit code if an observed budget is exceeded or an 
 
 ## Whole-tree monitoring and worker containment
 
-The recognition runner samples process-tree RSS every 40 ms, including the resident onefile launcher when present, stops a job that exceeds its edition's budget, and always cleans up the child process. The image decoder, processing pixel limits, sequential engine loading, one OpenMP thread, bounded context/output, and model admission reduce the chance of exceeding a budget. VLM images are also fitted within 1600 × 1600 before inference, in addition to the runner's image-token limit.
+The recognition runner samples process-tree RSS every 40 ms, including the resident onefile launcher when present, stops a job that exceeds its edition's budget, and always cleans up the child process. The image decoder, processing pixel limits, sequential engine loading, one OpenMP thread, bounded context/output, and model admission reduce the chance of exceeding a budget. VLM preview and inference images share a per-pack cap, defaulting to one million pixels and a 1600-pixel longest edge, in addition to the runner's image-token limit. The larger working source remains available for cropping.
 
 Workers now also receive an OS allocation allowance: edition budget minus the application's observed resident memory and a 16 MB reserve, rounded down to a page boundary. Jobs are refused before launch if fewer than 16 MB remain.
 

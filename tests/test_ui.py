@@ -314,3 +314,61 @@ def test_vision_text_can_be_copied_without_fabricating_source_boxes(window):
     assert not window.editor.linked
     assert not window.boxes.isEnabled()
     assert window.link_status.text() == "AI transcription"
+
+
+def test_vision_preview_matches_engine_input_and_preserves_original(window, monkeypatch):
+    from PIL import Image
+
+    from ocready.core.models import ModelPack
+    from ocready.core.types import OCRResult
+    from ocready.engines import vision
+    window.edition_combo.setCurrentIndex(window.edition_combo.findData("everyday"))
+    pack = ModelPack("compact", "Compact", "runner", "model", "projector", memory_mb=500,
+                     languages="eng", max_pixels=500_000, max_edge=1000)
+    window.packs = [pack]
+    window.refresh_methods()
+    source = Image.new("RGB", (2400, 1800), (20, 30, 40))
+    window._set_source(source, "Large screenshot")
+    full_size = window.preview.size
+    window.method_combo.setCurrentIndex(window.method_combo.findData("vision:compact"))
+    assert window.preview.width * window.preview.height <= pack.max_pixels
+    assert max(window.preview.size) <= pack.max_edge
+    assert window.view_original.isEnabled()
+    assert window.source is source
+    window.recipe = Recipe(invert=True, rotation=90, threshold=100)
+    window._apply_recipe()
+    expected = window.preview.copy()
+
+    def read_image(path, *_args, **_kwargs):
+        with Image.open(path) as image:
+            assert image.size == expected.size
+            assert image.tobytes() == expected.tobytes()
+        return OCRResult("transcribed", engine="vision:compact")
+
+    monkeypatch.setattr(vision, "recognize", read_image)
+    recognize_image(source, Request(window.edition, "eng", "vision:compact", recipe=window.recipe, model_pack=pack))
+    assert source.getpixel((0, 0)) == (20, 30, 40)
+    window.reset_recipe()
+    window.method_combo.setCurrentIndex(window.method_combo.findData("tesseract-fast"))
+    assert window.preview.size == full_size
+
+
+def test_model_image_limits_survive_settings_edits(window, tmp_path):
+    from ocready.core.models import ModelPack
+    from ocready.ui.settings import SettingsDialog
+    for name in ("model", "projector"):
+        (tmp_path / name).write_bytes(b"GGUFdata")
+    runner = tmp_path / "runner"
+    runner.write_text("test")
+    pack = ModelPack("compact", "Compact", str(runner), str(tmp_path / "model"), str(tmp_path / "projector"),
+                     memory_mb=500, max_pixels=750_000, max_edge=1200)
+    window.packs = [pack]
+    dialog = SettingsDialog(window)
+    dialog.select_pack(0)
+    assert dialog.pixels.value() == 750
+    assert dialog.edge.value() == 1200
+    dialog.edge.setValue(1024)
+    dialog.save_model()
+    assert window.packs[0].max_pixels == 750_000
+    assert window.packs[0].max_edge == 1024
+    dialog.close()

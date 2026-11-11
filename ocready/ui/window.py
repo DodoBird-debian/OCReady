@@ -30,7 +30,7 @@ from ocready.core.images import load_image
 from ocready.core.memory import tree_rss
 from ocready.core.models import load_packs
 from ocready.core.paths import build_profile, resource_root
-from ocready.core.pipeline import Request
+from ocready.core.pipeline import Request, image_policy
 from ocready.core.preprocess import Recipe, preprocess
 from ocready.core.settings import load_settings, save_settings
 from ocready.core.text import selected_text, unwrap_lines
@@ -82,6 +82,7 @@ class MainWindow(QMainWindow):
         self.vision_backend = self.preferences.get("vision_backend", "auto")
         self.source: Image.Image | None = None
         self.preview: Image.Image | None = None
+        self._preview_limits: tuple[int, int] | None = None
         self.recipe = Recipe()
         self.result: OCRResult | None = None
         self.alternatives: list[OCRResult] = []
@@ -490,12 +491,15 @@ class MainWindow(QMainWindow):
         if self.source is None:
             return
         try:
-            self.preview = preprocess(self.source, self.recipe, self.edition)
-            self.view_original.setEnabled(self.recipe != Recipe())
+            policy = self._image_policy()
+            self.preview = preprocess(self.source, self.recipe, policy)
+            self._preview_limits = (policy.max_pixels, policy.max_edge)
+            self.view_original.setEnabled(self.recipe != Recipe() or self.preview.size != self.source.size)
             self.view_original.setChecked(False)
+            self.view_original.setText("Show original")
             self.canvas.set_image(self.preview)
             self.image_info.setText(f"{self.preview.width} × {self.preview.height} · {self._source_name}")
-            self.image_info.setToolTip(self.recipe.label)
+            self.image_info.setToolTip(self.recipe.label + (" · AI preview is reduced to reserve model memory. Crop the original for small text." if str(self.method_combo.currentData()).startswith("vision:") else ""))
             if self.result:
                 self.editor.invalidate_link()
                 self.result = None
@@ -542,8 +546,6 @@ class MainWindow(QMainWindow):
         if not hasattr(self, "method_combo"):
             return
         self.refresh_methods()
-        if self.source is not None:
-            self._apply_recipe()
         if hasattr(self, "memory"):
             self._update_memory()
 
@@ -583,6 +585,14 @@ class MainWindow(QMainWindow):
                 self.language_combo.setCurrentIndex(self.language_combo.findData(pack.languages))
         item = self.method_combo.model().item(self.method_combo.currentIndex())
         self.recognize_button.setEnabled(self.source is not None and not self.worker and item is not None and item.isEnabled())
+        policy = self._image_policy()
+        if self.source is not None and self._preview_limits != (policy.max_pixels, policy.max_edge):
+            self._apply_recipe()
+
+    def _image_policy(self):
+        method = str(self.method_combo.currentData())
+        pack = next((p for p in self.packs if method == f"vision:{p.id}"), None)
+        return image_policy(self.edition, method, pack)
 
     def recognize(self) -> None:
         if self.source is None or self.worker or not self._confirm_replace():

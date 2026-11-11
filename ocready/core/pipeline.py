@@ -2,7 +2,7 @@ import tempfile
 import threading
 import time
 from collections.abc import Callable
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 from PIL import Image
@@ -26,16 +26,20 @@ class Request:
     backend: str = "auto"
 
 
+def image_policy(edition: Edition, method: str, pack: ModelPack | None = None) -> Edition:
+    """Use identical input bounds for the displayed preview and engine image."""
+    if not method.startswith("vision"):
+        return edition
+    return replace(edition, max_pixels=min(edition.max_pixels, pack.max_pixels if pack else 1_000_000),
+                   max_edge=min(edition.max_edge, pack.max_edge if pack else 1600))
+
+
 def recognize_image(source: Image.Image, request: Request, *, cancel: threading.Event | None = None,
                     progress: Callable[[str], None] = lambda _: None) -> tuple[OCRResult, list[OCRResult]]:
     cancel = cancel or threading.Event()
     started = time.monotonic()
     progress("Preparing image…")
-    processed = preprocess(source, request.recipe, request.edition)
-    if request.method.startswith("vision"):
-        # Vision-encoder activation memory can grow rapidly with image size.
-        # Bound the image before handing it to a user-supplied VLM runner.
-        processed.thumbnail((1600, 1600), Image.Resampling.LANCZOS)
+    processed = preprocess(source, request.recipe, image_policy(request.edition, request.method, request.model_pack))
     results = []
     with tempfile.TemporaryDirectory(prefix="ocready-ocr-") as directory:
         image_path = Path(directory) / "image.png"

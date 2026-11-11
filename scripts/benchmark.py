@@ -139,6 +139,11 @@ def main() -> int:
         image, edition, output, loops = args.gui_child
         return gui_child(image, edition, output, int(loops), args.vision_pack)
     editions = list(EDITIONS) if args.edition == "all" else [args.edition]
+    binary_profile = json.loads((args.binary.parent / "build-manifest.json").read_text(encoding="utf-8")) if args.binary else None
+    if binary_profile and editions != [binary_profile["edition"]]:
+        parser.error("--edition must match the compiled binary's edition")
+    if args.binary and args.vision_pack:
+        parser.error("Benchmark embedded vision packs through their binary's default method; --vision-pack is for source runs")
     records = []
     with tempfile.TemporaryDirectory(prefix="ocready-benchmark-") as temporary:
         temporary = Path(temporary)
@@ -154,7 +159,7 @@ def main() -> int:
                     from ocready.core.models import load_pack
                     pack = load_pack(args.vision_pack)
                     command += ["--method", "vision", "--model-pack", str(args.vision_pack.resolve()), "--language", pack.languages]
-                elif edition != "pocket":
+                elif edition != "pocket" and (not binary_profile or "tesseract-best" in binary_profile["methods"]):
                     command += ["--method", "tesseract-best"]
                 if scenario == "dark":
                     command.append("--invert")

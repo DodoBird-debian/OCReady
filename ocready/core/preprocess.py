@@ -1,3 +1,4 @@
+import math
 from dataclasses import dataclass
 
 from PIL import Image, ImageEnhance, ImageOps
@@ -47,7 +48,9 @@ class Recipe:
 
 
 def preprocess(source: Image.Image, recipe: Recipe, edition: Edition) -> Image.Image:
-    image = source.copy()
+    # Every operation below returns a new image. Avoid a full-size copy before
+    # reducing a large source to a compact model's input dimensions.
+    image = source
     if recipe.crop:
         c = recipe.crop
         left, top = min(c.x, image.width), min(c.y, image.height)
@@ -62,6 +65,12 @@ def preprocess(source: Image.Image, recipe: Recipe, edition: Edition) -> Image.I
         image = ImageOps.mirror(image)
     if recipe.flip:
         image = ImageOps.flip(image)
+    # Bound dimensions before color filters allocate their working buffers.
+    factor = min(recipe.scale, edition.max_edge / max(image.size),
+                 math.sqrt(edition.max_pixels / (image.width * image.height)))
+    if factor != 1:
+        image = image.resize((max(1, int(image.width * factor)), max(1, int(image.height * factor))),
+                             Image.Resampling.LANCZOS)
     if recipe.invert:
         image = ImageOps.invert(image)
     if recipe.grayscale:
@@ -72,11 +81,4 @@ def preprocess(source: Image.Image, recipe: Recipe, edition: Edition) -> Image.I
         image = ImageEnhance.Contrast(image).enhance(recipe.contrast)
     if recipe.threshold is not None:
         image = ImageOps.grayscale(image).point(lambda value: 255 if value >= recipe.threshold else 0)
-    if recipe.scale != 1:
-        # Fit the desired dimensions before allocation, rather than upscaling then shrinking.
-        import math
-        factor = min(recipe.scale, edition.max_edge / max(image.size),
-                     math.sqrt(edition.max_pixels / (image.width * image.height)))
-        image = image.resize((max(1, int(image.width * factor)), max(1, int(image.height * factor))),
-                             Image.Resampling.LANCZOS)
     return fit_image(image, edition).convert("RGB")

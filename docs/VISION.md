@@ -8,6 +8,8 @@ The app probes the selected CUDA runner's actual devices. Auto mode uses CUDA on
 
 Vision results are marked as AI transcription. They have no invented confidence or word coordinates. Use Fast or Precision OCR when you need to select individual words in the picture. Generative transcription can hallucinate, and model quality varies by language.
 
+AI preview and inference use the same image limits: by default one million pixels and a 1600-pixel longest edge. These limits reduce preview buffers as well as encoder input. The working original is retained for viewing and cropping. If small characters disappear in the reduced preview, crop that area from the original before recognizing. Settings → Vision models exposes both limits, within the supported bounds of 0.25–2.56 million pixels and 512–1600 pixels per edge. Fast and Precision retain their edition's larger image limits.
+
 ## A tested CPU configuration
 
 - Runner: llama.cpp `b12255`, `llama-mtmd-cli`, Linux x86_64 CPU release.
@@ -27,6 +29,8 @@ These single-image measurements do not certify a universal 4 GB ceiling. The app
 The [SmolVLM-256M model card](https://huggingface.co/HuggingFaceTB/SmolVLM-256M-Instruct) declares English support. The Q8 GGUF plus projector total about 279 MB on disk, and the real CPU run used about 491 MB including the small headless application. It read the sample's three English paragraphs and omitted the Arabic. OCReady therefore requires an English-only language setting for this pack; it is not an Arabic OCR replacement.
 
 Four Everyday source workloads passed with this pack, including an 8 MP tiled-image case and repeated native GUI runs. The largest observed GUI process-tree RSS was **847.5 MB**. See [the raw report](benchmarks/linux-everyday-smolvlm.json).
+
+With the shared one-million-pixel preview/input limit, the Q4 model passed the same four source workloads. Its repeated 8 MP GUI peak was **735.0 MB**. See [the Q4 bounded-input report](benchmarks/linux-everyday-smolvlm-q4-bounded.json). This measures memory and successful inference, not transcription accuracy on the tiled stress image.
 
 A Q4 variant of the language model was also tested in an **entirely embedded, vision-only executable**: a 269.6 MB Linux binary containing the runner, model and projector. Its real small-image headless run observed **775 MB**, including the onefile launcher, and its native GUI also passed transcription checks. This validates single-method/all-in-one packaging. Cap-sized embedded-vision workloads still need further tuning and verification; an oversized job is refused rather than bypassing the memory budget.
 
@@ -60,6 +64,8 @@ A manifest uses these fields (paths may be relative to the manifest):
   "projector": "./mmproj-GLM-OCR-Q8_0.gguf",
   "cuda_runner": "",
   "memory_mb": 2800,
+  "max_pixels": 1000000,
+  "max_edge": 1600,
   "tokens": 512,
   "prompt": "Text Recognition:"
 }
