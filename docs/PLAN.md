@@ -1669,6 +1669,7 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M67.T5: Revisit hardcoded edition restrictions only after a complete configuration demonstrates the required budget.
 - M67.V1: Require clean Linux/Windows CLI, native clipboard GUI and cap-sized process-tree measurements below 350,000,000 bytes.
 - M67.V2: Evaluate actual supported-language accuracy and failure/fallback behavior before adding an enabled Pocket model choice.
+- M67.V3: Measure source Qt/clipboard buffers separately, keep the workspace responsive and preserve existing user settings during feasibility experiments.
 - M67.T6: Retain component-only native measurements separately from complete Qt/clipboard/onefile evidence, including accuracy changes from quantized projectors and shorter contexts.
 - Release gate: Measured complete configurations, otherwise retain the verified classical Pocket default and document the results.
 

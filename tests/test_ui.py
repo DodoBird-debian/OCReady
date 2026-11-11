@@ -984,6 +984,40 @@ def test_builtin_cuda_helper_can_be_saved_and_cleared_in_settings(window, tmp_pa
     settings.close()
 
 
+def test_vision_feasibility_workspace_isolates_settings_and_keeps_pocket_policy(app, tmp_path, monkeypatch):
+    import sys
+
+    from PySide6.QtCore import QTimer
+    from PySide6.QtGui import QImage
+
+    from ocready.core.paths import resource_root
+    from scripts.probe_vision_memory import measure, qt_workspace
+
+    config = tmp_path / "existing-preferences"
+    config.mkdir()
+    marker = config / "keep.txt"
+    marker.write_bytes(b"existing settings stay intact")
+    for key in ("XDG_CONFIG_HOME", "APPDATA"):
+        monkeypatch.setenv(key, str(config))
+    events = []
+    signal = tmp_path / "qt-event-handled"
+    with qt_workspace() as (probe_app, window):
+        assert probe_app is app
+        assert os.environ["XDG_CONFIG_HOME"] != str(config)
+        assert not window.edition.vision and window.edition.budget == 350_000_000
+        app.clipboard().setImage(QImage(str(resource_root() / "assets/sample-bilingual.png")))
+        assert window.paste_image()
+        assert window.source.size == (1100, 720)
+        QTimer.singleShot(0, lambda: (signal.write_bytes(b"ready"), events.append("responsive")))
+        code = "import sys,time\nfrom pathlib import Path\nwhile not Path(sys.argv[1]).exists(): time.sleep(.01)\nprint('owned worker')"
+        result = measure([sys.executable, "-c", code, str(signal)], sys.executable,
+                         timeout_seconds=5, process_events=app.processEvents)
+        assert result["exit_code"] == 0 and events == ["responsive"]
+        assert result["experiment_tree_peak_rss_bytes"] >= result["worker_tree_peak_rss_bytes"] > 0
+    assert os.environ["XDG_CONFIG_HOME"] == os.environ["APPDATA"] == str(config)
+    assert list(config.iterdir()) == [marker] and marker.read_bytes() == b"existing settings stay intact"
+
+
 def test_switching_limited_models_restores_user_language_choice(window):
     from ocready.core.models import ModelPack
     window.edition_combo.setCurrentIndex(window.edition_combo.findData("everyday"))
