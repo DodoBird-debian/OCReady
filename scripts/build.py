@@ -119,6 +119,7 @@ def main() -> None:
                "--report=" + str(out / "compilation-report.xml")]
     if os.name == "nt":
         command += ["--windows-console-mode=attach", "--company-name=OCReady", "--product-name=OCReady",
+                    f"--windows-icon-from-ico={ROOT / 'assets/ocready.ico'}",
                     "--file-version=0.1.0.0", "--product-version=0.1.0.0"]
     env = os.environ.copy()
     env["PATH"] = str(Path(sys.executable).parent) + os.pathsep + env.get("PATH", "")
@@ -137,6 +138,8 @@ def main() -> None:
             print(f"Windows PE: machine={layout['machine']} file={layout['file_bytes']} mapped image={layout['image_bytes']}", flush=True)
             if layout["machine"] != "0x8664" or not layout["pe32_plus_under_2gib"]:
                 raise RuntimeError("The Windows image exceeds the supported x64 PE32+ layout. Use smaller quantized packs.")
+            if not {3, 14} <= set(layout["resource_types"]):
+                raise RuntimeError("The Windows executable is missing icon/group-icon resources.")
         digest = file_sha256(artifact)
         artifact.with_suffix(artifact.suffix + ".sha256").write_text(f"{digest}  {artifact.name}\n")
         print(f"Built {artifact} ({artifact.stat().st_size / 1_000_000:.1f} MB)")

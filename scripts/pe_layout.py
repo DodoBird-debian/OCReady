@@ -39,5 +39,27 @@ def inspect_pe(path: Path) -> dict:
             sections.append({"name": section[:8].rstrip(b"\x00").decode("ascii", errors="replace"),
                              "virtual_size": virtual_size, "virtual_address": address,
                              "raw_size": raw_size, "raw_offset": raw_offset})
+        resource_types = []
+        if optional_size >= 136 and struct.unpack_from("<I", optional, 108)[0] >= 3:
+            resource_rva, resource_size = struct.unpack_from("<II", optional, 128)
+            if resource_rva:
+                def read_resource(offset, length):
+                    if offset + length > resource_size:
+                        raise ValueError("The PE resource table exceeds its declared size.")
+                    for section in sections:
+                        relative = resource_rva + offset - section["virtual_address"]
+                        if 0 <= relative and relative + length <= section["raw_size"]:
+                            stream.seek(section["raw_offset"] + relative)
+                            value = stream.read(length)
+                            if len(value) == length:
+                                return value
+                    raise ValueError("The PE resource table extends past its file section.")
+                named, numbered = struct.unpack_from("<HH", read_resource(0, 16), 12)
+                count = named + numbered
+                if count > 4096:
+                    raise ValueError("The PE resource table has too many root entries.")
+                entries = read_resource(16, count * 8)
+                resource_types = sorted({struct.unpack_from("<I", entries, index * 8)[0]
+                                         for index in range(named, count)})
     return {"file_bytes": file_size, "machine": hex(machine), "image_bytes": image_size, "sections": sections,
-            "pe32_plus_under_2gib": image_size < 2 ** 31}
+            "pe32_plus_under_2gib": image_size < 2 ** 31, "resource_types": resource_types}

@@ -49,12 +49,23 @@ jobs:
         if: github.event_name != 'workflow_dispatch' || inputs.edition == 'all' || inputs.edition == matrix.edition
         run: uv run python scripts/smoke_binary.py dist/${{ matrix.edition }} --benchmark
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: failure() && (github.event_name != 'workflow_dispatch' || inputs.edition == 'all' || inputs.edition == matrix.edition)
+        with:
+          name: OCReady-${{ matrix.edition }}-${{ runner.os }}-diagnostics
+          path: |
+            dist/${{ matrix.edition }}/pe-layout.json
+            dist/${{ matrix.edition }}/compilation-report.xml
+            build/${{ matrix.edition }}/payload/build-manifest.json
+            test-output/packaged-${{ matrix.edition }}.json
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: github.event_name != 'workflow_dispatch' || inputs.edition == 'all' || inputs.edition == matrix.edition
         with:
           name: OCReady-${{ matrix.edition }}-${{ runner.os }}
           path: |
             dist/${{ matrix.edition }}/OCReady-*
             dist/${{ matrix.edition }}/build-manifest.json
+            dist/${{ matrix.edition }}/pe-layout.json
             test-output/packaged-${{ matrix.edition }}.json
           if-no-files-found: error
   release:

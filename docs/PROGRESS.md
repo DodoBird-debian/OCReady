@@ -409,3 +409,11 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Verified the controller against real child output, mismatched output and a timed-out process with its own sleeping descendant; the descendant was terminated. All 218 tests and Ruff passed after the final controller change.
 - Preserved clean `0ed066a` compact SmolVLM Q4 corpus evidence: one supported English fixture completed with zero CER/WER; ten unsupported Arabic/bilingual fixtures were skipped. This is not bilingual accuracy certification.
 - Studio platform/resource validation and the subsequent gated release run remain active independently of these developer experiments.
+
+## Iteration 47 — consistent native application branding
+
+- Replaced font-dependent runtime icon drawing with an owned vector mark and matching portable PNG. Added a reproducible Qt/Pillow renderer producing nine ICO resolutions from 16 to 256 pixels, preserving transparency and consistent appearance across systems.
+- Attached the ICO to the Windows executable itself. Inspection of the actual previous Pocket executable confirmed it contained version/manifest resources but no icon/group-icon resources; setting the Qt window icon alone had not branded the downloadable file.
+- Extended bounded PE diagnostics to record root resource types and reject a new Windows output missing its attached icon resources. Added resource-table bounds coverage and successfully parsed the earlier real Windows PE. Both build workflows retain layout diagnostics for failures and completed artifacts.
+- Visually inspected the generated mark, decoded all nine ICO sizes and loaded the runtime icon in native Qt. All 219 tests and Ruff passed after the resource changes. A font-independent vector fallback keeps incomplete source/package installations usable; actual Windows compilation follows this checkpoint before packaging claims.
+- A clean `af3baa9` Everyday onefile using the separately compiled JSON vision adapter is building independently. This tests the second modular LLM interface inside a complete application, beyond its earlier relocated worker probes.

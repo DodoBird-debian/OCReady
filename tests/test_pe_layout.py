@@ -45,3 +45,20 @@ def test_pe_audit_rejects_truncated_or_invalid_executables(tmp_path):
 def test_pe_audit_rejects_missing_or_undersized_mapped_image(tmp_path, size):
     with pytest.raises(ValueError, match="image"):
         inspect_pe(executable(tmp_path, size))
+
+
+def test_pe_audit_records_native_icon_resource_types(tmp_path):
+    path = executable(tmp_path)
+    data = bytearray(path.read_bytes())
+    optional = 152
+    struct.pack_into("<I", data, optional + 108, 16)
+    struct.pack_into("<II", data, optional + 128, 4096, 64)
+    struct.pack_into("<HH", data, 512 + 12, 0, 3)
+    for index, kind in enumerate((3, 14, 16)):
+        struct.pack_into("<II", data, 528 + index * 8, kind, 0x80000028)
+    path.write_bytes(data)
+    assert inspect_pe(path)["resource_types"] == [3, 14, 16]
+    struct.pack_into("<I", data, optional + 132, 20)
+    path.write_bytes(data)
+    with pytest.raises(ValueError, match="resource table"):
+        inspect_pe(path)

@@ -1,6 +1,8 @@
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor, QFont, QIcon, QPainter, QPixmap
+from PySide6.QtCore import QPointF, Qt
+from PySide6.QtGui import QColor, QFont, QIcon, QPainter, QPen, QPixmap
 from PySide6.QtWidgets import QApplication
+
+from ocready.core.paths import resource_root
 
 LIGHT = """
 QWidget { color: #25344c; font-family: 'Inter', 'Segoe UI', 'Noto Sans', sans-serif; font-size: 13px; }
@@ -58,6 +60,11 @@ def apply_theme(app: QApplication) -> None:
 
 
 def app_icon() -> QIcon:
+    icon = QIcon(str(resource_root() / "assets/ocready.png"))
+    if not icon.isNull():
+        return icon
+    # Keep incomplete/source-only installations usable without font-dependent
+    # letter drawing. Normal onefile builds contain the rendered vector mark.
     pixmap = QPixmap(128, 128)
     pixmap.fill(Qt.GlobalColor.transparent)
     painter = QPainter(pixmap)
@@ -65,11 +72,11 @@ def app_icon() -> QIcon:
     painter.setPen(Qt.PenStyle.NoPen)
     painter.setBrush(QColor("#386bdf"))
     painter.drawRoundedRect(4, 4, 120, 120, 30, 30)
-    painter.setPen(QColor("white"))
-    painter.setFont(QFont("DejaVu Sans", 48, QFont.Weight.Bold))
-    painter.drawText(pixmap.rect(), Qt.AlignmentFlag.AlignCenter, "O")
-    painter.setBrush(QColor("#92e2c2"))
+    painter.setBrush(Qt.BrushStyle.NoBrush)
+    painter.setPen(QPen(QColor("white"), 12))
+    painter.drawEllipse(QPointF(64, 61), 29, 29)
     painter.setPen(Qt.PenStyle.NoPen)
-    painter.drawEllipse(83, 82, 25, 25)
+    painter.setBrush(QColor("#92e2c2"))
+    painter.drawEllipse(QPointF(95.5, 94.5), 12.5, 12.5)
     painter.end()
     return QIcon(pixmap)
