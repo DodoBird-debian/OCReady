@@ -16,7 +16,7 @@ def main() -> None:
     parser.add_argument("--variant", choices=("neural", "combined", "multimodal"), required=True)
     parser.add_argument("--jobs", type=int, default=2)
     args = parser.parse_args()
-    methods = "neural" if args.variant == "neural" else "fast,best,vision,neural"
+    methods = "neural" if args.variant == "neural" else "neural,fast,best,vision"
     command = [sys.executable, "-m", "scripts.build", "--edition", args.edition, "--methods", methods,
                "--neural-pack", str(ROOT / "models/ppocr-v5/pack.json"), "--variant", args.variant, "--jobs", str(args.jobs)]
     if args.variant == "multimodal":

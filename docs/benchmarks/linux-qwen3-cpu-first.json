@@ -1,0 +1,99 @@
+{
+  "sample_interval_ms": 10,
+  "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
+  "platform": "linux",
+  "python": "3.12.16",
+  "cpu_count": 12,
+  "binary": false,
+  "scenarios": [
+    {
+      "edition": "studio",
+      "max_pixels": 16000000,
+      "scenario": "sample",
+      "peak_rss_bytes": 3024617472,
+      "budget_bytes": 4000000000,
+      "below_budget": true,
+      "elapsed_seconds": 23.089,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 22.9837706219987,
+        "peak_rss": 3024617472,
+        "engine": "vision:qwen3-vl-2b-q4",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 3952766976,
+        "worker_peak": 1898655744,
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "studio",
+      "max_pixels": 16000000,
+      "scenario": "dark",
+      "peak_rss_bytes": 3026223104,
+      "budget_bytes": 4000000000,
+      "below_budget": true,
+      "elapsed_seconds": 21.196,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 21.08930696700554,
+        "peak_rss": 3026223104,
+        "engine": "vision:qwen3-vl-2b-q4",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 3956023296,
+        "worker_peak": 1895788544,
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "studio",
+      "max_pixels": 16000000,
+      "scenario": "max-pixels",
+      "peak_rss_bytes": 3154456576,
+      "budget_bytes": 4000000000,
+      "below_budget": true,
+      "elapsed_seconds": 44.123,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 43.85741911799414,
+        "peak_rss": 3154456576,
+        "engine": "vision:qwen3-vl-2b-q4",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 3875049472,
+        "worker_peak": 1943986176,
+        "words": 0
+      },
+      "error": ""
+    },
+    {
+      "edition": "studio",
+      "max_pixels": 16000000,
+      "scenario": "gui-repeated",
+      "peak_rss_bytes": 3447046144,
+      "budget_bytes": 4000000000,
+      "below_budget": true,
+      "elapsed_seconds": 120.948,
+      "exit_code": 2,
+      "details": {
+        "error": "GUI workload timed out",
+        "completed_iterations": 2
+      },
+      "error": ""
+    }
+  ],
+  "source": {
+    "revision": "7a252b4b379c5cc78651d356872c10f715c6482c",
+    "dirty": false,
+    "tree_sha256": "5eed0a392d642030872c5d168fdf6858294a5a2a182a9bbe741731db59687130"
+  },
+  "sources_changed_during_run": false,
+  "binary_sha256": null,
+  "binary_changed_during_run": false,
+  "build_profile": null,
+  "requested_method": null,
+  "requested_pack_id": null
+}

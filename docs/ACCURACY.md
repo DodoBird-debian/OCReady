@@ -27,6 +27,8 @@ Linux, prepared Tesseract 5.5.0, clean source `1595c32`, the committed eleven fi
 
 These are weighted error rates on this synthetic corpus, not overall product accuracy. Arabic diacritics remain particularly poor (68.1% CER even with Precision in these runs). Screenshot layout read the Kufi case exactly with Fast, while confidence-based comparison selected a worse 49.2% CER result. Comparison did improve small Arabic from 30.8% CER to zero. A user must be able to inspect alternatives rather than assume higher confidence guarantees complete transcription.
 
+Later clean-source runs completed all eleven fixtures with neural OCR at 3.9% CER / 7.5% WER ([report](accuracy/linux-neural-v5.json)) and quantized Qwen3-VL on CUDA at 7.0% / 13.3% ([report](accuracy/linux-qwen3-cuda.json)). Qwen read the clean bilingual example exactly but changed `٢٥٠٠` to `٢٠٠٠` in the mixed-digit fixture and had 41.7% diacritic-case CER. These different engine configurations are separate measured baselines. Generative fluency does not establish exact transcription, and none of these small synthetic runs certifies real-world accuracy.
+
 Raw case-by-case references, output and scoring: [Screenshot layout](accuracy/linux-sparse.json), [Automatic plus comparison](accuracy/linux-compare.json).
 
 The desktop now exposes both comparison reads, rather than discarding the alternative selected against by the confidence heuristic. This real Kufi example shows the complete Screenshot reading chosen manually and an Arabic word linked to its source:

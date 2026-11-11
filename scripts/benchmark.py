@@ -139,12 +139,12 @@ def gui_child(image_path: str, edition: str, output: str, loops: int, pack_path:
         window.close()
         app.quit()
 
-    QTimer.singleShot(120_000, timed_out)
+    QTimer.singleShot(120_000 * max(1, loops), timed_out)
     app.exec()
     return 2 if failed else 0
 
 
-def observe(command: list[str], output: Path, budget: int) -> dict:
+def observe(command: list[str], output: Path, budget: int, timeout_seconds: int = 180) -> dict:
     env = os.environ.copy()
     env["QT_QPA_PLATFORM"] = "offscreen"
     env["XDG_CONFIG_HOME"] = str(output.parent / "config")
@@ -156,10 +156,10 @@ def observe(command: list[str], output: Path, budget: int) -> dict:
         try:
             while process.poll() is None:
                 peak = max(peak, tree_rss(process.pid))
-                if time.monotonic() - start > 180:
+                if time.monotonic() - start > timeout_seconds:
                     from ocready.core.memory import stop_tree
                     stop_tree(process.pid)
-                    raise RuntimeError("Benchmark scenario exceeded 180 seconds")
+                    raise RuntimeError(f"Benchmark scenario exceeded {timeout_seconds} seconds")
                 time.sleep(.01)
         finally:
             process.wait()
@@ -242,7 +242,8 @@ def main() -> int:
                         command += ["--neural-pack", str(args.neural_pack.resolve())]
                 elif scenario == "gui-onefile":
                     command = [*base, str(image), "--edition", edition, "--ui-smoke-output", str(output), *selection]
-                result = observe(command, output, EDITIONS[edition].budget)
+                result = observe(command, output, EDITIONS[edition].budget,
+                                 timeout_seconds=720 if scenario == "gui-repeated" else 180)
                 result = {"edition": edition, "max_pixels": EDITIONS[edition].max_pixels, "scenario": scenario, **result}
                 # Preserve evidence without copying all recognized document contents into reports.
                 if "text" in result["details"]:
