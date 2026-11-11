@@ -1,6 +1,7 @@
 import dataclasses
 import io
 import json
+import os
 import subprocess
 import tarfile
 from pathlib import Path
@@ -44,10 +45,12 @@ def test_runtime_copy_removes_stale_gpu_libraries(tmp_path):
     runner = source / "llama-mtmd-cli"
     runner.write_bytes(b"CPU executable")
     (source / "engine.so").write_bytes(b"CPU library")
+    os.link(source / "engine.so", source / "engine.so.1")
     (target / "stale-cuda.so").write_bytes(b"old GPU library")
     copy_runtime(runner, target)
     assert (target / runner.name).read_bytes() == runner.read_bytes()
     assert not (target / "stale-cuda.so").exists()
+    assert (target / "engine.so").stat().st_ino == (target / "engine.so.1").stat().st_ino
 
 
 def test_json_standalone_embedding_preserves_declared_native_descendants(tmp_path):

@@ -332,3 +332,10 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Added optional runner/adapter selection to pinned vision preparation. Model weights/prompts remain separate from the worker interface, so the same model can be evaluated through either adapter without pipeline/UI changes.
 - Consolidated declared-distribution bundling for neural and JSON workers, preserving nested native descendants and excluding undeclared siblings. Protocol/input, CPU-only flags, stale-library cleanup, declared nesting and tamper rejection are covered by focused tests.
 - Compilation and actual-model validation of this second adapter follow the clean checkpoint; unit protocol tests are not presented as real OCR proof.
+
+## Iteration 37 — real second-adapter CPU inference and runtime aliases
+
+- Compiled the JSON reference worker from clean `edfd7db`, including its own Python runtime and native llama.cpp descendant. Prepared the official SmolVLM pack for `json-cli-v1` and ran actual CPU inference through shared orchestration.
+- The result retained the expected English sample text and explicitly reported runtime `json-cli-v1`, CPU backend and cgroup-v2 containment. Observed development-run tree peak was 522.5 MB in 4.3 seconds; this is a source/client probe, not a complete outer onefile resource certification.
+- Runtime copying now preserves shared-library aliases as hard links where supported, with a copy fallback. This prevents needless duplication of large native GPU libraries in worker distributions and their onefile archives. Existing stale-runtime cleanup and nested-file hash verification remain in place.
+- The complete clean `3d2adb7` Studio binary built at 2062.8 MB. It has begun real per-method CLI/GUI and resource validation on disk-backed temporary storage. First neural CLI recognition returned six real linked lines; full evidence remains pending.

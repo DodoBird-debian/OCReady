@@ -21,9 +21,20 @@ def copy_runtime(runner: Path, destination: Path) -> None:
     libdir = runner.parent.parent / "lib"
     if libdir.is_dir():
         files.update(libdir.glob("*.so*"))
+    copied = {}
     for source in sorted(files):
         if source.is_file():
-            shutil.copy2(source, destination / source.name)
+            target = destination / source.name
+            stat = source.stat()
+            identity = (stat.st_dev, stat.st_ino)
+            if identity in copied:
+                try:
+                    target.hardlink_to(copied[identity])
+                except OSError:
+                    shutil.copy2(source, target)
+            else:
+                shutil.copy2(source, target)
+                copied[identity] = target
     for pattern in ("LICENSE*", "NOTICE*", "COPYING*"):
         for source in runner.parent.glob(pattern):
             if source.is_file():
