@@ -1,11 +1,18 @@
 import json
+import sys
 from pathlib import Path
+
+from scripts.benchmark import observe, redact_details
+
+
+def test_failed_gui_benchmark_preserves_error_without_document_contents():
+    safe = redact_details({"text": "private text", "words": 0, "error": "Model exceeds budget", "rss": 500})
+    assert safe == {"words": 0, "error": "Model exceeds budget", "rss": 500}
+    assert redact_details({"text": "private", "result": {"text": "private", "words": [{"text": "private"}], "engine": "vision"}}) == {"words": 1, "engine": "vision"}
+
 
 
 def test_benchmark_reads_arabic_under_a_windows_codepage(tmp_path, monkeypatch):
-    import sys
-
-    from scripts.benchmark import observe
     output = tmp_path / "result.json"
     output.write_text(json.dumps({"text": "مرحبا بالعالم"}, ensure_ascii=False), encoding="utf-8")
     original_read = Path.read_text

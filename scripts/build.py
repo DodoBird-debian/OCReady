@@ -1,6 +1,6 @@
 """Compile a Linux / Windows onefile executable with a selected OCR edition."""
 import argparse
-import hashlib
+import importlib.metadata
 import json
 import os
 import platform
@@ -8,7 +8,10 @@ import shutil
 import subprocess
 import sys
 import tarfile
+from datetime import UTC, datetime
 from pathlib import Path
+
+from scripts.provenance import file_sha256, included_runtime_manifest, require_unchanged, source_record
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -21,6 +24,7 @@ def main() -> None:
     parser.add_argument("--standalone", action="store_true", help="Diagnostic directory build instead of onefile")
     parser.add_argument("--jobs", type=int, default=4)
     args = parser.parse_args()
+    source = source_record(ROOT)
     defaults = {"pocket": ["fast"], "everyday": ["fast", "best", "vision"], "studio": ["fast", "best", "vision"]}
     methods = args.methods.split(",") if args.methods else defaults[args.edition]
     if not methods or not set(methods) <= set(defaults[args.edition]):
@@ -58,20 +62,25 @@ def main() -> None:
                 if path.is_file():
                     archive.add(path.resolve(), arcname=str(path.relative_to(runtime)), recursive=False)
         for quality in set(methods).intersection({"fast", "best"}):
-            for path in sorted((runtime / "tessdata" / quality).glob("*.traineddata")):
+            for language in ("ara", "eng"):
+                path = runtime / "tessdata" / quality / f"{language}.traineddata"
                 archive.add(path, arcname=str(path.relative_to(runtime)), recursive=False)
-        if (runtime / "manifest.json").exists():
-            archive.add(runtime / "manifest.json", arcname="manifest.json", recursive=False)
         gate = runtime / "bin" / "ocready-exec-gate"
         if not {"fast", "best"}.intersection(methods) and gate.is_file():
             archive.add(gate, arcname="bin/ocready-exec-gate", recursive=False)
         embedded = [bundle_pack(archive, pack) for pack in packs]
+        if (runtime / "manifest.json").exists():
+            selected_manifest = stage / "runtime-manifest.json"
+            selected_manifest.write_text(json.dumps(included_runtime_manifest(runtime, set(archive.getnames())), indent=2), encoding="utf-8")
+            archive.add(selected_manifest, arcname="manifest.json", recursive=False)
     editions = [args.edition]
     profile = {"edition": args.edition, "available_editions": editions,
                "methods": [f"tesseract-{m}" if m in {"fast", "best"} else m for m in methods],
                "platform": platform.platform(), "python": platform.python_version(),
                "embedded_models": embedded, "default_model": packs[0].id if packs else "",
-               "runtime_bundle_sha256": hashlib.sha256(bundle.read_bytes()).hexdigest(),
+               "runtime_bundle_sha256": file_sha256(bundle),
+               "source": source, "built_at_utc": datetime.now(UTC).isoformat(),
+               "dependencies": {name: importlib.metadata.version(name) for name in ("Nuitka", "Pillow", "psutil", "PySide6-Essentials")},
                "memory_certification": "Uncertified; see docs/PROGRESS.md and benchmark evidence"}
     manifest = stage / "build-manifest.json"
     manifest.write_text(json.dumps(profile, indent=2) + "\n")
@@ -95,10 +104,11 @@ def main() -> None:
     env = os.environ.copy()
     env["PATH"] = str(Path(sys.executable).parent) + os.pathsep + env.get("PATH", "")
     subprocess.run(command, cwd=ROOT, env=env, check=True)
+    require_unchanged(ROOT, source)
     extension = ".exe" if os.name == "nt" else ""
     artifact = out / (name + extension)
     if artifact.exists():
-        digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+        digest = file_sha256(artifact)
         artifact.with_suffix(artifact.suffix + ".sha256").write_text(f"{digest}  {artifact.name}\n")
         print(f"Built {artifact} ({artifact.stat().st_size / 1_000_000:.1f} MB)")
     shutil.copy2(manifest, out / "build-manifest.json")

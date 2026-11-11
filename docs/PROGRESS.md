@@ -144,3 +144,12 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Put the advanced model form inside a resizable scroll area while keeping Done outside it. The form no longer forces an 854-pixel-tall dialog.
 - Inspected the actual rendered 790 × 700 dialog and verified the prompt remains reachable by scrolling at a 560-pixel dialog height. Keyboard-accessible native controls are retained.
 - Validation: the native GUI suite (20 tests) and Ruff passed; the smaller-screen case was rerun after simplifying its viewport assertion. The core vision build and fresh source CI are still being observed separately.
+
+## Iteration 14 — traceable builds and failed benchmark evidence
+
+- Added source revision, dirty state, source-content digest, dependency versions and UTC build time to future build manifests. Compilation now rejects sources that changed during the build. Diagnostics expose the embedded source record.
+- Runtime manifests now list the included subset of prepared assets and verify their existing hashes. Pocket manifests no longer imply that excluded Precision weights are present; vision-only manifests retain the gate record without claiming an embedded Tesseract engine.
+- Benchmarks now record the actual binary digest and build profile, plus source state and changes during measurement. Fixed failed GUI report redaction so zero words stored as an integer cannot mask the real admission error.
+- The newly compiled 269.7 MB vision-only Everyday binary passed small-image CLI/native GUI and all three headless memory cases (largest 826.4 MB). Its 8 MP GUI case was safely refused at an estimated 1,037 MB; admission reserves still need review. This is not a passing embedded large-GUI result.
+- Downloaded all six successful `65bd416` CI artifacts and independently verified their binary checksums and benchmark success. Largest observed peaks: Linux Pocket 301.6 MB, Everyday 549.3 MB, Studio 739.3 MB; Windows Pocket 306.9 MB, Everyday 495.1 MB, Studio 672.6 MB. These are the documented classical workloads.
+- Validation: 99 local tests and Ruff passed after the provenance/reporting fixes. Fresh builds are required to exercise the new manifest controls; the shared-preview source CI was already green on both platforms.

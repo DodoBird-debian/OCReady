@@ -18,8 +18,21 @@ from PIL import Image, ImageOps
 
 from ocready.core.editions import EDITIONS
 from ocready.core.memory import tree_rss
+from scripts.provenance import file_sha256, source_record
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def redact_details(record: dict) -> dict:
+    """Remove document contents without hiding a failed GUI admission check."""
+    details = record.get("result", record)
+    safe = {key: details[key] for key in ("elapsed", "peak_rss", "engine", "backend", "containment",
+                                          "worker_limit", "worker_peak", "error", "rss") if key in details}
+    words = details.get("words", [])
+    safe["words"] = len(words) if isinstance(words, list) else words
+    if record.get("error"):
+        safe["error"] = record["error"]
+    return safe
 
 
 def make_image(path: Path, edition: str, dark=False, maximum=False) -> None:
@@ -144,6 +157,8 @@ def main() -> int:
         parser.error("--edition must match the compiled binary's edition")
     if args.binary and args.vision_pack:
         parser.error("Benchmark embedded vision packs through their binary's default method; --vision-pack is for source runs")
+    source = source_record(ROOT)
+    binary_hash = file_sha256(args.binary) if args.binary else None
     records = []
     with tempfile.TemporaryDirectory(prefix="ocready-benchmark-") as temporary:
         temporary = Path(temporary)
@@ -173,17 +188,20 @@ def main() -> int:
                 result = {"edition": edition, "max_pixels": EDITIONS[edition].max_pixels, "scenario": scenario, **result}
                 # Preserve evidence without copying all recognized document contents into reports.
                 if "text" in result["details"]:
-                    details = result["details"].get("result", result["details"])
-                    result["details"] = {key: details[key] for key in ("elapsed", "peak_rss", "engine", "backend", "containment", "worker_limit", "worker_peak") if key in details}
-                    result["details"]["words"] = len(details.get("words", []))
+                    result["details"] = redact_details(result["details"])
                 records.append(result)
                 print(f"{edition:9} {scenario:12} {result['peak_rss_bytes'] / 1e6:7.1f} MB  {'PASS' if result['below_budget'] and not result['exit_code'] else 'FAIL'}", flush=True)
     report = {"sample_interval_ms": 10, "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
               "platform": sys.platform, "python": sys.version.split()[0], "cpu_count": psutil.cpu_count(),
-              "binary": bool(args.binary), "scenarios": records}
+              "binary": bool(args.binary), "scenarios": records,
+              "source": source, "sources_changed_during_run": source_record(ROOT) != source,
+              "binary_sha256": binary_hash,
+              "binary_changed_during_run": bool(args.binary and file_sha256(args.binary) != binary_hash),
+              "build_profile": binary_profile}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    return 0 if all(row["below_budget"] and row["exit_code"] == 0 for row in records) else 2
+    return 0 if (all(row["below_budget"] and row["exit_code"] == 0 for row in records)
+                 and not report["sources_changed_during_run"] and not report["binary_changed_during_run"]) else 2
 
 
 if __name__ == "__main__":
