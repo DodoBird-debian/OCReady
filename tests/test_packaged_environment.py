@@ -79,6 +79,17 @@ def test_release_requires_actual_native_gui_and_isolation_for_new_builds(runtime
                    "private_configuration": True, "development_overrides_removed": True, "gui_platform": gui}
     report = {"execution_environment": environment, "scenarios": [{"scenario": "gui-onefile", "details": {"qt_platform": gui}}]}
     verify_execution_environment(report, profile, runtime)
+    profile["validation_policy"]["clipboard_image_input"] = True
+    for route in (None, "file"):
+        report["scenarios"][0]["details"]["input_route"] = route
+        with pytest.raises(ValueError, match="clipboard image input"):
+            verify_execution_environment(report, profile, runtime)
+    report["scenarios"][0]["details"]["input_route"] = "clipboard"
+    verify_execution_environment(report, profile, runtime)
+    profile["validation_policy"]["clipboard_image_input"] = False
+    with pytest.raises(ValueError, match="Unsupported"):
+        verify_execution_environment(report, profile, runtime)
+    profile["validation_policy"]["clipboard_image_input"] = True
     report["scenarios"][0]["details"]["qt_platform"] = "offscreen"
     with pytest.raises(ValueError, match="windowing backend"):
         verify_execution_environment(report, profile, runtime)

@@ -106,6 +106,8 @@ def main() -> None:
             assert not gui["error"], gui
             assert gui.get("qt_platform") == gui_test_platform(), gui
             assert gui.get("clipboard_copy_verified") is True, gui
+            if profile.get("validation_policy", {}).get("clipboard_image_input"):
+                assert gui.get("input_route") == "clipboard", gui
             assert gui["result"]["engine"] == result["engine"], gui
             if vision:
                 assert not gui["linked"] and gui["words"] == 0, gui

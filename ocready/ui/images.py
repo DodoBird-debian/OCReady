@@ -19,6 +19,10 @@ def qimage_to_source(image: QImage, edition: Edition) -> Image.Image:
         raise OCRError("Not enough memory to paste this image. Try a smaller capture.")
     rgba = Image.frombuffer("RGBA", (converted.width(), converted.height()), converted.constBits(),
                             "raw", "RGBA", converted.bytesPerLine(), 1)
+    # constBits exports a view without a Qt owner. Attach that owner to the
+    # borrowing PIL image so optimized/compiled local-variable lifetimes are
+    # irrelevant. RGB conversion/paste below returns independent pixels.
+    rgba._ocready_qimage_owner = converted
     if image.hasAlphaChannel():
         result = Image.new("RGB", rgba.size, "white")
         result.paste(rgba, mask=rgba.getchannel("A"))

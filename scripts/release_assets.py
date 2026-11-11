@@ -18,7 +18,8 @@ def verify_execution_environment(evidence: dict, profile: dict, runtime_platform
         return  # Older releases retain their original, narrower validation scope.
     if requirement is not None and (not isinstance(requirement, dict)
             or type(requirement.get("portable_runtime_environment")) is not int or requirement.get("portable_runtime_environment") != 1
-            or requirement.get("native_gui_backend") is not True or requirement.get("unicode_paths") is not True):
+            or requirement.get("native_gui_backend") is not True or requirement.get("unicode_paths") is not True
+            or "clipboard_image_input" in requirement and requirement["clipboard_image_input"] is not True):
         raise ValueError("Unsupported packaged validation policy.")
     expected_gui = {"windows"} if runtime_platform == "win32" else {"xcb", "wayland"}
     if (not isinstance(environment, dict) or environment.get("policy") != "isolated-runtime-v1"
@@ -30,6 +31,8 @@ def verify_execution_environment(evidence: dict, profile: dict, runtime_platform
     gui = [row for row in evidence.get("scenarios", []) if row.get("scenario") == "gui-onefile"]
     if len(gui) != 1 or gui[0].get("details", {}).get("qt_platform") != environment["gui_platform"]:
         raise ValueError("The GUI result did not confirm the requested native windowing backend.")
+    if requirement and requirement.get("clipboard_image_input") is True and gui[0].get("details", {}).get("input_route") != "clipboard":
+        raise ValueError("The GUI resource workload did not confirm clipboard image input.")
 
 
 def verify_artifacts(root: Path, revision: str) -> list[dict]:

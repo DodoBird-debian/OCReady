@@ -49,6 +49,8 @@ OCREADY_GUI_TEST_PLATFORM=xcb xvfb-run -a --server-args="-screen 0 1600x1200x24"
 
 Each basic GUI smoke read also exercises Copy all through Qt's clipboard API. For classical/neural output it clicks a genuine detected Arabic region inside the application's own widget, checks linked highlighting and copies that selection. This is an in-application clipboard readback while the window is alive; it does not certify cross-application pasting or screenshot-tool integration. Resource GUI cases retain platform/copy diagnostics without publishing their stress-image transcription.
 
+New builds declaring `clipboard_image_input` also exercise the incoming image through Qt's clipboard and the ordinary Paste image path, including the cap-sized GUI RAM case. The report must identify `input_route: clipboard`; the shared release gate rejects a missing/file route for this policy. CLI cases still exercise file input. Older builds retain their earlier file-input GUI scope. A failed paste fails diagnostics immediately and cannot reuse a previously recognized image/result.
+
 The workflow retains `gui-*.png` and `gui-*.json` records of the fixed public sample, including failed GUI records/screenshots when generated. These are review artifacts, not captures of the user's desktop. Source unit tests can still use the offscreen Qt backend, but new release evidence must identify X11/Wayland or Win32.
 
 ## Linux desktop dependencies

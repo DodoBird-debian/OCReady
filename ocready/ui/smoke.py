@@ -3,10 +3,11 @@ import json
 from pathlib import Path
 
 from PySide6.QtCore import QEvent, QPointF, Qt, QTimer
-from PySide6.QtGui import QFontInfo, QGuiApplication, QMouseEvent
+from PySide6.QtGui import QFontInfo, QGuiApplication, QImage, QMouseEvent
 from PySide6.QtWidgets import QApplication
 
 from ocready.core.memory import tree_rss
+from ocready.core.paths import resource_root
 from ocready.core.preprocess import Recipe
 from ocready.core.timeouts import gui_workload_timeout_seconds
 
@@ -18,10 +19,12 @@ def attach_smoke_run(app, window, image: str | None, output: Path, *, recipe: Re
 
     def start():
         nonlocal started
-        if image:
-            window.open_path(image)
-        else:
-            window.load_example()
+        path = image or resource_root() / "assets/sample-bilingual.png"
+        QApplication.clipboard().setImage(QImage(str(path)))
+        if not window.paste_image(replace_confirmed=True):
+            started = True
+            finish("Clipboard image input failed: " + window.status.text())
+            return
         if recipe is not None and window.source is not None:
             window.set_recipe(recipe)
         window.recognize()
@@ -66,6 +69,7 @@ def attach_smoke_run(app, window, image: str | None, output: Path, *, recipe: Re
         record = {"text": window.editor.toPlainText(), "words": len(window.canvas.words),
                   "linked": window.editor.linked, "rss": tree_rss(), "error": error, "deadline_seconds": deadline,
                   "qt_platform": QGuiApplication.platformName(), "clipboard_copy_verified": copied,
+                  "input_route": "clipboard",
                   "ui_font_family": QFontInfo(window.font()).family(),
                   "editor_font_family": QFontInfo(window.editor.font()).family(),
                   "source_selection_verified": source_selected}

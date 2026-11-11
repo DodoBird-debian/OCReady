@@ -104,7 +104,8 @@ def main() -> None:
                                        "level": 3 if not args.standalone and importlib.metadata.version("Nuitka") == "4.3.5" else None,
                                        "compiler_version": importlib.metadata.version("Nuitka")},
                "memory_certification": "Uncertified; see docs/PROGRESS.md and benchmark evidence"}
-    profile["validation_policy"] = {"portable_runtime_environment": 1, "native_gui_backend": True, "unicode_paths": True}
+    profile["validation_policy"] = {"portable_runtime_environment": 1, "native_gui_backend": True,
+                                    "unicode_paths": True, "clipboard_image_input": True}
     manifest = stage / "build-manifest.json"
     manifest.write_text(json.dumps(profile, indent=2) + "\n")
     out = ROOT / "dist" / variant

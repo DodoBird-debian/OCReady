@@ -98,6 +98,25 @@ def test_real_clipboard_paste_reaches_bilingual_ocr_and_keeps_its_own_source(win
     assert "screenshots" in window.editor.toPlainText() and window.editor.linked
 
 
+def test_gui_clipboard_smoke_cannot_reuse_an_old_result_after_failed_paste(recognized, app, tmp_path, monkeypatch):
+    import json
+    from types import SimpleNamespace
+
+    from ocready.ui.smoke import attach_smoke_run
+
+    calls, codes = [], []
+    monkeypatch.setattr(recognized, "recognize", lambda: calls.append(True))
+    output = tmp_path / "failed-paste.json"
+    attach_smoke_run(SimpleNamespace(exit=codes.append), recognized, str(tmp_path / "missing.png"), output)
+    until = time.monotonic() + 3
+    while not output.exists() and time.monotonic() < until:
+        app.processEvents()
+        time.sleep(.01)
+    record = json.loads(output.read_text(encoding="utf-8"))
+    assert not calls and codes == [2]
+    assert "Clipboard image input failed" in record["error"]
+
+
 def test_gui_smoke_does_not_cancel_vision_inside_its_engine_deadline(window, app, tmp_path, monkeypatch):
     import json
     import threading
@@ -172,6 +191,7 @@ def test_packaged_smoke_clicks_a_real_arabic_region_and_copies_text(window, app,
     assert codes == [0] and not record["error"]
     assert record["source_selection_verified"] is True
     assert record["clipboard_copy_verified"] is True
+    assert record["input_route"] == "clipboard"
     assert QApplication.clipboard().text() == record["text"]
     assert "مرحبا بالعالم" in record["text"]
 

@@ -34,7 +34,7 @@ def redact_details(record: dict) -> dict:
     safe["words"] = len(words) if isinstance(words, list) else words
     if record.get("error"):
         safe["error"] = record["error"]
-    for key in ("qt_platform", "clipboard_copy_verified", "source_selection_verified", "deadline_seconds"):
+    for key in ("qt_platform", "clipboard_copy_verified", "source_selection_verified", "deadline_seconds", "input_route"):
         if key in record:
             safe[key] = record[key]
     return safe
@@ -72,6 +72,7 @@ def make_image(path: Path, edition: str, dark=False, maximum=False) -> None:
 def gui_child(image_path: str, edition: str, output: str, loops: int, pack_path: Path | None = None,
               neural_path: Path | None = None) -> int:
     from PySide6.QtCore import QTimer
+    from PySide6.QtGui import QImage
     from PySide6.QtWidgets import QApplication
 
     from ocready.ui.theme import apply_theme
@@ -95,9 +96,16 @@ def gui_child(image_path: str, edition: str, output: str, loops: int, pack_path:
     failed = False
 
     def run_next():
-        nonlocal remaining
+        nonlocal remaining, failed
         window.editor.document().setModified(False)
-        window.open_path(image_path)
+        QApplication.clipboard().setImage(QImage(image_path))
+        if not window.paste_image(replace_confirmed=True):
+            failed = True
+            Path(output).write_text(json.dumps({"error": window.status.text(), "input_route": "clipboard"}), encoding="utf-8")
+            timer.stop()
+            window.close()
+            app.quit()
+            return
         if pack_path:
             window.method_combo.setCurrentIndex(window.method_combo.findData(f"vision:{pack.id}"))
         elif neural_path:
@@ -123,7 +131,7 @@ def gui_child(image_path: str, edition: str, output: str, loops: int, pack_path:
         if remaining > 0:
             run_next()
         else:
-            Path(output).write_text(json.dumps({"iterations": measurements, "qt_platform": app.platformName()}), encoding="utf-8")
+            Path(output).write_text(json.dumps({"iterations": measurements, "qt_platform": app.platformName(), "input_route": "clipboard"}), encoding="utf-8")
             timer.stop()
             window.close()
             app.quit()
