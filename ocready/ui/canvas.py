@@ -42,12 +42,14 @@ class ImageCanvas(QGraphicsView):
         self._pixmap = self.scene().addPixmap(QPixmap.fromImage(qimage))
         self.scene().setSceneRect(QRectF(0, 0, rgb.width, rgb.height))
         self.words, self.selected = [], set()
+        self._hover = -1
         self._rubber = self._start = None
         self.fit_image()
 
     def set_words(self, words: list[Word]) -> None:
         self.words = words
         self.selected = set()
+        self._hover = -1
         self.viewport().update()
 
     def set_selection(self, indices: set[int]) -> None:

@@ -586,11 +586,14 @@ class MainWindow(QMainWindow):
         if self.source is None or self.worker:
             return
         original = self.view_original.isChecked()
+        selection = set(self.canvas.selected)
         self.canvas.set_image(self.source if original else self.preview)
         self.view_original.setText("Show processed" if original else "Show original")
         if self.result and self.editor.linked:
             words = words_on_source(self.result.words, self.source.size, self.preview.size, self.recipe) if original else self.result.words
             self.canvas.set_words(words)
+            self.canvas.set_selection(selection)
+            self.copy_selection.setEnabled(bool(selection))
         if original and self.recipe != Recipe():
             message = "Original image. Recognized text stays linked through cleanup, crop, and rotation." if self.result and self.editor.linked else "Original image. Cleanup settings are retained for recognition."
             self._set_status(message)

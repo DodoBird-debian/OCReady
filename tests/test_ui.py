@@ -357,6 +357,37 @@ def test_original_image_keeps_located_word_selection_after_rotation(window, app)
     window.copy_image_selection()
     assert QApplication.clipboard().text() == "مرحبا"
     assert window.editor.linked
+    for original in (False, True, False):
+        window.view_original.setChecked(original)
+        window.toggle_original()
+        assert window.canvas.selected == {0}
+        assert window.editor.extraSelections()
+        assert window.copy_selection.isEnabled()
+        window.copy_image_selection()
+        assert QApplication.clipboard().text() == "مرحبا"
+
+
+@pytest.mark.parametrize("geometry", ["word", "line"])
+def test_text_selection_survives_original_processed_view_switch(window, app, geometry):
+    from ocready.core.types import Box, OCRResult, Word
+    window.load_example()
+    window.recipe = Recipe(rotation=90)
+    window._apply_recipe()
+    result = OCRResult("مرحبا", [Word("مرحبا", Box(490, 100, 30, 80), 95, 0, 5)], geometry=geometry)
+    window._recognized(window.job, result, [result])
+    cursor = window.editor.textCursor()
+    cursor.select(QTextCursor.SelectionType.Document)
+    window.editor.setTextCursor(cursor)
+    app.processEvents()
+    assert window.canvas.selected == {0}
+    for original in (True, False):
+        window.view_original.setChecked(original)
+        window.toggle_original()
+        assert window.canvas.selected == {0}
+        assert window.editor.textCursor().selectedText() == "مرحبا"
+        assert window.canvas.words[0].box == (Box(100, 200, 80, 30) if original else result.words[0].box)
+        window.copy_image_selection()
+        assert QApplication.clipboard().text() == "مرحبا"
 
 
 def _windows_capture_for_test(window, monkeypatch):

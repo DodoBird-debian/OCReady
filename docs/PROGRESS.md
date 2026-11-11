@@ -385,3 +385,11 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Testing against the actual published neural pair exposed raw corpus hashes differing solely because Git translated manifest line endings on Windows. Added canonical JSON content identity to new accuracy reports while retaining raw file hashes. Release preparation compares the committed corpus content and every expected case/model, accepting only that corpus's exact LF/CRLF legacy file checksums for old reports.
 - The new identity preserves digits, diacritics, fixture image hashes and cleanup recipes. Changed text, images, recipes, duplicate cases, wrong models and unrelated legacy hashes fail verification. The actual published Linux/Windows neural pair passes the stronger gate.
 - All 215 tests and Ruff passed. Studio's compact dual-model build has entered packaged executable/resource verification on both platforms; final results remain pending.
+
+## Iteration 44 — keep selections while inspecting the original
+
+- Reproduced a source/text mismatch: selecting recognized text or clicking a source word, then toggling the original picture, cleared canvas selection while the editor stayed highlighted and the copy action appeared available.
+- Preserved the same logical selection indices as geometry is mapped between processed and original images. Copying remains usable after repeated view changes; edits and genuinely new recognition results retain their existing invalidation behavior.
+- Reset stale hover indices when replacing image/word geometry, preventing a hover from a previous view/result being painted over unrelated text.
+- Extended the real rotated Arabic source-click test and added text-driven word/line selection cases. All three cases failed before the fix and passed afterward; the complete 217-test suite and Ruff passed.
+- Reviewed the native workspace at 960 × 700 with cleanup open; the split view and primary copy/recognition controls remained usable. Startup caching remains research: the supported compiler cache has per-file checksums, but first-run concurrency and interrupted runtime extraction require explicit engineering before enabling it for users.
