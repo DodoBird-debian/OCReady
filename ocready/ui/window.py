@@ -2,7 +2,7 @@ import dataclasses
 from pathlib import Path
 
 from PIL import Image
-from PySide6.QtCore import QBuffer, QIODevice, QSize, Qt, QTimer
+from PySide6.QtCore import QSize, Qt, QTimer
 from PySide6.QtGui import QCloseEvent, QDragEnterEvent, QDropEvent, QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QApplication,
@@ -498,10 +498,8 @@ class MainWindow(QMainWindow):
         if not replace_confirmed and not self._confirm_replace():
             return False
         try:
-            buffer = QBuffer()
-            buffer.open(QIODevice.OpenModeFlag.WriteOnly)
-            image.save(buffer, "PNG")
-            source = load_image(bytes(buffer.data()), self.edition)
+            from ocready.ui.images import qimage_to_source
+            source = qimage_to_source(image, self.edition)
             self._set_source(source, "Clipboard image")
             return True
         except Exception as exc:

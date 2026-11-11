@@ -1631,3 +1631,17 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M64.V2: Require actual hosted dependency/test/build success before publishing new platform claims.
 - M64.T6: Use only a fixed bounded HTTPS mirror fallback while retaining Ubuntu's original signing trust and suite identities.
 - Release gate: Successful signed dependency preparation followed by unchanged source, native GUI, accuracy and RAM gates.
+
+## M65 — direct clipboard pixel transfers
+
+- Responsibility: Keep screenshot pasting fast without unnecessary compression or borrowed-buffer lifetime bugs.
+- M65.T1: Transfer bounded Qt image pixels directly to the existing Pillow processing pipeline.
+- M65.T2: Normalize channel order, palettes and premultiplied alpha before conversion.
+- M65.T3: Flatten transparency on white identically to ordinary image loading.
+- M65.T4: Return owned RGB pixels independent of the clipboard and temporary Qt image lifetime.
+- M65.T5: Preserve edition input admission and processing pixel/edge caps.
+- M65.T6: Keep OS clipboard-provider decoding separate from post-retrieval conversion/admission claims.
+- M65.V1: Compare pixels against the lossless reference across padded rows, grayscale, indexed and alpha formats.
+- M65.V2: Change the clipboard/original QImage after paste and complete real bilingual OCR from the retained source.
+- M65.V3: Measure reproducible conversion times on owned data, retaining source/dependency identity and exact-pixel checks.
+- Release gate: Correct pixels, lifetime, source linking and edition behavior; conversion timings do not certify OS transfer time or universal RAM limits.

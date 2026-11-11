@@ -77,6 +77,27 @@ def test_workspace_uses_available_sans_fonts_including_the_text_editor(window):
     assert QFontInfo(window.editor.font()).family().casefold() in intended
 
 
+def test_real_clipboard_paste_reaches_bilingual_ocr_and_keeps_its_own_source(window, app):
+    from PySide6.QtGui import QColor, QImage
+
+    from ocready.core.paths import resource_root
+
+    if not readiness()[0]:
+        pytest.skip("Prepare OCR runtime for real clipboard recognition")
+    image = QImage(str(resource_root() / "assets/sample-bilingual.png"))
+    QApplication.clipboard().setImage(image)
+    assert window.paste_image()
+    QApplication.clipboard().setText("Clipboard changed after paste")
+    image.fill(QColor("black"))
+    window.recognize()
+    until = time.monotonic() + 10
+    while window.worker and time.monotonic() < until:
+        app.processEvents()
+        time.sleep(.01)
+    assert window.result and "مرحبا بالعالم" in window.result.text
+    assert "screenshots" in window.editor.toPlainText() and window.editor.linked
+
+
 def test_gui_smoke_does_not_cancel_vision_inside_its_engine_deadline(window, app, tmp_path, monkeypatch):
     import json
     import threading
