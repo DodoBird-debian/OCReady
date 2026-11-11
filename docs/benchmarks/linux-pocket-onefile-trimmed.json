@@ -1,0 +1,137 @@
+{
+  "sample_interval_ms": 10,
+  "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
+  "platform": "linux",
+  "python": "3.12.16",
+  "cpu_count": 12,
+  "binary": true,
+  "scenarios": [
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "sample",
+      "peak_rss_bytes": 200630272,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 1.556,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 1.0158764040024835,
+        "peak_rss": 102113280,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 284045312,
+        "worker_peak": 34459648,
+        "words": 31
+      },
+      "error": ""
+    },
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "dark",
+      "peak_rss_bytes": 200826880,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 1.601,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 1.018434397999954,
+        "peak_rss": 99741696,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 286838784,
+        "worker_peak": 34488320,
+        "words": 31
+      },
+      "error": ""
+    },
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "max-pixels",
+      "peak_rss_bytes": 199294976,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 1.671,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 1.1887384189976729,
+        "peak_rss": 125825024,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 274305024,
+        "worker_peak": 48267264,
+        "words": 95
+      },
+      "error": ""
+    },
+    {
+      "edition": "pocket",
+      "max_pixels": 2000000,
+      "scenario": "gui-onefile",
+      "peak_rss_bytes": 242405376,
+      "budget_bytes": 350000000,
+      "below_budget": true,
+      "elapsed_seconds": 2.202,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 1.1474077200036845,
+        "peak_rss": 242405376,
+        "engine": "tesseract-fast",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 157831168,
+        "worker_peak": 48246784,
+        "words": 95
+      },
+      "error": ""
+    }
+  ],
+  "source": {
+    "revision": "2ba93c6d6bf7def7178f5247a75ecdc88d4faf39",
+    "dirty": false,
+    "tree_sha256": "9a8cc994c57e5884071b15ae6d26c03e423c0044d6f8bf4390feeab6ee6e8173"
+  },
+  "sources_changed_during_run": false,
+  "binary_sha256": "29ecc142f0947e87abd1ea80e2a072787c07f972a4da17b8399f535011992b91",
+  "binary_changed_during_run": false,
+  "build_profile": {
+    "edition": "pocket",
+    "available_editions": [
+      "pocket"
+    ],
+    "methods": [
+      "tesseract-fast"
+    ],
+    "platform": "Linux-6.12.113+deb13-amd64-x86_64-with-glibc2.41",
+    "python": "3.12.16",
+    "embedded_models": [],
+    "default_model": "",
+    "runtime_bundle_sha256": "4c346383b06220b642494e89523a088b09ef09e52b674819a4030a416b28b673",
+    "source": {
+      "revision": "2ba93c6d6bf7def7178f5247a75ecdc88d4faf39",
+      "dirty": false,
+      "tree_sha256": "9a8cc994c57e5884071b15ae6d26c03e423c0044d6f8bf4390feeab6ee6e8173"
+    },
+    "built_at_utc": "2026-11-11T05:30:23.523338+00:00",
+    "dependencies": {
+      "Nuitka": "4.3.5",
+      "Pillow": "12.3.0",
+      "psutil": "7.2.2",
+      "PySide6-Essentials": "6.8.3"
+    },
+    "memory_certification": "Uncertified; see docs/PROGRESS.md and benchmark evidence",
+    "payload_memory": {
+      "enabled": true,
+      "nuitka": "4.3.5",
+      "strategy": "drop-unused-launcher-pages-v1",
+      "original_bootstrap_sha256": "73e5da1368005fa1d8ac82c62269095bb26cf231604f260409533a8fb21eb827",
+      "helper_sha256": "c065722f1e62de5b6e6a3bdde8db51c90d58fa010b61a98297f44dee4e9fda7d",
+      "patched_bootstrap_sha256": "4108a89dd7633c1de00be0bc858022912fb83687ffa7b29bbf5dab5d27d573c1"
+    }
+  }
+}

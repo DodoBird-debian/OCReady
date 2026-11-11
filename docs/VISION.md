@@ -34,6 +34,8 @@ With the shared one-million-pixel preview/input limit, the Q4 model passed the s
 
 A Q4 variant was tested in an **entirely embedded, vision-only executable** built from clean source `e9cdf23`: a 269.7 MB Linux binary containing the runner, model and projector. It passed small-image CLI and native GUI transcription checks. All four packaged memory workloads also passed: 780.9 MB sample, 777.2 MB inverted image, 826.7 MB cap-sized headless input, and **921.2 MB for the full 8 MP GUI workflow**, including the onefile launcher. See [the binary-identified report](benchmarks/linux-everyday-smolvlm-q4-onefile.json). This validates the tested Linux single-method packaging and memory workload. It does not establish Arabic accuracy, Windows VLM behavior, or a universal allocation ceiling.
 
+The later clean `2ba93c6` build releases unused launcher payload residency after extraction. Its 270.0 MB embedded executable passed the same packaged workloads with a **651.6 MB** maximum GUI peak, still counting its launcher and OCR children. [Updated binary-identified report](benchmarks/linux-everyday-smolvlm-q4-onefile-trimmed.json). This adds headroom for future engine combinations; each combination still needs its own admission and packaged tests.
+
 ## Building a compatible CUDA runner
 
 For a Linux driver that cannot run newer upstream PTX, an optional developer tool builds pinned llama.cpp with native kernels and NVIDIA's checksum-verified CUDA 12.4 redistributables:

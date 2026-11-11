@@ -221,3 +221,11 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Added native file-mapping preservation/RSS tests, overlay isolation/failure cleanup, and unknown compiler/layout rejection. All 124 tests and Ruff passed. Full Pocket, embedded vision and Windows builds are the next verification gates.
 - Separately evaluated official PP-OCRv5 mobile detection/Arabic recognition models in an isolated CPU harness: eleven fixtures in about three seconds, 6.3% CER and 230 MB observed tree peak including the harness. Mixed-direction copy order needs explicit handling before integration. The prototype is not a shipped method or a GUI memory result.
 - Preview 2 at `a46aeb6` passed all six platform/edition builds and publication verification; it includes remembered choices and visible OCR alternatives. Later launcher/engine work is outside that tagged snapshot.
+
+## Iteration 23 — full-app payload and session evidence
+
+- Rebuilt Pocket and the entirely embedded vision-only Everyday executable from clean `2ba93c6` with the compiler overlay. Verified matching source/patch provenance before running real packaged CLI and native GUI checks.
+- All four packaged scenarios passed. Pocket's maximum GUI peak was 242.4 MB. Embedded SmolVLM Q4 peaked at 651.6 MB for the full 8 MP GUI case, versus 921.2 MB before the launcher optimization. Reports include cold startup, launcher and OCR descendants; small Pocket headless jobs still peaked near 200 MB during extraction.
+- Both executables and project sources remained unchanged during measurement. Published the binary-identified reports rather than extrapolating from the small native probe.
+- A separate source-GUI soak completed all 100 cap-sized image loads/recognitions. Peak was 231.6 MB; average idle usage stayed flat (160.5 MB first ten jobs, 158.4 MB last ten). The raw report distinguishes source testing from a compiled soak and records when its source fingerprint was captured.
+- The Linux default-edition matrix is green with the new bootstrap. Windows jobs are still under observation. Neural OCR integration remains next, with explicit logical text ordering and honest line geometry required before shipping it.

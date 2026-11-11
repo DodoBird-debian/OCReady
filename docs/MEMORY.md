@@ -35,6 +35,19 @@ The optimization does not promise that file-cache pages disappear from system RA
 
 The overlay is version-checked against the locked compiler and records original/patched bootstrap and helper digests in the build manifest. `--no-payload-trim` provides an unmodified diagnostic build. An unknown compiler/bootstrap layout requires explicit review rather than a blind patch.
 
+Clean-source `2ba93c6` full builds then passed real compiled CLI/GUI checks and all four externally observed memory workloads:
+
+| Packaged workload | Pocket | Everyday, embedded English-only SmolVLM Q4 |
+| --- | ---: | ---: |
+| Small screenshot | 200.6 MB | 511.2 MB |
+| Inverted screenshot | 200.8 MB | 510.3 MB |
+| Image at edition processing cap | 199.3 MB | 556.5 MB |
+| Full cap-sized native GUI | **242.4 MB** | **651.6 MB** |
+
+These peaks include cold startup, the launcher and all OCR descendants. Pocket's cold extraction still dominates its smaller headless jobs; trimming is not a claim that every phase shrinks equally. The prior embedded-vision GUI case was 921.2 MB. Both source and binaries stayed unchanged during the new measurements. [Pocket raw report](benchmarks/linux-pocket-onefile-trimmed.json), [embedded vision raw report](benchmarks/linux-everyday-smolvlm-q4-onefile-trimmed.json). Windows checks remain separate.
+
+A separate **source GUI** soak completed 100 cap-sized Pocket image loads/recognitions in one window. Its peak was 231.6 MB; mean idle RSS was 160.5 MB over the first ten jobs and 158.4 MB over the last ten. This is evidence of stable memory over that workload, not a proof of unlimited-session behavior or a compiled 100-job test. [Raw 100-job source soak](benchmarks/linux-pocket-soak-100.json).
+
 ## Reproducing the measurements
 
 ```sh

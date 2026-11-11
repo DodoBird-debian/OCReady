@@ -51,7 +51,7 @@ uv run python scripts/build.py --edition everyday --methods vision \
   --model-pack /absolute/path/to/pack.json
 ```
 
-Repeat `--model-pack` to embed multiple compatible models, or use `--methods fast,best,vision` for a combined build. Installed models run sequentially. A 269.7 MB Linux vision-only executable with an English-only small model passed real CLI/GUI inference and its full 8 MP GUI memory workload at 921 MB. GitHub Actions builds the default Linux and Windows editions separately; artifacts remain prereleases until their platform and resource gates pass.
+Repeat `--model-pack` to embed multiple compatible models, or use `--methods fast,best,vision` for a combined build. Installed models run sequentially. A 270.0 MB Linux vision-only executable with an English-only small model passed real CLI/GUI inference and its full 8 MP GUI memory workload at 652 MB after releasing dormant launcher residency. GitHub Actions builds the default Linux and Windows editions separately; artifacts remain prereleases until their platform and resource gates pass.
 
 Build manifests record the source revision, source-content digest, dirty state, dependency versions, and included asset hashes. Keep sources unchanged during compilation; the build rejects a changed source tree before producing distribution metadata. Benchmark reports identify the measured executable by SHA256.
 
@@ -69,7 +69,7 @@ No document content is uploaded. Vision inference is a local subprocess. Model i
 
 Budgets use decimal MB/GB. GPU VRAM is separate and must also be reported. Small-tier vision models require a measured complete inference footprint before admission. Arabic accuracy and Windows behavior are separate validation gates.
 
-See [measured memory workloads and limitations](docs/MEMORY.md). The Linux Pocket executable at `65bd416` peaked at 314 MB in the cap-sized GUI benchmark, including its launcher. All three Linux source editions passed their documented workloads. These measurements are not universal hard-memory certifications.
+See [measured memory workloads and limitations](docs/MEMORY.md). The Linux Pocket executable at `2ba93c6` peaked at 242 MB in the cap-sized GUI benchmark, including its launcher. All three Linux source editions passed their documented workloads; a separate 100-job Pocket source-GUI soak also passed. These measurements are not universal hard-memory certifications.
 
 The [accuracy corpus and evaluator](docs/ACCURACY.md) track character/word errors across Arabic and English styles, including difficult cases. Passing resource tests is separate from transcription accuracy.
 
