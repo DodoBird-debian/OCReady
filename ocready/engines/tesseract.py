@@ -4,13 +4,14 @@ import threading
 from pathlib import Path
 
 from ocready.core.editions import Edition
-from ocready.core.paths import runtime_root
+from ocready.core.paths import build_profile, is_packaged, runtime_root
 from ocready.core.process import run_process
 from ocready.core.text import parse_tsv
 from ocready.core.types import OCRError, OCRResult
 
 LANGUAGES = {"ara+eng": "Arabic + English", "ara": "العربية · Arabic", "eng": "English"}
 LAYOUTS = {"auto": (3, "Automatic page"), "block": (6, "Single text block"), "sparse": (11, "Screenshot / scattered text")}
+SYSTEM_DATA_DIRS = (Path("/usr/share/tesseract-ocr/5/tessdata"), Path("/usr/share/tessdata"))
 
 
 def executable() -> Path | None:
@@ -21,6 +22,8 @@ def executable() -> Path | None:
     bundled = runtime_root() / "bin" / name
     if bundled.is_file():
         return bundled
+    if is_packaged():
+        return None
     found = shutil.which(name)
     return Path(found) if found else None
 
@@ -31,7 +34,8 @@ def data_dir(quality: str = "fast") -> Path | None:
         prefix = os.environ.get("TESSDATA_PREFIX")
         if prefix:
             candidates.append(Path(prefix))
-        candidates += [Path("/usr/share/tesseract-ocr/5/tessdata"), Path("/usr/share/tessdata")]
+        if not is_packaged():
+            candidates.extend(SYSTEM_DATA_DIRS)
     return next((p for p in candidates if p.is_dir() and (p / "eng.traineddata").is_file()), None)
 
 
@@ -48,10 +52,17 @@ def runtime_env() -> dict[str, str]:
 
 
 def readiness(quality: str = "fast") -> tuple[bool, str]:
+    packaged = is_packaged()
+    if packaged and f"tesseract-{quality}" not in build_profile().get("methods", []):
+        return False, f"This edition does not include {'Precision' if quality == 'best' else 'Fast'} OCR."
     if not executable():
+        if packaged:
+            return False, "The built-in OCR engine is unavailable. Download a fresh copy of this edition."
         return False, "OCR runtime missing. Run scripts/prepare_runtime.py or install Tesseract."
     data = data_dir(quality)
     if not data or not (data / "ara.traineddata").is_file():
+        if packaged:
+            return False, "The built-in Arabic and English language files are unavailable. Download a fresh copy of this edition."
         return False, f"Arabic + English {quality} language data is not installed."
     return True, "Ready · offline Arabic + English"
 

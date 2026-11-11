@@ -1540,3 +1540,33 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M58.V2: Retain a timeout row rather than abandoning the benchmark report.
 - M58.V3: Verify real descendant cleanup and rerun all platform/model gates before publication.
 - Release gate: Every required scenario completes successfully with unchanged RAM and accuracy checks; historical failures remain visible.
+
+## M59 — portable runtimes and Arabic filesystem paths
+
+- Responsibility: Verify a packaged application without silently borrowing a development installation.
+- M59.T1: Distinguish packaged runtime lookup from source-development fallback.
+- M59.T2: Require bundled classical assets in packaged builds while retaining explicit external runtime overrides.
+- M59.T3: Remove Python, OCR, loader and Qt plugin development overrides during portable-binary checks.
+- M59.T4: Restrict executable search to operating-system directories and preserve required OS service configuration.
+- M59.T5: Give every diagnostic a private application configuration to prevent user model/option shadowing.
+- M59.T6: Use Arabic original filenames and runtime temporary paths in complete workflow tests.
+- M59.T7: Record the environment policy and require it for builds declaring the new validation contract.
+- M59.V1: Prove a missing packaged engine/data file cannot be masked by a system installation.
+- M59.V2: Verify Windows environment-name casing and preserve the correct SystemRoot DLL search.
+- M59.V3: Execute real Unicode file I/O with invalid Python/plugin overrides removed.
+- M59.V4: Rerun all packaged methods and resource cases on both operating systems.
+- Release gate: Successful isolated, Unicode-path evidence for every published platform/model combination.
+
+## M60 — native desktop copy-workflow evidence
+
+- Responsibility: Verify native windowing, located selection and Unicode copying in compiled applications.
+- M60.T1: Run Linux GUI checks on X11 in a private virtual display and Windows checks on Win32.
+- M60.T2: Record the actual Qt platform returned by the application rather than trusting the requested environment alone.
+- M60.T3: Retain screenshots and GUI records of the public synthetic sample for review, including failures when available.
+- M60.T4: Send mouse events only to the tested application's own source widget; avoid external desktop input automation.
+- M60.T5: Click a genuine detected Arabic region and verify its linked text and selected-copy operation.
+- M60.T6: Read back Copy all through Qt's clipboard API without altering recognized text.
+- M60.V1: Verify actual platform identity for every packaged GUI resource case.
+- M60.V2: Exercise word and line geometry through their real widgets; VLM results retain no fabricated regions.
+- M60.V3: Review native platform screenshots separately from interactive capture integration.
+- Release gate: Correct native GUI and copy checks on both platforms; cross-application pasting and actual snipping remain separate evidence.

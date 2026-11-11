@@ -35,3 +35,18 @@ Accuracy reports retain the raw corpus-manifest checksum and a canonical JSON co
 New Windows builds also retain `pe-layout.json`: x64 machine, mapped image size, section bounds and numeric root resource types, following the [Microsoft PE format](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format). The builder requires icon and group-icon resources after attaching the owned application ICO. The vector source is `assets/ocready.svg`; `uv run python -m scripts.make_icon` regenerates the matching PNG and nine-resolution ICO. Runtime window branding uses the same mark without depending on an installed letterform font. Both build workflows retain small layout/compiler diagnostics after failures.
 
 Diagnostic timeouts derive from the same unchanged attempt limits used by the engines: 120 seconds for classical/neural workers, 300 seconds for a vision attempt and 20 seconds for its capability probe. Envelopes include a possible backend-to-CPU retry, sequential GUI iterations, a 30-second GUI allowance and a 120-second outer startup allowance. The limits bound test execution; they are not performance targets. A deadline failure retains its partial measurements and fails publication. The harness must never silently replace a failed result with a later successful run.
+
+## Isolated desktop validation
+
+New build manifests declare a validation requirement for isolated runtimes, native GUI backends and Unicode paths. Packaged checks remove inherited Python, OCR and Qt/loader overrides, use only OS directories on PATH and keep a private application configuration. Original benchmark images and runtime temporary directories include Arabic names. Deliberately configured external runtimes remain an app feature; the diagnostic isolation ensures those choices cannot accidentally mask missing bundled files.
+
+Linux workflow GUI checks use X11 through `xvfb-run`; Windows uses the native Win32 Qt platform. The GUI reports its actual platform name, and publication rejects a missing or mismatched result for the new validation policy. Older releases keep their original evidence scope. A local Linux developer can request the same path with:
+
+```sh
+OCREADY_GUI_TEST_PLATFORM=xcb xvfb-run -a --server-args="-screen 0 1600x1200x24" \
+  uv run python -m scripts.smoke_binary dist/pocket --benchmark
+```
+
+Each basic GUI smoke read also exercises Copy all through Qt's clipboard API. For classical/neural output it clicks a genuine detected Arabic region inside the application's own widget, checks linked highlighting and copies that selection. This is an in-application clipboard readback while the window is alive; it does not certify cross-application pasting or screenshot-tool integration. Resource GUI cases retain platform/copy diagnostics without publishing their stress-image transcription.
+
+The workflow retains `gui-*.png` and `gui-*.json` records of the fixed public sample, including failed GUI records/screenshots when generated. These are review artifacts, not captures of the user's desktop. Source unit tests can still use the offscreen Qt backend, but new release evidence must identify X11/Wayland or Win32.

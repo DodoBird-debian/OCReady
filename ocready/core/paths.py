@@ -13,6 +13,10 @@ def resource_root() -> Path:
     return Path(__file__).resolve().parents[2]
 
 
+def is_packaged() -> bool:
+    return (resource_root() / "build-manifest.json").is_file()
+
+
 def runtime_root() -> Path:
     override = os.environ.get("OCREADY_RUNTIME")
     if override:

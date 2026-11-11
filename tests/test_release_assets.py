@@ -24,6 +24,7 @@ def artifacts(tmp_path):
                        "source": {"revision": REVISION, "dirty": False, "tree_sha256": "b" * 64}}
             (binary.parent / "build-manifest.json").write_text(json.dumps(profile))
             report = {"binary": True, "binary_sha256": digest, "build_profile": profile,
+                      "source": profile["source"],
                       "platform": runtime_platform, "sources_changed_during_run": False, "binary_changed_during_run": False,
                       "scenarios": [{"edition": edition, "budget_bytes": policy.budget, "peak_rss_bytes": 1_000_000,
                                      "exit_code": 0, "below_budget": True, "scenario": scenario} for scenario in SCENARIOS]}
@@ -43,6 +44,15 @@ def test_release_contains_six_verified_binaries_and_checksummed_metadata(artifac
         assert file_sha256(output / name) == digest
     with pytest.raises(ValueError, match="empty output"):
         prepare_release(artifacts, output, REVISION, 123)
+
+
+def test_default_release_rejects_a_different_benchmark_controller_source(artifacts):
+    report = artifacts / "OCReady-pocket-Linux/test-output/packaged-pocket.json"
+    value = json.loads(report.read_text())
+    value["source"] = {**value["source"], "revision": "f" * 40}
+    report.write_text(json.dumps(value))
+    with pytest.raises(ValueError, match="provenance"):
+        verify_artifacts(artifacts, REVISION)
 
 
 @pytest.mark.parametrize("failure", ["binary", "wrong-source", "failed-gui", "over-budget", "changed-during-run"])

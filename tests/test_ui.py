@@ -115,6 +115,29 @@ def test_gui_smoke_does_not_cancel_vision_inside_its_engine_deadline(window, app
     assert record["deadline_seconds"] > 300
 
 
+def test_packaged_smoke_clicks_a_real_arabic_region_and_copies_text(window, app, tmp_path):
+    import json
+    from types import SimpleNamespace
+
+    from ocready.ui.smoke import attach_smoke_run
+
+    if not readiness()[0]:
+        pytest.skip("Prepare OCR runtime for the real copy workflow")
+    output = tmp_path / "copy-smoke.json"
+    codes = []
+    attach_smoke_run(SimpleNamespace(exit=codes.append), window, None, output)
+    until = time.monotonic() + 10
+    while not output.exists() and time.monotonic() < until:
+        app.processEvents()
+        time.sleep(.01)
+    record = json.loads(output.read_text())
+    assert codes == [0] and not record["error"]
+    assert record["source_selection_verified"] is True
+    assert record["clipboard_copy_verified"] is True
+    assert QApplication.clipboard().text() == record["text"]
+    assert "مرحبا بالعالم" in record["text"]
+
+
 def test_edition_method_layout_and_backend_choices_restore(window):
     from ocready.core.settings import save_settings
     save_settings({"edition": "studio", "methods": {"studio": "tesseract-fast", "everyday": "tesseract-best"},

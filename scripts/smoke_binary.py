@@ -1,13 +1,14 @@
 """Execute compiled onefile methods without a source-runtime override."""
 import argparse
 import json
-import os
+import shutil
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
 
 from ocready.core.timeouts import observed_workload_timeout_seconds
+from scripts.packaged_environment import gui_test_platform, runtime_test_environment
 
 
 def embedded_selections(profile: dict) -> list[tuple[str, str]]:
@@ -48,8 +49,6 @@ def main() -> None:
     selections = embedded_selections(profile) if args.all_methods else [(profile["methods"][0], "")]
     if not selections:
         raise RuntimeError("No embedded methods are available to test.")
-    env = {key: value for key, value in os.environ.items()
-           if key not in {"OCREADY_RUNTIME", "OCREADY_TESSERACT", "TESSDATA_PREFIX", "PYTHONPATH", "VIRTUAL_ENV"}}
     for method, pack_id in selections:
         vision = method == "vision"
         neural = method == "neural"
@@ -59,6 +58,7 @@ def main() -> None:
         label = method + ("-" + pack_id if pack_id else "")
         deadline = observed_workload_timeout_seconds(method)
         with tempfile.TemporaryDirectory(prefix="ocready-smoke-") as temporary:
+            env = runtime_test_environment(Path(temporary) / "runtime-العربية")
             output = Path(temporary) / "result.json"
             run_checked([str(binary), str(root / "assets/sample-bilingual.png"), "--json", "--layout", "sparse",
                          "--output", str(output), *selection], cwd=temporary, env=env, timeout=deadline)
@@ -73,19 +73,34 @@ def main() -> None:
                 assert result["geometry"] == "line", result
             print(f"{label}: compiled OCR passed; {len(result['words'])} regions; sampled {result['peak_rss'] / 1e6:.1f} MB RSS", flush=True)
             output = Path(temporary) / "gui-result.json"
-            gui_env = {**env, "QT_QPA_PLATFORM": "offscreen", "XDG_CONFIG_HOME": str(Path(temporary) / "config"),
+            gui_env = {**env, "QT_QPA_PLATFORM": gui_test_platform(), "XDG_CONFIG_HOME": str(Path(temporary) / "config"),
                        "APPDATA": str(Path(temporary) / "config")}
-            run_checked([str(binary), str(root / "assets/sample-bilingual.png"),
-                         "--ui-smoke-output", str(output), *selection], cwd=temporary, env=gui_env, timeout=deadline)
+            evidence_name = f"gui-{profile['edition']}" + ("-" + profile["variant"] if profile.get("variant") else "") + "-" + label
+            evidence = root / "test-output" / evidence_name
+            evidence.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                run_checked([str(binary), str(root / "assets/sample-bilingual.png"),
+                             "--ui-smoke-output", str(output), *selection], cwd=temporary, env=gui_env, timeout=deadline)
+            finally:
+                for suffix in (".json", ".png"):
+                    if output.with_suffix(suffix).is_file():
+                        shutil.copyfile(output.with_suffix(suffix), evidence.with_suffix(suffix))
             gui = json.loads(output.read_text(encoding="utf-8"))
             assert not gui["error"], gui
+            assert gui.get("qt_platform") == gui_test_platform(), gui
+            assert gui.get("clipboard_copy_verified") is True, gui
             assert gui["result"]["engine"] == result["engine"], gui
             if vision:
                 assert not gui["linked"] and gui["words"] == 0, gui
                 assert "screenshots" in gui["text"], gui["text"]
             else:
+                assert gui.get("source_selection_verified") is True, gui
                 assert gui["linked"] and gui["words"] >= (1 if neural else 25), gui
                 assert "مرحبا بالعالم" in gui["text"], gui["text"]
+            gui["build_profile"] = profile
+            gui["requested_method"], gui["requested_pack_id"] = method, pack_id
+            output.write_text(json.dumps(gui, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            shutil.copyfile(output, evidence.with_suffix(".json"))
             print(f"{label}: compiled native GUI passed; {gui['words']} linked regions; {gui['rss'] / 1e6:.1f} MB idle RSS", flush=True)
         if args.benchmark:
             # Preserve the original default-edition path used by release verification.

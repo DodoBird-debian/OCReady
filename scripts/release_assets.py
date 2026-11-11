@@ -11,6 +11,27 @@ from scripts.provenance import file_sha256
 SCENARIOS = {"sample", "dark", "max-pixels", "gui-onefile"}
 
 
+def verify_execution_environment(evidence: dict, profile: dict, runtime_platform: str) -> None:
+    requirement = profile.get("validation_policy")
+    environment = evidence.get("execution_environment")
+    if requirement is None and environment is None:
+        return  # Older releases retain their original, narrower validation scope.
+    if requirement is not None and (not isinstance(requirement, dict)
+            or type(requirement.get("portable_runtime_environment")) is not int or requirement.get("portable_runtime_environment") != 1
+            or requirement.get("native_gui_backend") is not True or requirement.get("unicode_paths") is not True):
+        raise ValueError("Unsupported packaged validation policy.")
+    expected_gui = {"windows"} if runtime_platform == "win32" else {"xcb", "wayland"}
+    if (not isinstance(environment, dict) or environment.get("policy") != "isolated-runtime-v1"
+            or environment.get("path_scope") != "OS system directories"
+            or environment.get("unicode_runtime_temp") is not True or environment.get("private_configuration") is not True
+            or environment.get("development_overrides_removed") is not True
+            or not isinstance(environment.get("gui_platform"), str) or environment.get("gui_platform") not in expected_gui):
+        raise ValueError("Packaged release needs isolated runtimes, Unicode paths and the native GUI backend.")
+    gui = [row for row in evidence.get("scenarios", []) if row.get("scenario") == "gui-onefile"]
+    if len(gui) != 1 or gui[0].get("details", {}).get("qt_platform") != environment["gui_platform"]:
+        raise ValueError("The GUI result did not confirm the requested native windowing backend.")
+
+
 def verify_artifacts(root: Path, revision: str) -> list[dict]:
     if not re.fullmatch(r"[0-9a-f]{40}", revision):
         raise ValueError("Supply the full 40-character source revision.")
@@ -37,6 +58,7 @@ def verify_artifacts(root: Path, revision: str) -> list[dict]:
                 raise ValueError(f"{binary.name}: executable checksum mismatch.")
             evidence = json.loads(report.read_text(encoding="utf-8"))
             if (evidence.get("binary_sha256") != digest or evidence.get("build_profile") != profile
+                    or evidence.get("source") != source
                     or evidence.get("binary") is not True or evidence.get("platform") != runtime_platform
                     or evidence.get("sources_changed_during_run") is not False
                     or evidence.get("binary_changed_during_run") is not False):
@@ -44,6 +66,7 @@ def verify_artifacts(root: Path, revision: str) -> list[dict]:
             rows = evidence.get("scenarios", [])
             if len(rows) != 4 or {row.get("scenario") for row in rows} != SCENARIOS:
                 raise ValueError(f"{binary.name}: all four packaged scenarios are required.")
+            verify_execution_environment(evidence, profile, runtime_platform)
             for row in rows:
                 if (row.get("edition") != edition or row.get("budget_bytes") != policy.budget
                         or row.get("below_budget") is not True or row.get("exit_code") != 0

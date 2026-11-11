@@ -40,7 +40,7 @@ jobs:
           uv sync --frozen --extra dev --extra neural
       - name: Linux runtime
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-ara libegl1 libxcb-cursor0 patchelf
+        run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-ara libegl1 libxcb-cursor0 libxkbcommon-x11-0 patchelf xvfb xauth
       - name: Windows runtime
         if: runner.os == 'Windows'
         run: choco install tesseract --no-progress -y
@@ -73,7 +73,15 @@ jobs:
           key: ${{ steps.worker-cache.outputs.cache-primary-key }}
       - name: Compile outer onefile application
         run: uv run python -m scripts.build_variant --edition ${{ inputs.edition }} --variant ${{ inputs.variant }} --jobs 2
-      - name: Verify complete executable and memory workloads
+      - name: Verify complete executable and X11 memory workloads
+        if: runner.os == 'Linux'
+        env:
+          OCREADY_GUI_TEST_PLATFORM: xcb
+        run: xvfb-run -a --server-args="-screen 0 1600x1200x24" uv run python -m scripts.smoke_binary dist/${{ inputs.edition }}-${{ inputs.variant }} --all-methods --benchmark
+      - name: Verify complete executable and Win32 memory workloads
+        if: runner.os == 'Windows'
+        env:
+          OCREADY_GUI_TEST_PLATFORM: windows
         run: uv run python -m scripts.smoke_binary dist/${{ inputs.edition }}-${{ inputs.variant }} --all-methods --benchmark
       - name: Retain failed-build layout diagnostics
         if: failure()
@@ -85,6 +93,8 @@ jobs:
             dist/${{ inputs.edition }}-${{ inputs.variant }}/compilation-report.xml
             build/${{ inputs.edition }}-${{ inputs.variant }}/payload/build-manifest.json
             test-output/packaged-*.json
+            test-output/gui-*.json
+            test-output/gui-*.png
           if-no-files-found: warn
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: success()
@@ -96,6 +106,8 @@ jobs:
             dist/${{ inputs.edition }}-${{ inputs.variant }}/pe-layout.json
             test-output/packaged-${{ inputs.edition }}-${{ inputs.variant }}-*.json
             test-output/neural-accuracy.json
+            test-output/gui-*.json
+            test-output/gui-*.png
           if-no-files-found: error
   release:
     needs: build

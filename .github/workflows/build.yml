@@ -32,7 +32,7 @@ jobs:
           uv sync --frozen --extra dev
       - name: Linux runtime
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-ara libegl1 libxcb-cursor0 patchelf
+        run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-ara libegl1 libxcb-cursor0 libxkbcommon-x11-0 patchelf xvfb xauth
       - name: Windows runtime
         if: runner.os == 'Windows'
         run: choco install tesseract --no-progress -y
@@ -45,8 +45,15 @@ jobs:
       - name: Compile selected edition
         if: github.event_name != 'workflow_dispatch' || inputs.edition == 'all' || inputs.edition == matrix.edition
         run: uv run python scripts/build.py --edition ${{ matrix.edition }} --jobs 2
-      - name: Smoke-test compiled binary
-        if: github.event_name != 'workflow_dispatch' || inputs.edition == 'all' || inputs.edition == matrix.edition
+      - name: Smoke-test compiled binary on X11
+        if: runner.os == 'Linux' && (github.event_name != 'workflow_dispatch' || inputs.edition == 'all' || inputs.edition == matrix.edition)
+        env:
+          OCREADY_GUI_TEST_PLATFORM: xcb
+        run: xvfb-run -a --server-args="-screen 0 1600x1200x24" uv run python scripts/smoke_binary.py dist/${{ matrix.edition }} --benchmark
+      - name: Smoke-test compiled binary on Win32
+        if: runner.os == 'Windows' && (github.event_name != 'workflow_dispatch' || inputs.edition == 'all' || inputs.edition == matrix.edition)
+        env:
+          OCREADY_GUI_TEST_PLATFORM: windows
         run: uv run python scripts/smoke_binary.py dist/${{ matrix.edition }} --benchmark
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: failure() && (github.event_name != 'workflow_dispatch' || inputs.edition == 'all' || inputs.edition == matrix.edition)
@@ -57,6 +64,8 @@ jobs:
             dist/${{ matrix.edition }}/compilation-report.xml
             build/${{ matrix.edition }}/payload/build-manifest.json
             test-output/packaged-${{ matrix.edition }}.json
+            test-output/gui-*.json
+            test-output/gui-*.png
           if-no-files-found: warn
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: github.event_name != 'workflow_dispatch' || inputs.edition == 'all' || inputs.edition == matrix.edition
@@ -67,6 +76,8 @@ jobs:
             dist/${{ matrix.edition }}/build-manifest.json
             dist/${{ matrix.edition }}/pe-layout.json
             test-output/packaged-${{ matrix.edition }}.json
+            test-output/gui-*.json
+            test-output/gui-*.png
           if-no-files-found: error
   release:
     needs: build

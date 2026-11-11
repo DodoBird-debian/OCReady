@@ -19,6 +19,7 @@ from PIL import Image, ImageOps
 from ocready.core.editions import EDITIONS
 from ocready.core.memory import tree_rss
 from ocready.core.timeouts import gui_workload_timeout_seconds, observed_workload_timeout_seconds
+from scripts.packaged_environment import execution_policy, gui_test_platform, runtime_test_environment
 from scripts.provenance import file_sha256, source_record
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -33,6 +34,9 @@ def redact_details(record: dict) -> dict:
     safe["words"] = len(words) if isinstance(words, list) else words
     if record.get("error"):
         safe["error"] = record["error"]
+    for key in ("qt_platform", "clipboard_copy_verified", "source_selection_verified", "deadline_seconds"):
+        if key in record:
+            safe[key] = record[key]
     return safe
 
 
@@ -119,7 +123,7 @@ def gui_child(image_path: str, edition: str, output: str, loops: int, pack_path:
         if remaining > 0:
             run_next()
         else:
-            Path(output).write_text(json.dumps({"iterations": measurements}), encoding="utf-8")
+            Path(output).write_text(json.dumps({"iterations": measurements, "qt_platform": app.platformName()}), encoding="utf-8")
             timer.stop()
             window.close()
             app.quit()
@@ -147,9 +151,9 @@ def gui_child(image_path: str, edition: str, output: str, loops: int, pack_path:
     return 2 if failed else 0
 
 
-def observe(command: list[str], output: Path, budget: int, timeout_seconds: int = 180) -> dict:
-    env = os.environ.copy()
-    env["QT_QPA_PLATFORM"] = "offscreen"
+def observe(command: list[str], output: Path, budget: int, timeout_seconds: int = 180, *, isolated: bool = False) -> dict:
+    env = runtime_test_environment(output.parent / "runtime-العربية", isolated=isolated)
+    env["QT_QPA_PLATFORM"] = gui_test_platform()
     env["XDG_CONFIG_HOME"] = str(output.parent / "config")
     env["APPDATA"] = str(output.parent / "config")
     start = time.monotonic()
@@ -226,7 +230,7 @@ def main() -> int:
         temporary = Path(temporary)
         for edition in editions:
             for scenario in ("sample", "dark", "max-pixels", "gui-onefile" if args.binary else "gui-repeated"):
-                image = temporary / "input.png"
+                image = temporary / "input-العربية.png"
                 output = temporary / "result.json"
                 output.unlink(missing_ok=True)
                 make_image(image, edition, dark=scenario == "dark", maximum=scenario in {"max-pixels", "gui-repeated", "gui-onefile"})
@@ -257,7 +261,7 @@ def main() -> int:
                 method = args.method or ("vision" if args.vision_pack else "neural" if args.neural_pack else
                                          binary_profile["methods"][0] if binary_profile else "tesseract-fast")
                 deadline = observed_workload_timeout_seconds(method, loops=4 if scenario == "gui-repeated" else 1)
-                result = observe(command, output, EDITIONS[edition].budget, timeout_seconds=deadline)
+                result = observe(command, output, EDITIONS[edition].budget, timeout_seconds=deadline, isolated=bool(args.binary))
                 result = {"edition": edition, "max_pixels": EDITIONS[edition].max_pixels, "scenario": scenario, **result}
                 # Preserve evidence without copying all recognized document contents into reports.
                 if "text" in result["details"]:
@@ -268,6 +272,7 @@ def main() -> int:
     report = {"sample_interval_ms": 10, "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
               "platform": sys.platform, "python": sys.version.split()[0], "cpu_count": psutil.cpu_count(),
               "binary": bool(args.binary), "scenarios": records,
+              "execution_environment": execution_policy(bool(args.binary)),
               "source": source, "sources_changed_during_run": source_record(ROOT) != source,
               "binary_sha256": binary_hash,
               "binary_changed_during_run": bool(args.binary and file_sha256(args.binary) != binary_hash),

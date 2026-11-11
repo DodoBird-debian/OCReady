@@ -9,7 +9,7 @@ from ocready.core.editions import EDITIONS
 from ocready.engines.vision_adapters import ADAPTERS
 from scripts.corpus_identity import load_corpus_identity
 from scripts.provenance import file_sha256
-from scripts.release_assets import SCENARIOS
+from scripts.release_assets import SCENARIOS, verify_execution_environment
 from scripts.smoke_binary import embedded_selections
 from scripts.variants import MODEL_VARIANTS, VISION_VARIANTS
 
@@ -123,6 +123,7 @@ def verify_variants(root: Path, revision: str, edition: str, variant: str) -> li
             rows = report.get("scenarios", [])
             if len(rows) != 4 or {row.get("scenario") for row in rows} != SCENARIOS:
                 raise ValueError("Every embedded choice needs all four packaged resource scenarios.")
+            verify_execution_environment(report, profile, runtime_platform)
             engine = f"{method}:{pack_id}" if pack_id else method
             for row in rows:
                 details = row.get("details", {})
