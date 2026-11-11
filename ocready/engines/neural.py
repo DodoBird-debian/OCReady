@@ -62,7 +62,7 @@ def recognize(image: Path, edition: Edition, pack: NeuralPack, *, language: str 
               backend: str = "auto", cancel: threading.Event | None = None, progress=lambda _text: None) -> OCRResult:
     if backend not in {"auto", "cpu", "cuda"}:
         raise OCRError("Choose Auto, CPU or CUDA for neural OCR.")
-    pack.validate()
+    pack.validate(require_cuda=False)
     if not set(language.split("+")) <= set(pack.languages.split("+")):
         raise OCRError(f"{pack.name} is configured for {pack.languages}. Choose a matching language.")
     allowed, reason = pack.admission(edition, tree_rss())
@@ -70,14 +70,16 @@ def recognize(image: Path, edition: Edition, pack: NeuralPack, *, language: str 
         raise OCRError(reason)
     with Image.open(image) as source:
         size = source.size
-    runner = pack.cuda_runner if backend != "cpu" and pack.cuda_runner else pack.runner
+    missing_cuda = bool(pack.cuda_runner and not Path(pack.cuda_runner).expanduser().is_file())
+    runner = pack.cuda_runner if backend != "cpu" and pack.cuda_runner and not missing_cuda else pack.runner
+    compute = "cpu" if missing_cuda else backend
     def command(program: str, compute: str) -> list[str]:
         return [program, "--image", str(image.resolve()), "--detector", pack.detector,
                 "--recognizer", pack.recognizer, "--dictionary", pack.dictionary,
                 "--backend", compute, "--direction", pack.direction, "--decode", pack.decode]
     progress(f"Reading with {pack.name}…")
     try:
-        process = run_process(command(runner, backend), budget=edition.budget, cancel=cancel,
+        process = run_process(command(runner, compute), budget=edition.budget, cancel=cancel,
                               timeout=PROCESS_TIMEOUT_SECONDS, env=runner_env(runner))
     except (Cancelled, BudgetExceeded):
         raise
@@ -88,6 +90,8 @@ def recognize(image: Path, edition: Edition, pack: NeuralPack, *, language: str 
         process = run_process(command(pack.runner, "cpu"), budget=edition.budget, cancel=cancel,
                               timeout=PROCESS_TIMEOUT_SECONDS, env=runner_env(pack.runner))
     result = parse_output(process.stdout, size, pack=pack, language=language)
+    if backend != "cpu" and missing_cuda:
+        result.note = (result.note + " The configured CUDA helper is unavailable; used CPU.").strip()
     if not result.text:
         result.note = (result.note + " No text lines found. Try a tighter crop or another OCR method.").strip()
     result.elapsed, result.peak_rss = process.elapsed, process.peak_rss

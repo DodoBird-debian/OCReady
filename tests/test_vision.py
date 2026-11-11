@@ -64,6 +64,34 @@ def test_config_persists_only_model_configuration(pack, tmp_path, monkeypatch):
     assert load_packs() == [pack]
 
 
+@pytest.mark.parametrize("backend", ["auto", "cpu", "cuda"])
+def test_removed_optional_cuda_helper_keeps_cpu_inference_available(pack, tmp_path, monkeypatch, backend):
+    helper = tmp_path / "optional-cuda"
+    helper.write_bytes(b"helper")
+    pack = dataclasses.replace(pack, cuda_runner=str(helper))
+    pack.validate()
+    helper.unlink()
+    # Manifest import and compilation remain strict about configured assets.
+    with pytest.raises(OCRError, match="CUDA runner does not exist"):
+        pack.validate()
+    monkeypatch.setattr(vision, "has_cuda", lambda *_args: pytest.fail("Missing helper must not be probed"))
+    calls = []
+    def execute(args, **kwargs):
+        calls.append(args)
+        return ProcessResult("مرحبا بالعالم", "", 700_000_000, 1)
+    monkeypatch.setattr(vision, "run_process", execute)
+    result = vision.recognize(tmp_path / "image.png", EDITIONS["studio"], pack, backend=backend)
+    assert len(calls) == 1 and calls[0][0] == pack.runner
+    assert calls[0][calls[0].index("-ngl") + 1] == "0"
+    assert "--no-mmproj-offload" in calls[0]
+    assert result.backend == "CPU" and result.text == "مرحبا بالعالم"
+    assert ("configured CUDA helper is unavailable" in result.note) == (backend != "cpu")
+    Path(pack.model).unlink()
+    with pytest.raises(OCRError, match="model file does not exist"):
+        vision.recognize(tmp_path / "image.png", EDITIONS["studio"], pack, backend=backend)
+    assert len(calls) == 1
+
+
 @pytest.mark.parametrize("bad", [{}, {"id": []}, {"id": "x", "name": "x", "runner": "x", "model": "x", "projector": "x", "tokens": "512"}])
 def test_malformed_model_configuration(bad):
     with pytest.raises(OCRError):

@@ -37,7 +37,7 @@ class ModelPack:
     max_edge: int = 1600
     adapter: str = "llama.cpp"
 
-    def validate(self) -> None:
+    def validate(self, *, require_cuda: bool = True) -> None:
         if not re.fullmatch(r"[a-zA-Z0-9_-]{1,60}", self.id):
             raise OCRError("Model ID must use 1–60 letters, digits, underscores or hyphens.")
         if not self.name.strip() or len(self.name) > 120:
@@ -62,7 +62,7 @@ class ModelPack:
             if not value or not path.is_file():
                 raise OCRError(f"The {name} file does not exist. Choose it in Settings → Vision models.")
         adapter.validate_model(self)
-        if self.cuda_runner and not Path(self.cuda_runner).expanduser().is_file():
+        if require_cuda and self.cuda_runner and not Path(self.cuda_runner).expanduser().is_file():
             raise OCRError("The configured CUDA runner does not exist.")
 
     def admission(self, edition: Edition, resident_bytes: int = 150_000_000) -> tuple[bool, str]:

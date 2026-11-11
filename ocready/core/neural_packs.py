@@ -32,7 +32,7 @@ class NeuralPack:
     license: str = "See the model licenses"
     bundled: bool = False
 
-    def validate(self) -> None:
+    def validate(self, *, require_cuda: bool = True) -> None:
         if not re.fullmatch(r"[a-zA-Z0-9_-]{1,60}", self.id) or not self.name.strip() or len(self.name) > 120:
             raise OCRError("Give the neural pack a short name and a valid letter/digit/underscore/hyphen ID.")
         if not 100 <= self.memory_mb <= 3800:
@@ -43,7 +43,7 @@ class NeuralPack:
             raise OCRError("Choose supported languages, reading direction, and model text encoding.")
         for key in ASSET_FIELDS:
             value = getattr(self, key)
-            if key == "cuda_runner" and not value:
+            if key == "cuda_runner" and (not require_cuda or not value):
                 continue
             if not value or not Path(value).expanduser().is_file():
                 raise OCRError(f"The neural {key} file does not exist. Import its manifest in Settings.")

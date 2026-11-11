@@ -40,7 +40,9 @@ def recognize(image: Path, edition: Edition, pack: ModelPack, *, language: str =
               backend: str = "auto", cancel: threading.Event | None = None, progress=lambda _message: None) -> OCRResult:
     if backend not in {"auto", "cpu", "cuda"}:
         raise OCRError("Choose Auto, CPU, or CUDA for vision inference.")
-    pack.validate()
+    # Imports/builds still validate every configured asset strictly. A helper
+    # removed after configuration must not prevent using the intact CPU pack.
+    pack.validate(require_cuda=False)
     adapter = get_adapter(pack.adapter)
     if any(value not in pack.languages.split("+") for value in language.split("+")):
         raise OCRError(f"{pack.name} is configured for {pack.languages}. Choose a matching language, or use Fast/Precision OCR for Arabic + English.")
@@ -48,10 +50,13 @@ def recognize(image: Path, edition: Edition, pack: ModelPack, *, language: str =
     if not allowed:
         raise OCRError(detail)
     started = time.monotonic()
-    cuda_program = pack.cuda_runner or pack.runner
-    cuda = bool(backend != "cpu" and has_cuda(cuda_program, edition, cancel, pack.adapter))
+    missing_cuda = bool(pack.cuda_runner and not Path(pack.cuda_runner).expanduser().is_file())
+    cuda_program = str(Path(pack.cuda_runner or pack.runner).expanduser())
+    cuda = bool(backend != "cpu" and not missing_cuda and has_cuda(cuda_program, edition, cancel, pack.adapter))
     note = "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR."
-    if backend == "cuda" and not cuda:
+    if backend != "cpu" and missing_cuda:
+        note += " The configured CUDA helper is unavailable; used CPU."
+    elif backend == "cuda" and not cuda:
         note += " CUDA was unavailable; used CPU."
     progress(f"Reading with {pack.name} · {'CUDA' if cuda else 'CPU'}…")
     try:

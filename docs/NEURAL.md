@@ -53,6 +53,8 @@ Both CLI and GUI accept an explicit installed choice, for example `--method visi
 
 Import an external pack using **Settings → Neural OCR → Import local pack**. Built-in packs appear automatically. The settings retain options without moving or deleting model files. The shared Compute selector applies to neural and vision methods. The tested worker is CPU-based; it reports CPU when CUDA is not usable. A CUDA-capable compatible worker may be supplied separately, and backend initialization failures can fall back to CPU. Actual neural CUDA inference remains a separate validation task.
 
+If an optional CUDA worker disappears after configuration, recognition selects the intact CPU worker with an explicit CPU request. CPU selection also remains available without that helper. Manifest import and build preparation still validate configured helpers strictly; missing CPU workers or model/dictionary files remain errors.
+
 ## Copy order and model provenance
 
 The tested Arabic CTC recognizer emits visual scan order. The worker converts it into logical Unicode for copying. Automatic conversion uses an Arabic paragraph base when Arabic is present; English-only runs keep their normal order, digits, punctuation and email addresses. For English-led paragraphs containing inline Arabic, choose **English paragraph base** in pack options. Bidi inversion is ambiguous for some mixed layouts; this option is explicit rather than silently reversing all text. Models that already emit logical text can disable the conversion.

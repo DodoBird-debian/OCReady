@@ -8,6 +8,8 @@ Open **Settings → Vision models** and select the CPU runner, model, and matchi
 
 The app probes the selected CUDA runner's actual devices. Auto mode uses CUDA only when that runner reports a CUDA device; initialization failures retry once with the CPU runner, all GPU layers disabled, and the projector on CPU. Cancellation and RAM-budget failures never trigger an additional inference attempt.
 
+If an optional CUDA runner is removed after configuration, recognition uses the intact CPU runner and reports that fallback. Explicit CPU selection does not depend on the optional helper. Importing a manifest and preparing a build still require every configured file to exist; missing CPU runners, weights or projectors remain errors.
+
 Vision results are marked as AI transcription. They have no invented confidence or word coordinates. Use Fast or Precision OCR when you need to select individual words in the picture. Generative transcription can hallucinate, and model quality varies by language.
 
 AI preview and inference use the same image limits: by default one million pixels and a 1600-pixel longest edge. These limits reduce preview buffers as well as encoder input. The working original is retained for viewing and cropping. If small characters disappear in the reduced preview, crop that area from the original before recognizing. Settings → Vision models exposes both limits, within the supported bounds of 0.25–2.56 million pixels and 512–1600 pixels per edge. Fast and Precision retain their edition's larger image limits.

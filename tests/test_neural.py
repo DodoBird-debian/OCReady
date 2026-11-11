@@ -7,7 +7,9 @@ import pytest
 from native.neural_runner import logical_text
 from ocready.core.editions import EDITIONS
 from ocready.core.neural_packs import NeuralPack, load_neural_pack
+from ocready.core.process import ProcessResult
 from ocready.core.types import OCRError
+from ocready.engines import neural
 from ocready.engines.neural import parse_output
 
 
@@ -37,6 +39,35 @@ def test_neural_pack_validation_and_relative_manifest(neural_pack, tmp_path):
         NeuralPack.from_dict({**data, "languages": "unsupported"})
     with pytest.raises(OCRError):
         dataclasses.replace(neural_pack, direction="unknown").validate()
+
+
+@pytest.mark.parametrize("backend", ["auto", "cpu", "cuda"])
+def test_removed_optional_neural_helper_uses_intact_cpu_worker(neural_pack, tmp_path, monkeypatch, backend):
+    from PIL import Image
+    helper = tmp_path / "cuda-worker"
+    helper.write_bytes(b"helper")
+    pack = dataclasses.replace(neural_pack, cuda_runner=str(helper))
+    pack.validate()
+    helper.unlink()
+    with pytest.raises(OCRError, match="cuda_runner file does not exist"):
+        pack.validate()
+    image = tmp_path / "input.png"
+    Image.new("RGB", (100, 80), "white").save(image)
+    calls = []
+    def execute(args, **kwargs):
+        calls.append(args)
+        return ProcessResult(json.dumps({"schema": 1, "width": 100, "height": 80, "backend": "CPU", "lines": [
+            {"text": "مرحبا بالعالم", "polygon": [[1, 1], [90, 1], [90, 40], [1, 40]], "score": .9}]}), "", 350_000_000, 1)
+    monkeypatch.setattr(neural, "run_process", execute)
+    result = neural.recognize(image, EDITIONS["everyday"], pack, backend=backend)
+    assert len(calls) == 1 and calls[0][0] == pack.runner
+    assert calls[0][calls[0].index("--backend") + 1] == "cpu"
+    assert result.backend == "CPU" and result.text == "مرحبا بالعالم"
+    assert ("configured CUDA helper is unavailable" in result.note) == (backend != "cpu")
+    Path(pack.detector).unlink()
+    with pytest.raises(OCRError, match="detector file does not exist"):
+        neural.recognize(image, EDITIONS["everyday"], pack, backend=backend)
+    assert len(calls) == 1
 
 
 @pytest.mark.parametrize("raw,expected", [("ملاعلاب ابحرم", "مرحبا بالعالم"),
