@@ -33,6 +33,8 @@ def test_neural_pack_validation_and_relative_manifest(neural_pack, tmp_path):
     assert load_neural_pack(path) == neural_pack
     with pytest.raises(OCRError, match="Invalid neural manifest"):
         NeuralPack.from_dict({**data, "max_pixels": True})
+    with pytest.raises(OCRError, match="Invalid neural manifest"):
+        NeuralPack.from_dict({**data, "languages": "unsupported"})
     with pytest.raises(OCRError):
         dataclasses.replace(neural_pack, direction="unknown").validate()
 

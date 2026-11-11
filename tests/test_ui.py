@@ -660,3 +660,35 @@ def test_external_vision_runtime_can_be_swapped_in_native_settings(window, tmp_p
     dialog.select_pack(next(i for i, p in enumerate(dialog.packs) if p.id == pack.id))
     assert dialog.adapter.currentData() == "json-cli-v1"
     dialog.close()
+
+
+def test_switching_limited_models_restores_user_language_choice(window):
+    from ocready.core.models import ModelPack
+    window.edition_combo.setCurrentIndex(window.edition_combo.findData("everyday"))
+    window.packs = [ModelPack("english", "English model", "runner", "model", "projector", memory_mb=500, languages="eng"),
+                    ModelPack("arabic", "Arabic model", "runner", "model", "projector", memory_mb=500, languages="ara")]
+    window.refresh_methods()
+    window.language_combo.setCurrentIndex(window.language_combo.findData("ara+eng"))
+    window.method_combo.setCurrentIndex(window.method_combo.findData("vision:english"))
+    assert window.language_combo.currentData() == "eng"
+    assert not window.language_combo.model().item(window.language_combo.findData("ara")).isEnabled()
+    window.method_combo.setCurrentIndex(window.method_combo.findData("tesseract-best"))
+    assert window.language_combo.currentData() == "ara+eng"
+    assert all(window.language_combo.model().item(i).isEnabled() for i in range(window.language_combo.count()))
+    window.language_combo.setCurrentIndex(window.language_combo.findData("eng"))
+    window.method_combo.setCurrentIndex(window.method_combo.findData("vision:arabic"))
+    assert window.language_combo.currentData() == "ara"
+    window.method_combo.setCurrentIndex(window.method_combo.findData("tesseract-best"))
+    assert window.language_combo.currentData() == "eng"
+
+
+def test_model_language_constraint_does_not_overwrite_saved_preference(window):
+    from ocready.core.models import ModelPack
+    from ocready.core.settings import load_settings
+    window.edition_combo.setCurrentIndex(window.edition_combo.findData("everyday"))
+    window.packs = [ModelPack("english", "English model", "runner", "model", "projector", memory_mb=500, languages="eng")]
+    window.refresh_methods()
+    window.method_combo.setCurrentIndex(window.method_combo.findData("vision:english"))
+    assert window.language_combo.currentData() == "eng"
+    window.close()
+    assert load_settings()["language"] == "ara+eng"

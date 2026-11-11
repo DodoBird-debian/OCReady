@@ -85,6 +85,9 @@ class MainWindow(QMainWindow):
         saved_methods = self.preferences.get("methods", {})
         self.method_preferences = {key: value for key, value in saved_methods.items() if key in EDITIONS and isinstance(value, str)} if isinstance(saved_methods, dict) else {}
         self._method_edition = None
+        preferred_language = self.preferences.get("language", "ara+eng")
+        self._preferred_language = preferred_language if isinstance(preferred_language, str) and preferred_language in LANGUAGES else "ara+eng"
+        self._syncing_language = False
         self.packs = load_packs()
         self.neural_packs = load_neural_packs()
         self.vision_backend = self.preferences.get("vision_backend", "auto")
@@ -185,7 +188,9 @@ class MainWindow(QMainWindow):
         self.language_combo.setAccessibleName("Recognition language")
         for key, name in LANGUAGES.items():
             self.language_combo.addItem(name, key)
-        self.language_combo.setCurrentIndex(max(0, self.language_combo.findData(self.preferences.get("language", "ara+eng"))))
+        self.language_combo.setCurrentIndex(self.language_combo.findData(self._preferred_language))
+        self.language_combo.currentIndexChanged.connect(self._language_changed)
+        self.language_combo.activated.connect(self._language_changed)
         options.addWidget(self.language_combo)
         options.addSpacing(5)
         options.addWidget(label("with"))
@@ -646,14 +651,14 @@ class MainWindow(QMainWindow):
         self.layout_combo.setEnabled(classical and not self.worker)
         description = ("Compact offline OCR. Select individual words in the picture." if method == "tesseract-fast"
                        else "Larger offline language models. Select individual words in the picture.")
+        pack = None
         if not classical:
             pack = (next((p for p in self.neural_packs if method == f"neural:{p.id}"), None) if method.startswith("neural:")
                     else next((p for p in self.packs if method == f"vision:{p.id}"), None))
-            if pack and self.language_combo.currentData() != pack.languages and pack.languages != "ara+eng":
-                self.language_combo.setCurrentIndex(self.language_combo.findData(pack.languages))
             description = ("Detected text lines link to the picture. Select a line to copy it; use Fast or Precision for individual words."
                            if method.startswith("neural:") else
                            "AI transcription can omit or invent text. Check it against the picture; word locations are unavailable.")
+        self._sync_language(pack.languages if pack else "ara+eng")
         self.method_combo.setToolTip(f"{self.method_combo.currentText()}\n{description}")
         item = self.method_combo.model().item(self.method_combo.currentIndex())
         if item is not None and item.isEnabled() and self.method_combo.currentData():
@@ -662,6 +667,26 @@ class MainWindow(QMainWindow):
         policy = self._image_policy()
         if self.source is not None and self._preview_limits != (policy.max_pixels, policy.max_edge):
             self._apply_recipe()
+
+    def _language_changed(self, *_args) -> None:
+        if not self._syncing_language and self.language_combo.currentData() in LANGUAGES:
+            self._preferred_language = self.language_combo.currentData()
+
+    def _sync_language(self, supported: str) -> None:
+        if not isinstance(supported, str) or supported not in LANGUAGES:
+            self.language_combo.setToolTip("This model's language declaration is unsupported. Correct it in Settings.")
+            return
+        allowed = set(LANGUAGES) if supported == "ara+eng" else {supported}
+        selected = self._preferred_language if self._preferred_language in allowed else supported
+        self._syncing_language = True
+        try:
+            for index in range(self.language_combo.count()):
+                self.language_combo.model().item(index).setEnabled(self.language_combo.itemData(index) in allowed)
+            self.language_combo.setCurrentIndex(self.language_combo.findData(selected))
+        finally:
+            self._syncing_language = False
+        self.language_combo.setToolTip("Choose the languages to read." if supported == "ara+eng" else
+                                       f"This model supports {LANGUAGES[supported]}. Choose another method for other languages.")
 
     def _image_policy(self):
         method = str(self.method_combo.currentData())
@@ -914,7 +939,7 @@ class MainWindow(QMainWindow):
             event.ignore()
             return
         try:
-            save_settings({"edition": self.edition.id, "language": self.language_combo.currentData(),
+            save_settings({"edition": self.edition.id, "language": self._preferred_language,
                            "vision_backend": self.vision_backend, "methods": self.method_preferences,
                            "layout": self.layout_combo.currentData()})
         except OSError:

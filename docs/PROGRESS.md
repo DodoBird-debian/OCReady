@@ -354,3 +354,10 @@ The plan describes both the implementation sequence and release gates. Pending i
 - Added a late-invalid-member regression check that confirms earlier staged files are removed and no runtime is published. All 186 tests and Ruff passed, including the existing extraction/alias and real native containment suite.
 - Selected Nuitka's supported low-memory build flag rather than adding another compiler patch. In pinned 4.3.5 this also selects level-3 onefile compression; the requested policy/compiler and known level are recorded in provenance. Standalone builds do not claim onefile compression. Full compiled memory/startup checks follow this checkpoint.
 - The already-frozen `3d2adb7` Studio executable continues its original packaged measurements independently; its first neural CLI/GUI and all four resource scenarios passed at roughly 2.20 GB cold tree RSS. Later startup changes are not retroactively attributed to those results.
+
+## Iteration 40 — preserve language intent when swapping models
+
+- Fixed English/Arabic-only models overwriting the user's broader recognition choice. Model constraints now temporarily select supported languages, disable incompatible choices and restore the explicit user preference when returning to a compatible method.
+- Closing while a constrained model is selected saves the underlying preference, so merely trying the English-only vision model does not make later classical/neural sessions omit Arabic. Explicit user language changes remain persistent.
+- Rejected unsupported language declarations while reading model/neural manifests, with defensive UI handling for invalid programmatic packs. Existing valid packs need no migration.
+- Added native tests for bilingual → English model → classical restoration, explicit English → Arabic model → classical restoration, enabled-item lifecycle and saved preference preservation. Focused UI/vision/neural checks and Ruff passed; full source validation follows the checkpoint.

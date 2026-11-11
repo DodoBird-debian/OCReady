@@ -78,6 +78,8 @@ class NeuralPack:
                     raise ValueError(f"invalid type for {key}")
             if not 250_000 <= pack.max_pixels <= 4_000_000 or not 512 <= pack.max_edge <= 3000:
                 raise ValueError("image limits out of range")
+            if pack.languages not in {"ara+eng", "ara", "eng"} or pack.direction not in {"auto", "rtl", "ltr"} or pack.decode not in {"visual", "logical"}:
+                raise ValueError("unsupported language or text-order declaration")
             return pack
         except (TypeError, ValueError) as exc:
             raise OCRError(f"Invalid neural manifest: {exc}") from exc

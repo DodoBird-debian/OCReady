@@ -90,6 +90,8 @@ class ModelPack:
                 raise ValueError("vision image limits are out of range")
             if type(pack.bundled) is not bool:
                 raise ValueError("bundled must be a boolean")
+            if pack.languages not in {"ara+eng", "ara", "eng"}:
+                raise ValueError("unsupported model language declaration")
             from ocready.engines.vision_adapters import get_adapter
             get_adapter(pack.adapter)
             return pack
