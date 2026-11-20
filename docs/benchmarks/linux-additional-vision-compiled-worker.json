@@ -1,0 +1,173 @@
+{
+  "source": {
+    "revision": "ee98e57a7543d28f248b062ad07595b60138b71d",
+    "dirty": false,
+    "tree_sha256": "3f6fb3ae2ed8169e3c1bd1d92bb31c44b92fe5d27d07bbe332d247af8916d1f8"
+  },
+  "scope": "Linux relocated standalone compiled CPU JSON worker, two real English models; separate temporary native-GPU override tests actual incompatible-helper fallback. Not outer onefile or Windows qualification.",
+  "worker_manifest": {
+    "protocol": 1,
+    "adapter": "json-cli-v1",
+    "source": {
+      "revision": "ee98e57a7543d28f248b062ad07595b60138b71d",
+      "dirty": false,
+      "tree_sha256": "3f6fb3ae2ed8169e3c1bd1d92bb31c44b92fe5d27d07bbe332d247af8916d1f8"
+    },
+    "backend_errors_sha256": "9c0cb4a7c969b211cf83de66c911e5365d5e2a6481580dd132d3ecb931902ae7",
+    "backend_probe_sha256": "f002d9726860989b2bded9bfecb43d1686ad9faf1246d417f8d7a46e37c60c87",
+    "entrypoint_sha256": "97a5ea5f44ad94eb2c0d24a29bad614962a89923d77bcd6a5400ec2ed6f3bcae",
+    "python": "3.12.16",
+    "native_runner_sha256": "d1ba0e89d3c2938b1300193f674efd2eeadb6b5ef7539a07d7c9c98303e3e20d",
+    "files": {
+      "LICENSE-OCReady.txt": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "LICENSE-Python.txt": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf",
+      "libpython3.12.so.1.0": "3758022b6458e9cf801e832d3c5087ee75e6b539bbe44ca86a8175323a81ba4d",
+      "llama/LICENSE": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+      "llama/LICENSE-llama.txt": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+      "llama/NOTICE-ocready.txt": "b1eaa8e4462e83ff8e09a5a3826f314a4f58bfa8b4995f8686237a33ca773f7b",
+      "llama/libggml-base.so": "e456c91fdb7a21a738d2b7aef5eee760b8ad0fd8f7eda72c517c3791a01660a6",
+      "llama/libggml-base.so.0": "e456c91fdb7a21a738d2b7aef5eee760b8ad0fd8f7eda72c517c3791a01660a6",
+      "llama/libggml-base.so.0.29.0": "e456c91fdb7a21a738d2b7aef5eee760b8ad0fd8f7eda72c517c3791a01660a6",
+      "llama/libggml-cpu-alderlake.so": "ae990ef0ac6f28a4b13a89e613c551b77694db16bf01332baf82619c107700b5",
+      "llama/libggml-cpu-cannonlake.so": "777d4395e2a4ad70059d7c06f77856e8552e4d6b12dcd7d15919a52498729fea",
+      "llama/libggml-cpu-cascadelake.so": "2fe006a3e958e0ce01e611f10e76066db7bcede4e25eebcddbaa871527ca2232",
+      "llama/libggml-cpu-cooperlake.so": "bb9ae0899202ca1c0ad5e0f23c5b09f179cc48cbf1e8af6d581c2c8caef8af03",
+      "llama/libggml-cpu-haswell.so": "da288889750392560dd4b922f3cdaee88567cc1aedb7f525a2e415ed280a47cd",
+      "llama/libggml-cpu-icelake.so": "d1ce43ffcd6d3ecc3581b611297b3fd24a99234a536827de435815309845e110",
+      "llama/libggml-cpu-ivybridge.so": "9aae18a31f1ea5a3aa881c3b96e6cbe558d4cde682b6acf0bd2916d928510694",
+      "llama/libggml-cpu-piledriver.so": "ff6f486b7486eb4a7b661d3c0336138fba2481118a4813be40f790267a80f626",
+      "llama/libggml-cpu-sandybridge.so": "4fcbcfe781d6df24b37e06500a164086506afc0542d2690238618261120a59a5",
+      "llama/libggml-cpu-sapphirerapids.so": "c5c16b23805b8c5fc7817ee277657f59ab882269391ab9f611fd6b75dcb5839a",
+      "llama/libggml-cpu-skylakex.so": "55d53dbaa0f19015d27c576c5c57683b21a453ee95490192b9ece7e72c9d8dd8",
+      "llama/libggml-cpu-sse42.so": "073800a428bf19ef9c37fc7cbc55451f2ecae6f7beb37d1c0447bd17f6e15ef4",
+      "llama/libggml-cpu-x64.so": "25f93d8f3119d5b656144290bf5d2125a10f6bcbf54a3f9135b312c9900883c7",
+      "llama/libggml-cpu-zen4.so": "aaa1b6db727c1ecd62a53462674df544e1005fb46b2fd6d1c884f52b300b1b38",
+      "llama/libggml-rpc.so": "03c9619577dccf1be16d63f2ea0f9e4ebca4ef24a72eae9362f920323f18217d",
+      "llama/libggml.so": "246fb50e2042c311b7186d2836e186d2257ebe9fe05554ddc35a399660cbb74c",
+      "llama/libggml.so.0": "246fb50e2042c311b7186d2836e186d2257ebe9fe05554ddc35a399660cbb74c",
+      "llama/libggml.so.0.29.0": "246fb50e2042c311b7186d2836e186d2257ebe9fe05554ddc35a399660cbb74c",
+      "llama/libllama-batched-bench-impl.so": "16c7d8f85c9143cd6c0e1961eb3c22331b28b16f8b06323e643658bcac725a32",
+      "llama/libllama-bench-impl.so": "75b330c8f2719f487ebe2ad59754d7f4172ae2b18dfba6176c8c14c8a653e8de",
+      "llama/libllama-cli-impl.so": "43ca526945ba91656dc7f1754384529774b0fee0783e6223d7b48d4209a2a89f",
+      "llama/libllama-common.so": "85a75dd094b9373f0945d70cc22e0511a12d41dfbb64143d87e06890b93ca2d3",
+      "llama/libllama-common.so.0": "85a75dd094b9373f0945d70cc22e0511a12d41dfbb64143d87e06890b93ca2d3",
+      "llama/libllama-common.so.0.9.0": "85a75dd094b9373f0945d70cc22e0511a12d41dfbb64143d87e06890b93ca2d3",
+      "llama/libllama-completion-impl.so": "e7b84452ce1ef1ad4936e57262c8a0c87791cf92fec8eec53c54855b4f7f3da1",
+      "llama/libllama-fit-params-impl.so": "7ec37c389a189a1ddb2677efc03ac46d814835a488bd6459cd332272005ab0e0",
+      "llama/libllama-perplexity-impl.so": "fd7d505cd6e0e04ce87212a4ce47694874dfc5446131ed5982118ccd4194e09a",
+      "llama/libllama-quantize-impl.so": "79d821e4e88ebc408f52a1b3d7d13f44aeb6f71bba13574e7d395608b671775a",
+      "llama/libllama-server-impl.so": "347a5b6a844b32ce7beb105ff3d96f895e3b868479c67e685b273f8cdbf85f3c",
+      "llama/libllama.so": "5bf792de8f3dbd68fa918421921339c9bf9d4b4ce3ac3839942a4a73bc7d48fa",
+      "llama/libllama.so.0": "5bf792de8f3dbd68fa918421921339c9bf9d4b4ce3ac3839942a4a73bc7d48fa",
+      "llama/libllama.so.0.9.0": "5bf792de8f3dbd68fa918421921339c9bf9d4b4ce3ac3839942a4a73bc7d48fa",
+      "llama/libmtmd.so": "124029fe64cb9fbb3e74c13a7a6aa089ca47d06f3f3fef734629b7712de8e51d",
+      "llama/libmtmd.so.0": "124029fe64cb9fbb3e74c13a7a6aa089ca47d06f3f3fef734629b7712de8e51d",
+      "llama/libmtmd.so.0.9.0": "124029fe64cb9fbb3e74c13a7a6aa089ca47d06f3f3fef734629b7712de8e51d",
+      "llama/llama-mtmd-cli": "d1ba0e89d3c2938b1300193f674efd2eeadb6b5ef7539a07d7c9c98303e3e20d",
+      "ocready-vision-bridge": "5c2a8421a7db616b765fb987ec54fd166b767c4560f1f1a0580359cc09012e16"
+    }
+  },
+  "capabilities": {
+    "schema": 1,
+    "backends": [
+      "cpu"
+    ]
+  },
+  "fixture_sha256": "c9f5ae4f32a8e96dcaf3bf265f1d57d4e97244bc2d9cbb44d949a5c3394a7caa",
+  "cases": [
+    {
+      "preset": "smol-500m",
+      "backend": "cpu",
+      "result": {
+        "text": "Your screenshots are ready to copy. Order 12345 costs 25.00 USD. Keep punctuation, numbers, and paragraphs.",
+        "words": [],
+        "engine": "vision:smolvlm-500m-q8",
+        "language": "eng",
+        "elapsed": 3.8624271609878633,
+        "peak_rss": 864952320,
+        "backend": "CPU",
+        "recipe": "Original",
+        "note": "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR.",
+        "containment": "cgroup-v2",
+        "worker_limit": 3954511872,
+        "worker_peak": 374726656,
+        "layout": "",
+        "geometry": "none",
+        "runtime": "json-cli-v1",
+        "confidence": null
+      },
+      "metrics": {
+        "character_errors": 0,
+        "reference_characters": 107,
+        "word_errors": 0,
+        "reference_words": 16,
+        "cer": 0.0,
+        "wer": 0.0
+      }
+    },
+    {
+      "preset": "internvl3-1b",
+      "backend": "cpu",
+      "result": {
+        "text": "Your screenshots are ready to copy. Order 12345 costs 25.00 USD. Keep punctuation, numbers, and paragraphs.",
+        "words": [],
+        "engine": "vision:internvl3-1b-q8",
+        "language": "eng",
+        "elapsed": 14.536241618014174,
+        "peak_rss": 1370124288,
+        "backend": "CPU",
+        "recipe": "Original",
+        "note": "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR.",
+        "containment": "cgroup-v2",
+        "worker_limit": 3953074176,
+        "worker_peak": 646656000,
+        "layout": "",
+        "geometry": "none",
+        "runtime": "json-cli-v1",
+        "confidence": null
+      },
+      "metrics": {
+        "character_errors": 0,
+        "reference_characters": 107,
+        "word_errors": 0,
+        "reference_words": 16,
+        "cer": 0.0,
+        "wer": 0.0
+      }
+    },
+    {
+      "preset": "smol-500m",
+      "backend": "incompatible-cuda-experiment",
+      "temporary_native_override": true,
+      "native_runner_sha256": "d660cec6176050d913168e3d66156236bee09614eb96d6fa7c99e298e2dfa8a9",
+      "failure_returncode": 2,
+      "failure_stderr_tail": "0.00.375.110 I cmn          init: llama threadpool init, n_threads = 8\n0.00.386.014 W load_tensors: ffn up/down are swapped\n0.00.427.476 I mtmd_cli_context: chat template example:\n<|im_start|>You are a helpful assistant\n\nUser: Hello<end_of_utterance>\nAssistant: Hi there<end_of_utterance>\nUser: How are you?<end_of_utterance>\nAssistant:\n0.00.427.479 I main: loading model: /home/dodobird/Dev/OCReady/models/vision/smol-500m/SmolVLM-500M-Instruct-Q8_0.gguf\n0.00.427.735 W WARN: This is an experimental CLI for testing multimodal capability.\n0.00.427.736 W       For normal use cases, please use the standard llama-cli\n/__w/llama.cpp/llama.cpp/ggml/src/ggml-cuda/ggml-cuda.cu:111: CUDA error\n0.00.487.064 E CUDA error: the provided PTX was compiled with an unsupported toolchain.\n0.00.487.067 E   current device: 0, in function ggml_cuda_kernel_can_use_pdl at /__w/llama.cpp/llama.cpp/ggml/src/ggml-cuda/common.cuh:1692\n0.00.487.068 E   cudaFuncGetAttributes(&attr, kernel)\n\nNative vision runner exited with code -6.\n",
+      "result": {
+        "text": "Your screenshots are ready to copy. Order 12345 costs 25.00 USD. Keep punctuation, numbers, and paragraphs.",
+        "words": [],
+        "engine": "vision:smolvlm-500m-q8",
+        "language": "eng",
+        "elapsed": 7.367285894986708,
+        "peak_rss": 868683776,
+        "backend": "CPU",
+        "recipe": "Original",
+        "note": "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR. CUDA failed to initialize; retried on CPU.",
+        "containment": "cgroup-v2",
+        "worker_limit": 3953057792,
+        "worker_peak": 374231040,
+        "layout": "",
+        "geometry": "none",
+        "runtime": "json-cli-v1",
+        "confidence": null
+      },
+      "metrics": {
+        "character_errors": 0,
+        "reference_characters": 107,
+        "word_errors": 0,
+        "reference_words": 16,
+        "cer": 0.0,
+        "wer": 0.0
+      }
+    }
+  ]
+}
