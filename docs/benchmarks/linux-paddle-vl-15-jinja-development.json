@@ -1,0 +1,69 @@
+{
+  "source": {
+    "revision": "9f7780e06186bbd30801b4a43ec098a946e68894",
+    "dirty": true,
+    "tree_sha256": "678b91ebbda323d98b83681acf0537e0efd187d5dd38d54e2b10affb2bd223b8"
+  },
+  "chat_template": "jinja",
+  "cases": [
+    {
+      "backend": "cuda",
+      "result": {
+        "text": "A little less typing.\nTurn your screenshots into something useful.\nSelect a word. Copy a sentence. Keep going.\nمرحبا بالعالم\nاللغة العربية واللغة الإنجليزية\nOCReady / Local. Private. Ready to copy.",
+        "words": [],
+        "engine": "vision:paddleocr-vl-15",
+        "language": "ara+eng",
+        "elapsed": 4.320365019986639,
+        "peak_rss": 1221394432,
+        "backend": "CUDA",
+        "recipe": "Original",
+        "note": "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR.",
+        "containment": "cgroup-v2",
+        "worker_limit": 3951423488,
+        "worker_peak": 284336128,
+        "layout": "",
+        "geometry": "none",
+        "runtime": "llama.cpp",
+        "confidence": null
+      }
+    },
+    {
+      "backend": "cpu",
+      "result": {
+        "text": "A little less typing.\nTurn your screenshots into something useful.\nSelect a word. Copy a sentence. Keep going.\nمرحبا بالعالم\nاللغة العربية واللغة الإنجليزية\nOCReady / Local. Private. Ready to copy.",
+        "words": [],
+        "engine": "vision:paddleocr-vl-15",
+        "language": "ara+eng",
+        "elapsed": 27.337028721987735,
+        "peak_rss": 2200489984,
+        "backend": "CPU",
+        "recipe": "Original",
+        "note": "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR.",
+        "containment": "cgroup-v2",
+        "worker_limit": 3948478464,
+        "worker_peak": 1221074944,
+        "layout": "",
+        "geometry": "none",
+        "runtime": "llama.cpp",
+        "confidence": null
+      }
+    }
+  ],
+  "upstream": {
+    "repo": "PaddlePaddle/PaddleOCR-VL-1.5-GGUF",
+    "revision": "cc977c16989848c264d813ec1705cb181b7a21ee"
+  },
+  "asset_sha256": {
+    "PaddleOCR-VL-1.5-mmproj.gguf": "e7f1a72400fba517046f90d964e2fa0f4dac7781ee3b1bc5d2022f5f8cecbd87",
+    "PaddleOCR-VL-1.5.gguf": "299051d54faa065abc505cc39b8383ea338fd3020c775ea3e0ba514a7022328c"
+  },
+  "runner_sha256": {
+    "cpu": "d1ba0e89d3c2938b1300193f674efd2eeadb6b5ef7539a07d7c9c98303e3e20d",
+    "cuda": "baf8ce68e3aaae53d588a84b9b7bc03dd045c0dafcb48a745add2a64ca28976c"
+  },
+  "image_sha256": "7e638e1363968b4fb0b95d8939f24c6e29243e1b26a677c53c08251d65da0bd0",
+  "prompt": "OCR:",
+  "context": 4096,
+  "output_tokens": 512,
+  "scope": "Actual Linux source development sample after explicit Jinja template selection. Single sample; no corpus or packaged-memory certification."
+}

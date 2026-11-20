@@ -154,6 +154,18 @@ def test_cuda_device_mentions_do_not_retry_unrelated_model_errors(pack, tmp_path
     assert len(calls) == 1
 
 
+def test_custom_template_failure_is_not_misclassified_as_a_gpu_failure(pack, tmp_path, monkeypatch):
+    calls = []
+    monkeypatch.setattr(vision, "has_cuda", lambda *_args: True)
+    def execute(*args, **kwargs):
+        calls.append(args)
+        raise OCRError("CUDA0 device found\nthis custom template is not supported, try using --jinja")
+    monkeypatch.setattr(vision, "run_process", execute)
+    with pytest.raises(OCRError, match="custom template"):
+        vision.recognize(tmp_path / "image.png", EDITIONS["studio"], pack)
+    assert len(calls) == 1
+
+
 def test_helper_removed_after_probe_still_recovers_on_cpu(pack, tmp_path, monkeypatch):
     helper = tmp_path / "cuda-helper"
     helper.write_bytes(b"helper")

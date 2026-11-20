@@ -1,8 +1,16 @@
 name: Qualify additional vision models
 on:
   workflow_dispatch:
+    inputs:
+      include_paddle:
+        description: Also qualify the experimental bilingual PaddleOCR-VL Jinja preset
+        type: boolean
+        default: false
 permissions:
   contents: read
+defaults:
+  run:
+    shell: bash
 jobs:
   qualify:
     strategy:
@@ -30,6 +38,9 @@ jobs:
         run: |
           uv run python -m scripts.prepare_runtime --best
           uv run python -m scripts.prepare_vision --preset smol-500m --preset internvl3-1b
+      - name: Prepare the optional bilingual Jinja model
+        if: inputs.include_paddle
+        run: uv run python -m scripts.prepare_vision --preset paddle-vl-15
       - name: Compile and verify the current standalone CPU JSON worker
         run: |
           uv run python -m scripts.build_vision_bridge --runner-pack models/vision/smol-500m/pack.json --output runtime/vision-bridge/qualification --jobs 2
@@ -40,6 +51,11 @@ jobs:
         run: |
           uv run python -m scripts.accuracy evaluate --edition studio --methods vision --backend cpu --model-pack models/vision/smol-500m/pack.json --output test-output/additional-vision/smol-500m-accuracy.json
           uv run python -m scripts.accuracy evaluate --edition studio --methods vision --backend cpu --model-pack models/vision/internvl3-1b/pack.json --output test-output/additional-vision/internvl3-1b-accuracy.json
+      - name: Bilingual native and relocated compiled-worker transcription
+        if: inputs.include_paddle
+        run: |
+          uv run python -m scripts.probe_vision_packs --pack models/vision/paddle-vl-15/pack.json --worker runtime/vision-bridge/qualification/vision_bridge.dist --output test-output/additional-vision/paddle-worker-model.json
+          uv run python -m scripts.accuracy evaluate --edition studio --methods vision --backend cpu --model-pack models/vision/paddle-vl-15/pack.json --output test-output/additional-vision/paddle-vl-15-accuracy.json
       - name: Linux source and native-X11 clipboard resource workloads
         if: runner.os == 'Linux'
         env:
@@ -54,6 +70,16 @@ jobs:
         run: |
           uv run python -m scripts.benchmark --edition studio --vision-pack models/vision/smol-500m/pack.json --output test-output/additional-vision/smol-500m-resources.json
           uv run python -m scripts.benchmark --edition studio --vision-pack models/vision/internvl3-1b/pack.json --output test-output/additional-vision/internvl3-1b-resources.json
+      - name: Linux bilingual source native-X11 resource workloads
+        if: runner.os == 'Linux' && inputs.include_paddle
+        env:
+          OCREADY_GUI_TEST_PLATFORM: xcb
+        run: xvfb-run -a --server-args="-screen 0 1600x1200x24" uv run python -m scripts.benchmark --edition studio --vision-pack models/vision/paddle-vl-15/pack.json --output test-output/additional-vision/paddle-vl-15-resources.json
+      - name: Windows bilingual source native-Win32 resource workloads
+        if: runner.os == 'Windows' && inputs.include_paddle
+        env:
+          OCREADY_GUI_TEST_PLATFORM: windows
+        run: uv run python -m scripts.benchmark --edition studio --vision-pack models/vision/paddle-vl-15/pack.json --output test-output/additional-vision/paddle-vl-15-resources.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

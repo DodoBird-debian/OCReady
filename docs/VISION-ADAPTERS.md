@@ -39,6 +39,8 @@ worker --ocready-vision-v1 --image INPUT.png --model MODEL \
 
 The input is already bounded by the pack's image policy and has the requested reversible cleanup applied. Paths and the prompt are distinct arguments. The worker must stay offline, honor CPU-only requests and constrain output generation. If it creates descendants, they remain within the application's worker resource containment where the platform supports it.
 
+An opt-in manifest setting `"chat_template":"jinja"` adds `--chat-template-mode jinja`. The current reference worker forwards this as native `--jinja`, rendering the GGUF model's embedded template. Existing manifests use `auto` and send no additional argument, preserving older worker commands. Other JSON workers must explicitly support this optional extension before using a Jinja pack. The setting accepts only `auto` or `jinja`; it does not supply arbitrary CLI arguments, external template files or Python modules.
+
 On success stdout is exactly one JSON object, with diagnostic logs on stderr:
 
 ```json

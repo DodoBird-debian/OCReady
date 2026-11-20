@@ -1,0 +1,12 @@
+{
+  "scope": "Linux private-X11 source settings layout and device probes only; development source",
+  "source": {
+    "revision": "9f7780e06186bbd30801b4a43ec098a946e68894",
+    "dirty": true,
+    "tree_sha256": "1cbbba260cccbc3e97bef994b088cb3444e928ac8eeb75eff3c8340fd479a242"
+  },
+  "chat_template": "jinja",
+  "prompt": "OCR:",
+  "message": "CPU runner responds.\nCUDA device detected; model inference still needs testing.\nEstimated 3538 MB total; runtime memory is monitored. This estimate is not certification.\nThis check does not load model weights.",
+  "platform": "xcb"
+}

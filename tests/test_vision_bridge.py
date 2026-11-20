@@ -36,7 +36,8 @@ def test_capability_bridge_does_not_invent_cpu_or_cuda_readiness(tmp_path, monke
         assert not output.out and "readiness is unknown" in output.err
 
 
-def test_reference_worker_protocol_preserves_arabic_and_cpu_request(tmp_path, monkeypatch, capsys):
+@pytest.mark.parametrize("template", ["auto", "jinja"])
+def test_reference_worker_protocol_preserves_arabic_and_cpu_request(tmp_path, monkeypatch, capsys, template):
     runner = tmp_path / "llama-mtmd-cli"
     runner.write_bytes(b"native runner")
     image = tmp_path / "input.png"
@@ -48,11 +49,13 @@ def test_reference_worker_protocol_preserves_arabic_and_cpu_request(tmp_path, mo
         return subprocess.CompletedProcess(args, 0, "مرحبا بالعالم<|im_end|>".encode(), b"")
     monkeypatch.setattr(vision_bridge.subprocess, "run", execute)
     assert vision_bridge.main(["--ocready-vision-v1", "--image", str(image), "--model", "model.gguf",
-                               "--projector", "projector.gguf", "--prompt", "Read it", "--backend", "cpu"]) == 0
+                               "--projector", "projector.gguf", "--prompt", "Read it", "--backend", "cpu",
+                               "--chat-template-mode", template]) == 0
     response = json.loads(capsys.readouterr().out)
     assert response == {"schema": 1, "width": 100, "height": 80, "text": "مرحبا بالعالم", "backend": "CPU"}
     assert calls[0][calls[0].index("-ngl") + 1] == "0"
     assert "--no-mmproj-offload" in calls[0]
+    assert ("--jinja" in calls[0]) == (template == "jinja")
     monkeypatch.setattr(vision_bridge.subprocess, "run", lambda args, **_kwargs:
                         subprocess.CompletedProcess(args, 17, b"", b"CUDA error: unsupported PTX toolchain\n" + b"x" * 20000))
     assert vision_bridge.main(["--ocready-vision-v1", "--image", str(image), "--model", "model.gguf",

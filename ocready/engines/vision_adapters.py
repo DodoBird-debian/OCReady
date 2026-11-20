@@ -71,6 +71,8 @@ class LlamaCppAdapter:
                 "--image-max-tokens", "1024", "--no-warmup", "--log-colors", "off", "-ngl", "99" if cuda else "0"]
         if not cuda:
             args.append("--no-mmproj-offload")
+        if pack.chat_template == "jinja":
+            args.append("--jinja")
         return args
 
     def probe_command(self, runner: str) -> list[str]:
@@ -117,6 +119,8 @@ class JsonCliAdapter:
                 "--max-image-tokens", "1024"]
         if pack.projector:
             args += ["--projector", str(Path(pack.projector).expanduser())]
+        if pack.chat_template == "jinja":
+            args += ["--chat-template-mode", "jinja"]
         return args
 
     def probe_command(self, runner: str) -> list[str]:

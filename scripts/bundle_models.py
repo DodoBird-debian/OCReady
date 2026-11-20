@@ -84,7 +84,8 @@ def bundle_pack(archive: tarfile.TarFile, pack: ModelPack) -> dict:
     info.size, info.mode = len(blob), 0o644
     archive.addfile(info, io.BytesIO(blob))
     return {"id": pack.id, "name": pack.name, "source": pack.source, "license": pack.license,
-            "languages": pack.languages, "adapter": pack.adapter, "model_sha256": file_digest(Path(pack.model)),
+            "languages": pack.languages, "adapter": pack.adapter, "chat_template": pack.chat_template,
+            "model_sha256": file_digest(Path(pack.model)),
             "projector_sha256": file_digest(Path(pack.projector)) if pack.projector else ""}
 
 

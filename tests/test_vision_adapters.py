@@ -36,10 +36,31 @@ def test_old_packs_keep_llama_defaults_and_unknown_adapters_fail(json_pack):
     data = pack.to_dict()
     data.pop("adapter")
     assert ModelPack.from_dict(data).adapter == "llama.cpp"
+    data.pop("chat_template")
+    assert ModelPack.from_dict(data).chat_template == "auto"
     with pytest.raises(OCRError, match="Unsupported vision runtime"):
         ModelPack.from_dict({**data, "adapter": "arbitrary.python.module"})
     with pytest.raises(OCRError, match="require.*projector"):
         dataclasses.replace(pack, adapter="llama.cpp").validate()
+
+
+@pytest.mark.parametrize("bad", [True, [], "--arbitrary-argument", "custom.py"])
+def test_manifest_chat_templates_are_explicit_bounded_choices(json_pack, bad):
+    pack, _image = json_pack
+    with pytest.raises(OCRError):
+        ModelPack.from_dict({**pack.to_dict(), "chat_template": bad})
+
+
+def test_jinja_is_forwarded_only_for_models_that_request_it(json_pack):
+    pack, image = json_pack
+    for adapter_id, flag in (("llama.cpp", "--jinja"), ("json-cli-v1", "--chat-template-mode")):
+        adapter = get_adapter(adapter_id)
+        assert flag not in adapter.command(pack, image, False)
+        args = adapter.command(dataclasses.replace(pack, chat_template="jinja"), image, False)
+        assert flag in args
+        if adapter_id == "json-cli-v1":
+            assert args[args.index(flag) + 1] == "jinja"
+        assert adapter.command(dataclasses.replace(pack, chat_template="jinja"), image, True)[0] == pack.runner
 
 
 def test_json_adapter_runs_through_shared_engine_without_gguf_or_projector(json_pack, monkeypatch):
@@ -99,6 +120,7 @@ def test_json_capability_probe_requires_versioned_backend_declaration():
 
 def test_json_pack_embedding_preserves_adapter_and_opaque_format(json_pack, tmp_path):
     pack, _image = json_pack
+    pack = dataclasses.replace(pack, chat_template="jinja")
     stream = io.BytesIO()
     with tarfile.open(fileobj=stream, mode="w") as archive:
         metadata = bundle_pack(archive, pack)
@@ -108,5 +130,6 @@ def test_json_pack_embedding_preserves_adapter_and_opaque_format(json_pack, tmp_
     loaded = load_pack(tmp_path / "out/vision/json-test/pack.json")
     loaded.validate()
     assert loaded.adapter == "json-cli-v1" and loaded.projector == ""
+    assert loaded.chat_template == metadata["chat_template"] == "jinja"
     assert Path(loaded.model).suffix == ".onnx"
     assert metadata["adapter"] == "json-cli-v1"

@@ -259,6 +259,45 @@
           "sha256": "8f03d25fbcffafa2254d4d1414bf2a38423a966006b4a6964ee21f728d610bff"
         }
       ]
+    },
+    "paddle-vl-15": {
+      "id": "paddleocr-vl-15",
+      "name": "PaddleOCR-VL 1.5 \u00b7 Arabic + English (experimental)",
+      "repo": "PaddlePaddle/PaddleOCR-VL-1.5-GGUF",
+      "revision": "cc977c16989848c264d813ec1705cb181b7a21ee",
+      "memory_mb": 3400,
+      "tokens": 512,
+      "languages": "ara+eng",
+      "license": "Apache-2.0",
+      "chat_template": "jinja",
+      "prompt": "OCR:",
+      "limitations": "Requires the model's embedded Jinja template and the OCR: task prompt. Experimental Arabic/English transcription; no reliable source geometry. Actual target-platform inference and packaged memory require separate verification. Generative output can omit or invent text.",
+      "files": [
+        {
+          "file": "PaddleOCR-VL-1.5.gguf",
+          "url": "https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.5-GGUF/resolve/cc977c16989848c264d813ec1705cb181b7a21ee/PaddleOCR-VL-1.5.gguf",
+          "bytes": 935768992,
+          "sha256": "299051d54faa065abc505cc39b8383ea338fd3020c775ea3e0ba514a7022328c"
+        },
+        {
+          "file": "PaddleOCR-VL-1.5-mmproj.gguf",
+          "url": "https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.5-GGUF/resolve/cc977c16989848c264d813ec1705cb181b7a21ee/PaddleOCR-VL-1.5-mmproj.gguf",
+          "bytes": 881770496,
+          "sha256": "e7f1a72400fba517046f90d964e2fa0f4dac7781ee3b1bc5d2022f5f8cecbd87"
+        },
+        {
+          "file": "modelcard.md",
+          "url": "https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.5-GGUF/raw/cc977c16989848c264d813ec1705cb181b7a21ee/README.md",
+          "bytes": 14717,
+          "sha256": "a1ef1e6ff40096ceca70cebc6cdc632e0868f2fa16454730cfb686c5f5606bb3"
+        },
+        {
+          "file": "LICENSE-model.txt",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "bytes": 11358,
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        }
+      ]
     }
   }
 }

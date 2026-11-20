@@ -47,7 +47,7 @@ def check_model_backends(pack: ModelPack, edition: Edition, *, cancel: threading
     cuda = check(pack.cuda_runner or pack.runner)
     cpu_available = "cpu" in cpu["backends"]
     cuda_detected = "cuda" in cuda["backends"]
-    return {"id": pack.id, "name": pack.name, "adapter": pack.adapter,
+    return {"id": pack.id, "name": pack.name, "adapter": pack.adapter, "chat_template": pack.chat_template,
             "assets_valid": not assets_error, "assets_error": assets_error,
             "admitted": admitted, "admission": admission, "cpu_runner": cpu, "cuda_runner": cuda,
             "cpu_available": cpu_available, "cuda_device_detected": cuda_detected,

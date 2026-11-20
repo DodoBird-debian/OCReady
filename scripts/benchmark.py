@@ -74,6 +74,7 @@ def local_pack_identity(vision_path: Path | None, neural_path: Path | None) -> d
     else:
         return None
     return {"id": pack.id, "languages": pack.languages, "adapter": getattr(pack, "adapter", "neural-json-v1"),
+            **({"chat_template": pack.chat_template} if vision_path else {}),
             "manifest_sha256": file_sha256(vision_path or neural_path),
             "assets_sha256": {field: file_sha256(Path(getattr(pack, field))) for field in fields if getattr(pack, field)}}
 

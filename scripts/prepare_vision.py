@@ -143,7 +143,7 @@ def prepare_pack(preset: dict, runner: Path, folder: Path, cuda_runner: Path | N
                      str(projector.resolve()), cuda_runner=str(cuda_runner.resolve()) if cuda_runner else "",
                      memory_mb=preset["memory_mb"], tokens=preset["tokens"], prompt=preset["prompt"],
                      languages=preset["languages"], source=f"https://huggingface.co/{preset['repo']}",
-                     license=preset["license"], adapter=adapter)
+                     license=preset["license"], adapter=adapter, chat_template=preset.get("chat_template", "auto"))
     pack.validate()
     record = pack.to_dict()
     for key in ("runner", "model", "projector", "cuda_runner"):
@@ -178,6 +178,7 @@ def main() -> None:
         print(json.dumps({"scope": "Preparation catalog; memory estimates are not measured or certified limits.",
                           "presets": [{"preset": key, "id": value["id"], "name": value["name"],
                                        "languages": value["languages"], "runner_memory_estimate_mb": value["memory_mb"],
+                                       "chat_template": value.get("chat_template", "auto"),
                                        "source": f"https://huggingface.co/{value['repo']}/tree/{value['revision']}",
                                        "limitations": value["limitations"]} for key, value in lock["packs"].items()]},
                          ensure_ascii=True, indent=2))

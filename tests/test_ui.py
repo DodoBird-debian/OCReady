@@ -1122,3 +1122,24 @@ def test_settings_backend_check_discards_changed_selection_and_stops_before_clos
     assert not dialog.isVisible()
     dialog.new_pack()
     assert not dialog.check_button.isEnabled()
+
+
+def test_vision_chat_template_selection_round_trips_saved_configuration(window, tmp_path):
+    from ocready.core.models import ModelPack, load_packs
+    from ocready.ui.settings import SettingsDialog
+
+    paths = [tmp_path / name for name in ("runner", "model", "projector")]
+    for path in paths:
+        path.write_bytes(b"GGUFtest")
+    pack = ModelPack("template-test", "Template test", *(str(path) for path in paths), memory_mb=500)
+    window.packs = [pack]
+    dialog = SettingsDialog(window)
+    assert dialog.chat_template.currentData() == "auto"
+    dialog.chat_template.setCurrentIndex(dialog.chat_template.findData("jinja"))
+    dialog.save_model()
+    assert next(p for p in load_packs() if p.id == pack.id).chat_template == "jinja"
+    dialog.select_pack(next(i for i, p in enumerate(dialog.packs) if p.id == pack.id))
+    assert dialog.chat_template.currentData() == "jinja"
+    dialog.new_pack()
+    assert dialog.chat_template.currentData() == "auto"
+    dialog.close()

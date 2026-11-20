@@ -102,6 +102,11 @@ class SettingsDialog(QDialog):
             self.adapter.addItem(adapter.name, adapter.id)
         self.adapter.setToolTip("Match the runner's interface. Existing GGUF packs use llama.cpp. Custom offline workers can implement OCReady JSON v1.")
         form.addRow("Inference runtime", self.adapter)
+        self.chat_template = QComboBox()
+        self.chat_template.addItem("Automatic", "auto")
+        self.chat_template.addItem("Model's Jinja template", "jinja")
+        self.chat_template.setToolTip("Use Jinja for models that require rendering their embedded chat template, such as PaddleOCR-VL. JSON workers need the matching template-mode extension.")
+        form.addRow("Chat template", self.chat_template)
         self.fields = {}
         self.browse_buttons = {}
         for key, title in (("runner", "CPU runner"), ("model", "Model file"), ("projector", "Vision projector"), ("cuda_runner", "CUDA runner (optional)")):
@@ -232,6 +237,7 @@ class SettingsDialog(QDialog):
         self.prompt.setPlainText(TRANSCRIPTION_PROMPT)
         self.adapter.setEnabled(True)
         self.adapter.setCurrentIndex(self.adapter.findData("llama.cpp"))
+        self.chat_template.setCurrentIndex(self.chat_template.findData("auto"))
         self.languages.setCurrentIndex(0)
         self._reset_backend_check()
 
@@ -242,6 +248,7 @@ class SettingsDialog(QDialog):
         self.pack_id = pack.id
         self.name.setText(pack.name)
         self.adapter.setCurrentIndex(self.adapter.findData(pack.adapter))
+        self.chat_template.setCurrentIndex(self.chat_template.findData(pack.chat_template))
         self.adapter.setEnabled(not pack.bundled)
         for key, field in self.fields.items():
             helper = key == "cuda_runner" and pack.bundled
@@ -327,6 +334,7 @@ class SettingsDialog(QDialog):
                                        **({} if base.bundled else {key: str(Path(field.text()).expanduser().resolve()) if field.text().strip() else "" for key, field in self.fields.items()}),
                                        memory_mb=self.memory.value(), tokens=self.tokens.value(), prompt=self.prompt.toPlainText(),
                                        languages=self.languages.currentData(), adapter=base.adapter if base.bundled else self.adapter.currentData())
+            pack = dataclasses.replace(pack, chat_template=self.chat_template.currentData())
             pack = dataclasses.replace(pack, max_pixels=self.pixels.value() * 1000, max_edge=self.edge.value())
             pack.validate(require_cuda=not pack.bundled)
             if pack.bundled:

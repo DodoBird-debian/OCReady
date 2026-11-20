@@ -54,6 +54,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--max-output-tokens", type=int, default=512)
     parser.add_argument("--max-image-tokens", type=int, default=1024)
     parser.add_argument("--backend", choices=("cpu", "cuda"), default="cpu")
+    parser.add_argument("--chat-template-mode", choices=("auto", "jinja"), default="auto")
     args = parser.parse_args(argv)
     runner = runner_path()
     try:
@@ -82,6 +83,8 @@ def main(argv: list[str] | None = None) -> int:
                    "-ngl", "99" if args.backend == "cuda" else "0"]
         if args.backend == "cpu":
             command.append("--no-mmproj-offload")
+        if args.chat_template_mode == "jinja":
+            command.append("--jinja")
         result = subprocess.run(command, capture_output=True, timeout=300, env=environment(runner))
         if result.returncode:
             error = result.stderr.decode("utf-8", errors="replace")
