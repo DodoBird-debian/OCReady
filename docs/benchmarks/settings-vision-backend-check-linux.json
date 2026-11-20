@@ -1,0 +1,13 @@
+{
+  "scope": "Actual Linux private-X11 source dialog, development source; runner probes only",
+  "source": {
+    "revision": "5cc8f08121b27de44e2b2fda9fe237f70a7535d8",
+    "dirty": true,
+    "tree_sha256": "76f561ad73f84267fb960baeb4826bf8bd16efa2c0f3fecd56a3c997cffd1644"
+  },
+  "qt_platform": "xcb",
+  "message": "CPU runner responds.\nCUDA device detected; model inference still needs testing.\nEstimated 2337 MB total; runtime memory is monitored. This estimate is not certification.\nThis check does not load model weights.",
+  "check_button_enabled": true,
+  "check_button_visible": true,
+  "result_visible": true
+}

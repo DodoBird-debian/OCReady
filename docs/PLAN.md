@@ -1757,3 +1757,19 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - Measure source resource workloads before proposing lower memory estimates.
 - Keep native onefile and Windows qualification as independent release gates.
 - Keep existing published compositions stable until their replacements qualify.
+
+## M74 — native settings access to backend checks
+
+- Provide an explicit check action for each saved model.
+- Run device probes off the Qt UI thread.
+- Keep checking independent of image or model inference.
+- Preserve the selected saved configuration during a check.
+- Explain that unsaved fields must be saved before checking.
+- Keep CPU response, CUDA discovery and RAM admission distinct.
+- Cancel a check when the selected model changes.
+- Reject stale results already queued for a previous selection.
+- Defer closing the dialog until its cancelled worker stops.
+- Prevent runner checks during recognition.
+- Keep unsaved models' check action disabled.
+- Verify responsive UI event handling and worker cleanup.
+- Inspect the actual native settings layout with a real local runner.

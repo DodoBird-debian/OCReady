@@ -1,0 +1,78 @@
+{
+  "scope": "Linux source CPU/CUDA/fallback and English-only fixture evaluation; CPU source private-X11 resource workloads. No onefile/Windows qualification or universal RAM claim.",
+  "measured_source": {
+    "revision": "5cc8f08121b27de44e2b2fda9fe237f70a7535d8",
+    "dirty": false,
+    "tree_sha256": "aef9e0167c359cfdb0ee8f0af226ace5887744fb2109a28fdd301879c788de25"
+  },
+  "reports": [
+    {
+      "file": "linux-additional-vision-samples.json",
+      "kind": "sample-cpu-cuda-fallback",
+      "preset": null,
+      "sha256": "b53bfad8ed3ad750c13faeba287a9d72c8c8b3a4574c685c849356844ae5dd4b"
+    },
+    {
+      "file": "linux-smol-500m-cpu-source.json",
+      "kind": "cpu-source-resources",
+      "preset": "smol-500m",
+      "sha256": "a50f04465342258d70ea909ca4e4a95aa84857374a5639cfc9212a8c8e4210c9"
+    },
+    {
+      "file": "linux-smol-500m-cpu.json",
+      "kind": "english-fixture-accuracy",
+      "preset": "smol-500m",
+      "sha256": "3fbeefea57e4e8504bcc4a79672f31452888bff81a926976f4eef832dbf8e331"
+    },
+    {
+      "file": "linux-smol-500m-cuda.json",
+      "kind": "english-fixture-accuracy",
+      "preset": "smol-500m",
+      "sha256": "642d58e7966b24a1ca1bb0d3653b6bf99708b583c0ffae1a2e8d50dba4df684a"
+    },
+    {
+      "file": "linux-internvl3-1b-cpu-source.json",
+      "kind": "cpu-source-resources",
+      "preset": "internvl3-1b",
+      "sha256": "41206995eb497409b26202c22c0701607ea06f7dd28564db5152b79017d9186d"
+    },
+    {
+      "file": "linux-internvl3-1b-cpu.json",
+      "kind": "english-fixture-accuracy",
+      "preset": "internvl3-1b",
+      "sha256": "9a76e6e8e313277dc84df4d61888e04c364350d22f6ed486928993087f0287d7"
+    },
+    {
+      "file": "linux-internvl3-1b-cuda.json",
+      "kind": "english-fixture-accuracy",
+      "preset": "internvl3-1b",
+      "sha256": "6a92e08ad4df60083e355e82046567b59328c6985253d042c20db2c66558d428"
+    }
+  ],
+  "models": [
+    {
+      "preset": "smol-500m",
+      "id": "smolvlm-500m-q8",
+      "languages": "eng",
+      "runner_estimate_mb": 1200,
+      "assets_sha256": {
+        "runner": "d1ba0e89d3c2938b1300193f674efd2eeadb6b5ef7539a07d7c9c98303e3e20d",
+        "cuda_runner": "baf8ce68e3aaae53d588a84b9b7bc03dd045c0dafcb48a745add2a64ca28976c",
+        "model": "9d4612de6a42214499e301494a3ecc2be0abdd9de44e663bda63f1152fad1bf4",
+        "projector": "d1eb8b6b23979205fdf63703ed10f788131a3f812c7b1f72e0119d5d81295150"
+      }
+    },
+    {
+      "preset": "internvl3-1b",
+      "id": "internvl3-1b-q8",
+      "languages": "eng",
+      "runner_estimate_mb": 2200,
+      "assets_sha256": {
+        "runner": "d1ba0e89d3c2938b1300193f674efd2eeadb6b5ef7539a07d7c9c98303e3e20d",
+        "cuda_runner": "baf8ce68e3aaae53d588a84b9b7bc03dd045c0dafcb48a745add2a64ca28976c",
+        "model": "e87f98e2945c91da1a324034143f2f3bad014dcf6b34d440fcf885c00704378f",
+        "projector": "2d92c4d3dd95ae6a5974f48a1e6a77817ef6970b0eb09a48dd63ad95b69ea7e5"
+      }
+    }
+  ]
+}

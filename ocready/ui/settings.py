@@ -27,6 +27,7 @@ from ocready.__main__ import diagnostics
 from ocready.core.cuda_helpers import cuda_helper, save_cuda_helper
 from ocready.core.models import TRANSCRIPTION_PROMPT, ModelPack, load_pack, load_packs, save_packs
 from ocready.engines.vision_adapters import ADAPTERS
+from ocready.ui.backend_check import BackendCheckWorker, report_text
 from ocready.ui.neural_settings import NeuralSettings
 
 
@@ -36,6 +37,9 @@ class SettingsDialog(QDialog):
         self.window = window
         self.packs = list(window.packs)
         self.pack_id = ""
+        self.backend_worker = None
+        self._backend_generation = 0
+        self._backend_close_result = None
         self.setWindowTitle("OCReady settings")
         self.resize(790, 700)
         outer = QVBoxLayout(self)
@@ -156,12 +160,20 @@ class SettingsDialog(QDialog):
         layout.addLayout(form)
         self.message = QLabel("Estimates are not certified memory measurements. AI transcription can omit or invent text.")
         self.message.setWordWrap(True)
+        self.message.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.message.setObjectName("Subtle")
         layout.addWidget(self.message)
         save = QPushButton("Save model")
         save.setObjectName("Primary")
         save.clicked.connect(self.save_model)
-        layout.addWidget(save, 0, Qt.AlignmentFlag.AlignRight)
+        checks = QHBoxLayout()
+        self.check_button = QPushButton("Check saved model")
+        self.check_button.setToolTip("Check this saved model's CPU/CUDA runners without loading weights. Save any changes first.")
+        self.check_button.clicked.connect(self.check_saved_model)
+        checks.addWidget(self.check_button)
+        checks.addStretch(1)
+        checks.addWidget(save)
+        layout.addLayout(checks)
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
@@ -221,6 +233,7 @@ class SettingsDialog(QDialog):
         self.adapter.setEnabled(True)
         self.adapter.setCurrentIndex(self.adapter.findData("llama.cpp"))
         self.languages.setCurrentIndex(0)
+        self._reset_backend_check()
 
     def select_pack(self, row: int) -> None:
         if row < 0 or row >= len(self.packs):
@@ -245,6 +258,60 @@ class SettingsDialog(QDialog):
         self.edge.setValue(pack.max_edge)
         self.prompt.setPlainText(pack.prompt)
         self.languages.setCurrentIndex(self.languages.findData(pack.languages))
+        self._reset_backend_check()
+
+    def _reset_backend_check(self) -> None:
+        self._backend_generation += 1
+        if self.backend_worker:
+            self.backend_worker.cancel.set()
+        self.check_button.setEnabled(self.backend_worker is None and any(pack.id == self.pack_id for pack in self.packs))
+        self.message.setText("Save any changes before checking this model's CPU/CUDA runners. Checks do not load model weights.")
+
+    def check_saved_model(self) -> None:
+        if self.backend_worker:
+            return
+        pack = next((pack for pack in self.packs if pack.id == self.pack_id), None)
+        if not pack:
+            self.message.setText("Save the model before checking its runners.")
+            return
+        if self.window.worker:
+            self.message.setText("Wait for recognition to finish before checking model runners.")
+            return
+        self._backend_generation += 1
+        self.backend_worker = BackendCheckWorker(self._backend_generation, pack, self.window.edition, self)
+        self.backend_worker.reportReady.connect(self._backend_report)
+        self.backend_worker.failed.connect(self._backend_failed)
+        self.backend_worker.finished.connect(self._backend_finished)
+        self.check_button.setEnabled(False)
+        self.check_button.setText("Checking…")
+        self.message.setText("Checking the saved CPU/CUDA runners. No image or model inference is running…")
+        self.backend_worker.start()
+
+    def _backend_report(self, generation: int, report: dict) -> None:
+        if generation == self._backend_generation and self._backend_close_result is None:
+            self.message.setText(report_text(report))
+
+    def _backend_failed(self, generation: int, message: str) -> None:
+        if generation == self._backend_generation and self._backend_close_result is None:
+            self.message.setText("Runner check failed: " + message)
+
+    def _backend_finished(self) -> None:
+        worker, self.backend_worker = self.backend_worker, None
+        if worker:
+            worker.deleteLater()
+        self.check_button.setText("Check saved model")
+        self.check_button.setEnabled(any(pack.id == self.pack_id for pack in self.packs))
+        if self._backend_close_result is not None:
+            result, self._backend_close_result = self._backend_close_result, None
+            self.done(result)
+
+    def done(self, result: int) -> None:
+        if self.backend_worker:
+            self._backend_close_result = result
+            self.backend_worker.cancel.set()
+            self.message.setText("Stopping the runner check…")
+            return
+        super().done(result)
 
     def browse(self, key: str) -> None:
         file_filter = "GGUF models (*.gguf);;All files (*)" if key in {"model", "projector"} and self.adapter.currentData() == "llama.cpp" else "All files (*)"

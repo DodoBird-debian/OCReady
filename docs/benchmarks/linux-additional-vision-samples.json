@@ -1,0 +1,184 @@
+{
+  "source": {
+    "revision": "5cc8f08121b27de44e2b2fda9fe237f70a7535d8",
+    "dirty": false,
+    "tree_sha256": "aef9e0167c359cfdb0ee8f0af226ace5887744fb2109a28fdd301879c788de25"
+  },
+  "scope": "Linux source single bilingual sample, English request; no onefile, Windows or universal memory claim",
+  "cases": [
+    {
+      "preset": "smol-500m",
+      "requested_backend": "cpu",
+      "asset_sha256": {
+        "runner": "d1ba0e89d3c2938b1300193f674efd2eeadb6b5ef7539a07d7c9c98303e3e20d",
+        "cuda_runner": "baf8ce68e3aaae53d588a84b9b7bc03dd045c0dafcb48a745add2a64ca28976c",
+        "model": "9d4612de6a42214499e301494a3ecc2be0abdd9de44e663bda63f1152fad1bf4",
+        "projector": "d1eb8b6b23979205fdf63703ed10f788131a3f812c7b1f72e0119d5d81295150"
+      },
+      "actual_cuda_runner_sha256": "baf8ce68e3aaae53d588a84b9b7bc03dd045c0dafcb48a745add2a64ca28976c",
+      "result": {
+        "text": "A little less typing.",
+        "words": [],
+        "engine": "vision:smolvlm-500m-q8",
+        "language": "eng",
+        "elapsed": 3.578522491006879,
+        "peak_rss": 838213632,
+        "backend": "CPU",
+        "recipe": "Original",
+        "note": "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR.",
+        "containment": "cgroup-v2",
+        "worker_limit": 3952087040,
+        "worker_peak": 361140224,
+        "layout": "",
+        "geometry": "none",
+        "runtime": "llama.cpp",
+        "confidence": null
+      }
+    },
+    {
+      "preset": "smol-500m",
+      "requested_backend": "cuda",
+      "asset_sha256": {
+        "runner": "d1ba0e89d3c2938b1300193f674efd2eeadb6b5ef7539a07d7c9c98303e3e20d",
+        "cuda_runner": "baf8ce68e3aaae53d588a84b9b7bc03dd045c0dafcb48a745add2a64ca28976c",
+        "model": "9d4612de6a42214499e301494a3ecc2be0abdd9de44e663bda63f1152fad1bf4",
+        "projector": "d1eb8b6b23979205fdf63703ed10f788131a3f812c7b1f72e0119d5d81295150"
+      },
+      "actual_cuda_runner_sha256": "baf8ce68e3aaae53d588a84b9b7bc03dd045c0dafcb48a745add2a64ca28976c",
+      "result": {
+        "text": "A little less typing.",
+        "words": [],
+        "engine": "vision:smolvlm-500m-q8",
+        "language": "eng",
+        "elapsed": 1.8047659840085544,
+        "peak_rss": 725704704,
+        "backend": "CUDA",
+        "recipe": "Original",
+        "note": "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR.",
+        "containment": "cgroup-v2",
+        "worker_limit": 3949006848,
+        "worker_peak": 266522624,
+        "layout": "",
+        "geometry": "none",
+        "runtime": "llama.cpp",
+        "confidence": null
+      }
+    },
+    {
+      "preset": "smol-500m",
+      "requested_backend": "incompatible-cuda",
+      "asset_sha256": {
+        "runner": "d1ba0e89d3c2938b1300193f674efd2eeadb6b5ef7539a07d7c9c98303e3e20d",
+        "cuda_runner": "baf8ce68e3aaae53d588a84b9b7bc03dd045c0dafcb48a745add2a64ca28976c",
+        "model": "9d4612de6a42214499e301494a3ecc2be0abdd9de44e663bda63f1152fad1bf4",
+        "projector": "d1eb8b6b23979205fdf63703ed10f788131a3f812c7b1f72e0119d5d81295150"
+      },
+      "actual_cuda_runner_sha256": "d660cec6176050d913168e3d66156236bee09614eb96d6fa7c99e298e2dfa8a9",
+      "result": {
+        "text": "A little less typing.",
+        "words": [],
+        "engine": "vision:smolvlm-500m-q8",
+        "language": "eng",
+        "elapsed": 7.421016378997592,
+        "peak_rss": 845422592,
+        "backend": "CPU",
+        "recipe": "Original",
+        "note": "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR. CUDA failed to initialize; retried on CPU.",
+        "containment": "cgroup-v2",
+        "worker_limit": 3944951808,
+        "worker_peak": 356593664,
+        "layout": "",
+        "geometry": "none",
+        "runtime": "llama.cpp",
+        "confidence": null
+      }
+    },
+    {
+      "preset": "internvl3-1b",
+      "requested_backend": "cpu",
+      "asset_sha256": {
+        "runner": "d1ba0e89d3c2938b1300193f674efd2eeadb6b5ef7539a07d7c9c98303e3e20d",
+        "cuda_runner": "baf8ce68e3aaae53d588a84b9b7bc03dd045c0dafcb48a745add2a64ca28976c",
+        "model": "e87f98e2945c91da1a324034143f2f3bad014dcf6b34d440fcf885c00704378f",
+        "projector": "2d92c4d3dd95ae6a5974f48a1e6a77817ef6970b0eb09a48dd63ad95b69ea7e5"
+      },
+      "actual_cuda_runner_sha256": "baf8ce68e3aaae53d588a84b9b7bc03dd045c0dafcb48a745add2a64ca28976c",
+      "result": {
+        "text": "A little less typing.\n\nTurn your screenshots into something useful.\n\nSelect a word. Copy a sentence. Keep going.\n\nOCReady / Local. Private. Ready to copy.",
+        "words": [],
+        "engine": "vision:internvl3-1b-q8",
+        "language": "eng",
+        "elapsed": 24.784927508997498,
+        "peak_rss": 1368719360,
+        "backend": "CPU",
+        "recipe": "Original",
+        "note": "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR.",
+        "containment": "cgroup-v2",
+        "worker_limit": 3942629376,
+        "worker_peak": 646287360,
+        "layout": "",
+        "geometry": "none",
+        "runtime": "llama.cpp",
+        "confidence": null
+      }
+    },
+    {
+      "preset": "internvl3-1b",
+      "requested_backend": "cuda",
+      "asset_sha256": {
+        "runner": "d1ba0e89d3c2938b1300193f674efd2eeadb6b5ef7539a07d7c9c98303e3e20d",
+        "cuda_runner": "baf8ce68e3aaae53d588a84b9b7bc03dd045c0dafcb48a745add2a64ca28976c",
+        "model": "e87f98e2945c91da1a324034143f2f3bad014dcf6b34d440fcf885c00704378f",
+        "projector": "2d92c4d3dd95ae6a5974f48a1e6a77817ef6970b0eb09a48dd63ad95b69ea7e5"
+      },
+      "actual_cuda_runner_sha256": "baf8ce68e3aaae53d588a84b9b7bc03dd045c0dafcb48a745add2a64ca28976c",
+      "result": {
+        "text": "A little less typing.\n\nTurn your screenshots into something useful.\n\nSelect a word. Copy a sentence. Keep going.\n\nOCReady / Local. Private. Ready to copy.",
+        "words": [],
+        "engine": "vision:internvl3-1b-q8",
+        "language": "eng",
+        "elapsed": 6.596017646981636,
+        "peak_rss": 1009213440,
+        "backend": "CUDA",
+        "recipe": "Original",
+        "note": "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR.",
+        "containment": "cgroup-v2",
+        "worker_limit": 3939467264,
+        "worker_peak": 295182336,
+        "layout": "",
+        "geometry": "none",
+        "runtime": "llama.cpp",
+        "confidence": null
+      }
+    },
+    {
+      "preset": "internvl3-1b",
+      "requested_backend": "incompatible-cuda",
+      "asset_sha256": {
+        "runner": "d1ba0e89d3c2938b1300193f674efd2eeadb6b5ef7539a07d7c9c98303e3e20d",
+        "cuda_runner": "baf8ce68e3aaae53d588a84b9b7bc03dd045c0dafcb48a745add2a64ca28976c",
+        "model": "e87f98e2945c91da1a324034143f2f3bad014dcf6b34d440fcf885c00704378f",
+        "projector": "2d92c4d3dd95ae6a5974f48a1e6a77817ef6970b0eb09a48dd63ad95b69ea7e5"
+      },
+      "actual_cuda_runner_sha256": "d660cec6176050d913168e3d66156236bee09614eb96d6fa7c99e298e2dfa8a9",
+      "result": {
+        "text": "A little less typing.\n\nTurn your screenshots into something useful.\n\nSelect a word. Copy a sentence. Keep going.\n\nOCReady / Local. Private. Ready to copy.",
+        "words": [],
+        "engine": "vision:internvl3-1b-q8",
+        "language": "eng",
+        "elapsed": 28.60413935498218,
+        "peak_rss": 1371889664,
+        "backend": "CPU",
+        "recipe": "Original",
+        "note": "AI transcription can omit or invent text. It has no reliable word boxes; compare with offline OCR. CUDA failed to initialize; retried on CPU.",
+        "containment": "cgroup-v2",
+        "worker_limit": 3939446784,
+        "worker_peak": 644050944,
+        "layout": "",
+        "geometry": "none",
+        "runtime": "llama.cpp",
+        "confidence": null
+      }
+    }
+  ]
+}

@@ -1048,3 +1048,77 @@ def test_model_language_constraint_does_not_overwrite_saved_preference(window):
     assert window.language_combo.currentData() == "eng"
     window.close()
     assert load_settings()["language"] == "ara+eng"
+
+
+def test_settings_backend_check_keeps_ui_responsive_and_uses_saved_pack(window, app, monkeypatch):
+    import threading
+
+    from PySide6.QtCore import QTimer
+
+    from ocready.core.models import ModelPack
+    from ocready.ui import backend_check
+    from ocready.ui.settings import SettingsDialog
+
+    started, release = threading.Event(), threading.Event()
+    captured, gui_events = [], []
+    report = {"cpu_available": True, "cuda_device_detected": False,
+              "cpu_runner": {"status": "responding"}, "cuda_runner": {"status": "responding"},
+              "assets_valid": True, "admission": "Estimated 700 MB total; not certification."}
+    def check(pack, edition, **kwargs):
+        captured.append(pack)
+        started.set()
+        assert release.wait(2), "UI callback did not run during runner check"
+        return report
+    monkeypatch.setattr(backend_check, "check_model_backends", check)
+    pack = ModelPack("saved", "Saved", "runner", "model", "projector")
+    window.packs = [pack]
+    dialog = SettingsDialog(window)
+    dialog.show()
+    dialog.fields["runner"].setText("unsaved runner")
+    dialog.check_saved_model()
+    def gui_callback():
+        gui_events.append("responsive")
+        release.set()
+    QTimer.singleShot(20, gui_callback)
+    deadline = time.monotonic() + 3
+    while dialog.backend_worker and time.monotonic() < deadline:
+        QTest.qWait(10)
+    assert started.is_set() and gui_events == ["responsive"] and captured == [pack]
+    assert dialog.backend_worker is None and dialog.check_button.isEnabled()
+    assert "CPU runner responds" in dialog.message.text()
+    assert "No CUDA device" in dialog.message.text() and "does not load" in dialog.message.text()
+    dialog.close()
+
+
+def test_settings_backend_check_discards_changed_selection_and_stops_before_close(window, app, monkeypatch):
+    import threading
+
+    from ocready.core.models import ModelPack
+    from ocready.core.types import Cancelled
+    from ocready.ui import backend_check
+    from ocready.ui.settings import SettingsDialog
+
+    started = threading.Event()
+    def check(pack, edition, *, cancel):
+        started.set()
+        assert cancel.wait(2), "Closing settings must cancel the runner check"
+        raise Cancelled("cancelled")
+    monkeypatch.setattr(backend_check, "check_model_backends", check)
+    window.packs = [ModelPack("one", "One", "runner", "model", "projector"),
+                    ModelPack("two", "Two", "runner", "model", "projector")]
+    dialog = SettingsDialog(window)
+    dialog.show()
+    dialog.check_saved_model()
+    generation = dialog._backend_generation
+    dialog.select_pack(1)
+    message = dialog.message.text()
+    dialog._backend_report(generation, {})  # Simulate an already queued result for the old selection.
+    assert dialog.message.text() == message
+    dialog.reject()
+    deadline = time.monotonic() + 3
+    while dialog.backend_worker and time.monotonic() < deadline:
+        QTest.qWait(10)
+    assert started.is_set() and dialog.backend_worker is None
+    assert not dialog.isVisible()
+    dialog.new_pack()
+    assert not dialog.check_button.isEnabled()

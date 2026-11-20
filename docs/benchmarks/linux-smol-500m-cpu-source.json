@@ -1,0 +1,141 @@
+{
+  "sample_interval_ms": 10,
+  "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
+  "platform": "linux",
+  "python": "3.12.16",
+  "cpu_count": 12,
+  "binary": false,
+  "scenarios": [
+    {
+      "edition": "studio",
+      "max_pixels": 16000000,
+      "scenario": "sample",
+      "peak_rss_bytes": 841428992,
+      "budget_bytes": 4000000000,
+      "below_budget": true,
+      "elapsed_seconds": 3.776,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 3.6755567209911533,
+        "peak_rss": 841428992,
+        "engine": "vision:smolvlm-500m-q8",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 3952746496,
+        "worker_peak": 360042496,
+        "words": 0
+      },
+      "error": "",
+      "timeout_seconds": 770,
+      "timed_out": false
+    },
+    {
+      "edition": "studio",
+      "max_pixels": 16000000,
+      "scenario": "dark",
+      "peak_rss_bytes": 839274496,
+      "budget_bytes": 4000000000,
+      "below_budget": true,
+      "elapsed_seconds": 3.822,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 3.7156780349905603,
+        "peak_rss": 839274496,
+        "engine": "vision:smolvlm-500m-q8",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 3956289536,
+        "worker_peak": 365461504,
+        "words": 0
+      },
+      "error": "",
+      "timeout_seconds": 770,
+      "timed_out": false
+    },
+    {
+      "edition": "studio",
+      "max_pixels": 16000000,
+      "scenario": "max-pixels",
+      "peak_rss_bytes": 923504640,
+      "budget_bytes": 4000000000,
+      "below_budget": true,
+      "elapsed_seconds": 6.077,
+      "exit_code": 0,
+      "details": {
+        "elapsed": 5.821100305998698,
+        "peak_rss": 923504640,
+        "engine": "vision:smolvlm-500m-q8",
+        "backend": "CPU",
+        "containment": "cgroup-v2",
+        "worker_limit": 3874988032,
+        "worker_peak": 369270784,
+        "words": 0
+      },
+      "error": "",
+      "timeout_seconds": 770,
+      "timed_out": false
+    },
+    {
+      "edition": "studio",
+      "max_pixels": 16000000,
+      "scenario": "gui-repeated",
+      "peak_rss_bytes": 1156677632,
+      "budget_bytes": 4000000000,
+      "below_budget": true,
+      "elapsed_seconds": 25.272,
+      "exit_code": 0,
+      "details": {
+        "iterations": [
+          {
+            "characters": 21,
+            "elapsed": 5.845335582009284,
+            "worker_peak_rss": 1083236352,
+            "idle_rss": 272146432
+          },
+          {
+            "characters": 21,
+            "elapsed": 5.806020296993665,
+            "worker_peak_rss": 1110355968,
+            "idle_rss": 294273024
+          },
+          {
+            "characters": 21,
+            "elapsed": 5.874242834019242,
+            "worker_peak_rss": 1155350528,
+            "idle_rss": 342286336
+          },
+          {
+            "characters": 21,
+            "elapsed": 5.848699152003974,
+            "worker_peak_rss": 1156677632,
+            "idle_rss": 341884928
+          }
+        ],
+        "qt_platform": "xcb",
+        "input_route": "clipboard"
+      },
+      "error": "",
+      "timeout_seconds": 2630,
+      "timed_out": false
+    }
+  ],
+  "execution_environment": {
+    "policy": "inherited-source-environment",
+    "path_scope": "inherited",
+    "unicode_runtime_temp": true,
+    "private_configuration": true,
+    "development_overrides_removed": false,
+    "gui_platform": "xcb"
+  },
+  "source": {
+    "revision": "5cc8f08121b27de44e2b2fda9fe237f70a7535d8",
+    "dirty": false,
+    "tree_sha256": "aef9e0167c359cfdb0ee8f0af226ace5887744fb2109a28fdd301879c788de25"
+  },
+  "sources_changed_during_run": false,
+  "binary_sha256": null,
+  "binary_changed_during_run": false,
+  "build_profile": null,
+  "requested_method": null,
+  "requested_pack_id": null
+}
