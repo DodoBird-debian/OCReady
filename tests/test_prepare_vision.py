@@ -1,11 +1,26 @@
 import hashlib
 import io
+import json
+import sys
 import tarfile
 import zipfile
 
 import pytest
 
 from scripts.prepare_vision import extract_runner, fetch, quantize_model
+
+
+def test_locked_model_catalog_is_available_without_provisioning(monkeypatch, capsys):
+    from scripts import prepare_vision
+    monkeypatch.setattr(sys, "argv", ["prepare_vision", "--list-presets"])
+    monkeypatch.setattr(prepare_vision, "prepare_runner", lambda *_a: pytest.fail("Catalog must not provision a runner"))
+    monkeypatch.setattr(prepare_vision, "fetch", lambda *_a: pytest.fail("Catalog must stay offline"))
+    prepare_vision.main()
+    report = json.loads(capsys.readouterr().out)
+    presets = {p["preset"]: p for p in report["presets"]}
+    assert {"smol-500m", "internvl3-1b"} <= presets.keys()
+    assert presets["smol-500m"]["languages"] == presets["internvl3-1b"]["languages"] == "eng"
+    assert "not measured" in report["scope"]
 
 
 def test_derived_weight_cache_and_mismatch_never_publish_unverified_output(tmp_path, monkeypatch):

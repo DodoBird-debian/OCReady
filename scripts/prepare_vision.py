@@ -161,9 +161,12 @@ def prepare_pack(preset: dict, runner: Path, folder: Path, cuda_runner: Path | N
 
 
 def main() -> None:
+    lock = json.loads((ROOT / "assets/vision-lock.json").read_text(encoding="utf-8"))
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--preset", action="append", choices=("smol", "smol-q4", "glm", "qwen3"), required=True,
-                        help="Repeat to prepare multiple choices; GLM and Qwen3 require Studio.")
+    selection = parser.add_mutually_exclusive_group(required=True)
+    selection.add_argument("--preset", action="append", choices=tuple(lock["packs"]),
+                           help="Repeat to prepare multiple choices; larger presets require Studio.")
+    selection.add_argument("--list-presets", action="store_true", help="List locked models and estimates as JSON, without downloading or running anything")
     parser.add_argument("--runtime-dir", type=Path, default=ROOT / "runtime/vision-cpu")
     parser.add_argument("--model-dir", type=Path, default=ROOT / "models/vision")
     parser.add_argument("--cuda-runner", type=Path, help="Optional separately provisioned compatible CUDA runner")
@@ -171,7 +174,14 @@ def main() -> None:
     parser.add_argument("--adapter", choices=("llama.cpp", "json-cli-v1"), default="llama.cpp")
     parser.add_argument("--quantizer", type=Path, help="Optional explicit llama-quantize for derived compact presets")
     args = parser.parse_args()
-    lock = json.loads((ROOT / "assets/vision-lock.json").read_text(encoding="utf-8"))
+    if args.list_presets:
+        print(json.dumps({"scope": "Preparation catalog; memory estimates are not measured or certified limits.",
+                          "presets": [{"preset": key, "id": value["id"], "name": value["name"],
+                                       "languages": value["languages"], "runner_memory_estimate_mb": value["memory_mb"],
+                                       "source": f"https://huggingface.co/{value['repo']}/tree/{value['revision']}",
+                                       "limitations": value["limitations"]} for key, value in lock["packs"].items()]},
+                         ensure_ascii=True, indent=2))
+        return
     if args.adapter != "llama.cpp" and not args.runner:
         parser.error("Supply --runner for the selected adapter; see scripts.build_vision_bridge.")
     runner = args.runner.resolve() if args.runner else prepare_runner(lock["runner"], args.runtime_dir.resolve())

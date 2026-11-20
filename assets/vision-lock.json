@@ -177,6 +177,88 @@
         "bytes": 107777728,
         "sha256": "0574eaffbb56eea1b7eaddd6ed61e0b93ad5832fe3e939d272747faac94f4277"
       }
+    },
+    "smol-500m": {
+      "id": "smolvlm-500m-q8",
+      "name": "SmolVLM 500M Q8 \u00b7 English (experimental)",
+      "repo": "ggml-org/SmolVLM-500M-Instruct-GGUF",
+      "revision": "72e986006ef53e37cdd3f6d4241c90b0f01df376",
+      "memory_mb": 1200,
+      "tokens": 256,
+      "languages": "eng",
+      "license": "Apache-2.0",
+      "prompt": "Read the text in the image. Return only the exact text without explanation.",
+      "limitations": "The upstream model card lists English only. Studio admission estimate; no packaged memory certification. Generative transcription may omit or invent text. Use classical/neural OCR or the evaluated Qwen preset for Arabic.",
+      "files": [
+        {
+          "file": "SmolVLM-500M-Instruct-Q8_0.gguf",
+          "url": "https://huggingface.co/ggml-org/SmolVLM-500M-Instruct-GGUF/resolve/72e986006ef53e37cdd3f6d4241c90b0f01df376/SmolVLM-500M-Instruct-Q8_0.gguf",
+          "bytes": 436806912,
+          "sha256": "9d4612de6a42214499e301494a3ecc2be0abdd9de44e663bda63f1152fad1bf4"
+        },
+        {
+          "file": "mmproj-SmolVLM-500M-Instruct-Q8_0.gguf",
+          "url": "https://huggingface.co/ggml-org/SmolVLM-500M-Instruct-GGUF/resolve/72e986006ef53e37cdd3f6d4241c90b0f01df376/mmproj-SmolVLM-500M-Instruct-Q8_0.gguf",
+          "bytes": 108783360,
+          "sha256": "d1eb8b6b23979205fdf63703ed10f788131a3f812c7b1f72e0119d5d81295150"
+        },
+        {
+          "file": "modelcard.md",
+          "url": "https://huggingface.co/HuggingFaceTB/SmolVLM-500M-Instruct/raw/753c1752602b5e739af7a7fa6947a635051897a3/README.md",
+          "bytes": 9918,
+          "sha256": "8465c1a46b0db5d5d0d0945df04032d1b405bb2fa12cdab3da1652bd75fca4b9"
+        },
+        {
+          "file": "LICENSE-model.txt",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "bytes": 11358,
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        }
+      ]
+    },
+    "internvl3-1b": {
+      "id": "internvl3-1b-q8",
+      "name": "InternVL3 1B Q8 \u00b7 English (experimental)",
+      "repo": "ggml-org/InternVL3-1B-Instruct-GGUF",
+      "revision": "c622c04f3b46dc8ef733ca64ffb25a800c4041cc",
+      "memory_mb": 2200,
+      "tokens": 512,
+      "languages": "eng",
+      "license": "MIT (InternVL project); Apache-2.0 (Qwen component and GGUF metadata)",
+      "prompt": "Read the text in the image. Return only the exact text without explanation.",
+      "limitations": "The upstream model is multilingual, but this quantized preset is initially limited to English until Arabic transcription is evaluated. Studio admission estimate; no packaged memory certification. Generative transcription may omit or invent text. Use classical/neural OCR or the evaluated Qwen preset for Arabic.",
+      "files": [
+        {
+          "file": "InternVL3-1B-Instruct-Q8_0.gguf",
+          "url": "https://huggingface.co/ggml-org/InternVL3-1B-Instruct-GGUF/resolve/c622c04f3b46dc8ef733ca64ffb25a800c4041cc/InternVL3-1B-Instruct-Q8_0.gguf",
+          "bytes": 675206560,
+          "sha256": "e87f98e2945c91da1a324034143f2f3bad014dcf6b34d440fcf885c00704378f"
+        },
+        {
+          "file": "mmproj-InternVL3-1B-Instruct-Q8_0.gguf",
+          "url": "https://huggingface.co/ggml-org/InternVL3-1B-Instruct-GGUF/resolve/c622c04f3b46dc8ef733ca64ffb25a800c4041cc/mmproj-InternVL3-1B-Instruct-Q8_0.gguf",
+          "bytes": 332567840,
+          "sha256": "2d92c4d3dd95ae6a5974f48a1e6a77817ef6970b0eb09a48dd63ad95b69ea7e5"
+        },
+        {
+          "file": "modelcard.md",
+          "url": "https://huggingface.co/OpenGVLab/InternVL3-1B-Instruct/raw/f91c6391476dbc8fd07674d2589e8168d3ca667f/README.md",
+          "bytes": 36086,
+          "sha256": "f6a716d3fa314ed6a974e39267a8ffa865c9a42d7b5e68c9c31d4aeb18b080c5"
+        },
+        {
+          "file": "LICENSE-model.txt",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+          "bytes": 11358,
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        },
+        {
+          "file": "LICENSE-InternVL.txt",
+          "url": "https://raw.githubusercontent.com/OpenGVLab/InternVL/2410d1dbf208f0e799459aff9376e5747dbf41a2/LICENSE",
+          "bytes": 1066,
+          "sha256": "8f03d25fbcffafa2254d4d1414bf2a38423a966006b4a6964ee21f728d610bff"
+        }
+      ]
     }
   }
 }

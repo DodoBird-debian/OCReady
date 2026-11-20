@@ -1721,7 +1721,8 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M71.V1: Exercise actual compatible/incompatible helpers as well as model errors whose paths/logs contain CUDA text.
 - M71.V2: Verify bounded diagnostic tails retain enough cause information for reliable decisions.
 - Release gate: Demonstrated CPU recovery for genuine initialization failures and no retry for unrelated failures.
-# M72 — explicit local vision runner checks
+
+## M72 — explicit local vision runner checks
 
 - Keep passive diagnostics free of subprocess launches.
 - Add an explicit headless check for installed or external vision packs.
@@ -1739,3 +1740,20 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - Never describe device discovery as successful model inference.
 - Exercise real CPU, working CUDA and incompatible CUDA helpers.
 - Retain the need for inference and packaged cross-platform verification.
+
+## M73 — extend the reproducible vision model catalog
+
+- Add distinct compact and one-billion-class vision model choices.
+- Pin official model revisions, file sizes and SHA256 identities.
+- Keep each matching projector beside its language weights.
+- Retain upstream model cards and component licenses.
+- Offer a passive catalog command before explicit preparation.
+- Derive command choices from the same checksum lock as provisioning.
+- Keep larger models behind conservative Studio admission estimates.
+- Do not enable Arabic from an unspecified multilingual label alone.
+- Exercise CPU and CUDA with actual image transcription.
+- Evaluate English fixture text and retain omissions or hallucinations.
+- Preserve CPU fallback checks on a real incompatible helper.
+- Measure source resource workloads before proposing lower memory estimates.
+- Keep native onefile and Windows qualification as independent release gates.
+- Keep existing published compositions stable until their replacements qualify.
