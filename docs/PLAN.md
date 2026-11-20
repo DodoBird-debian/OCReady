@@ -1721,3 +1721,21 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - M71.V1: Exercise actual compatible/incompatible helpers as well as model errors whose paths/logs contain CUDA text.
 - M71.V2: Verify bounded diagnostic tails retain enough cause information for reliable decisions.
 - Release gate: Demonstrated CPU recovery for genuine initialization failures and no retry for unrelated failures.
+# M72 — explicit local vision runner checks
+
+- Keep passive diagnostics free of subprocess launches.
+- Add an explicit headless check for installed or external vision packs.
+- Validate model assets separately from runner response.
+- Report estimated admission separately from measured inference.
+- Probe only local executables already selected by the user.
+- Preserve the edition budget and bounded process timeout.
+- Deduplicate CPU/CUDA checks when they share a runner within a pack.
+- Accept CUDA device rows only from the actual native stdout listing.
+- Do not treat CUDA library paths or initialization logs as devices.
+- Preserve custom JSON workers' versioned backend declarations.
+- Fail reference-worker capabilities if the native runner fails.
+- Report a missing helper independently of intact CPU assets.
+- Keep CPU fallback usable without the optional helper.
+- Never describe device discovery as successful model inference.
+- Exercise real CPU, working CUDA and incompatible CUDA helpers.
+- Retain the need for inference and packaged cross-platform verification.

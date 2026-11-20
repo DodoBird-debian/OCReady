@@ -13,6 +13,7 @@ import sys
 from pathlib import Path
 
 from ocready.core.backend_errors import cuda_failure_detail
+from ocready.core.backend_probe import llama_device_listing
 
 
 def runner_path() -> Path:
@@ -61,9 +62,11 @@ def main(argv: list[str] | None = None) -> int:
         if args.ocready_vision_capabilities:
             probe = subprocess.run([str(runner), "--list-devices"], capture_output=True, timeout=20,
                                    env=environment(runner))
-            devices = (probe.stdout + probe.stderr).decode("utf-8", errors="replace")
+            devices = llama_device_listing(probe.stdout.decode("utf-8", errors="replace"))
+            if probe.returncode or devices is None:
+                raise ValueError("The native runner failed its device probe; CPU/CUDA readiness is unknown.")
             backends = ["cpu"]
-            if probe.returncode == 0 and re.search(r"CUDA\d|CUDA\s*:", devices, re.IGNORECASE):
+            if devices:
                 backends.append("cuda")
             print(json.dumps({"schema": 1, "backends": backends}))
             return 0

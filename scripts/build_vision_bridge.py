@@ -74,6 +74,7 @@ def main() -> None:
     require_unchanged(ROOT, source)
     metadata = {"protocol": 1, "adapter": "json-cli-v1", "source": source,
                 "backend_errors_sha256": file_sha256(ROOT / "ocready/core/backend_errors.py"),
+                "backend_probe_sha256": file_sha256(ROOT / "ocready/core/backend_probe.py"),
                 "entrypoint_sha256": file_sha256(entrypoint), "python": sys.version.split()[0],
                 "native_runner_sha256": file_sha256(distribution / "llama" / runner.name),
                 "files": {p.relative_to(distribution).as_posix(): file_sha256(p) for p in sorted(distribution.rglob("*"))

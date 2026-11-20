@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Protocol
 
+from ocready.core.backend_probe import llama_device_listing
 from ocready.core.types import OCRError
 
 if TYPE_CHECKING:
@@ -27,6 +28,7 @@ class VisionAdapter(Protocol):
     def command(self, pack: "ModelPack", image: Path, cuda: bool) -> list[str]: ...
     def probe_command(self, runner: str) -> list[str]: ...
     def probe_cuda(self, stdout: str, stderr: str) -> bool: ...
+    def probe_backends(self, stdout: str, stderr: str) -> tuple[str, ...]: ...
     def decode(self, stdout: str, image: Path, cuda: bool) -> VisionRead: ...
     def environment(self, runner: str) -> dict[str, str]: ...
 
@@ -75,7 +77,13 @@ class LlamaCppAdapter:
         return [runner, "--list-devices"]
 
     def probe_cuda(self, stdout: str, stderr: str) -> bool:
-        return bool(re.search(r"CUDA\d|CUDA\s*:", stdout + stderr, re.IGNORECASE))
+        return "cuda" in self.probe_backends(stdout, stderr)
+
+    def probe_backends(self, stdout: str, stderr: str) -> tuple[str, ...]:
+        devices = llama_device_listing(stdout)
+        if devices is None:
+            raise OCRError("The runner did not return a recognized llama.cpp device listing.")
+        return ("cpu", "cuda") if devices else ("cpu",)
 
     def decode(self, stdout: str, image: Path, cuda: bool) -> VisionRead:
         return VisionRead(clean_llama_output(stdout), "CUDA" if cuda else "CPU")
@@ -115,11 +123,14 @@ class JsonCliAdapter:
         return [runner, "--ocready-vision-capabilities"]
 
     def probe_cuda(self, stdout: str, stderr: str) -> bool:
+        return "cuda" in self.probe_backends(stdout, stderr)
+
+    def probe_backends(self, stdout: str, stderr: str) -> tuple[str, ...]:
         value = protocol_json(stdout)
         backends = value.get("backends")
         if not isinstance(backends, list) or not backends or any(not isinstance(v, str) or v not in {"cpu", "cuda"} for v in backends):
             raise OCRError("The vision worker must declare its supported CPU/CUDA backends.")
-        return "cuda" in backends
+        return tuple(dict.fromkeys(backends))
 
     def decode(self, stdout: str, image: Path, cuda: bool) -> VisionRead:
         from PIL import Image

@@ -12,6 +12,16 @@ The app probes the selected CUDA runner's actual devices. Auto mode uses CUDA on
 
 CPU retry requires an explicit GPU backend failure, such as a CUDA initialization/driver error or GPU allocation failure. A CUDA filename or device listing alongside an unrelated model/input error does not trigger another attempt. The failure's native status and a bounded GPU-cause excerpt survive long diagnostic logs. If an optional helper disappears after its successful probe, the intact CPU runner can still recover.
 
+Check a pack's runner setup without loading its weights:
+
+```sh
+python -m ocready --check-backends --edition studio --model-pack models/vision/qwen3/pack.json
+# Or check installed packs, optionally selecting one with --method vision --pack-id ID:
+python -m ocready --diagnostics --check-backends --edition studio
+```
+
+The JSON separates asset validation, estimated edition admission, CPU-runner response and CUDA-device discovery. Probes run with the edition's process budget and a 20-second timeout per distinct runner within each pack. Ordinary `--diagnostics` stays passive. No image or model inference runs in this check; a detected device does not prove driver/kernel compatibility, VRAM capacity, model support or OCR quality. The pinned llama.cpp adapter recognizes actual CUDA rows in stdout's device listing, rather than CUDA mentions in stderr. The JSON reference worker fails its capability request when its native probe fails instead of declaring an unverified CPU backend.
+
 If an optional CUDA runner is removed after configuration, recognition uses the intact CPU runner and reports that fallback. Explicit CPU selection does not depend on the optional helper. Importing a manifest and preparing a build still require every configured file to exist; missing CPU runners, weights or projectors remain errors.
 
 Vision results are marked as AI transcription. They have no invented confidence or word coordinates. Use Fast or Precision OCR when you need to select individual words in the picture. Generative transcription can hallucinate, and model quality varies by language.

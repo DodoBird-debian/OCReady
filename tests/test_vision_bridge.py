@@ -16,6 +16,26 @@ from scripts.bundle_models import bundle_pack
 from scripts.provenance import file_sha256
 
 
+@pytest.mark.parametrize("status,stdout,stderr,expected", [
+    (0, b"Available devices:\n(none)\n", b"CUDA0: driver failed", ["cpu"]),
+    (0, b"Available devices:\nCUDA0: Example (8192 MiB, 7000 MiB free)\n", b"", ["cpu", "cuda"]),
+    (17, b"Available devices:\n(none)\n", b"native loader failed", None),
+    (0, b"unrecognized response", b"CUDA0", None),
+])
+def test_capability_bridge_does_not_invent_cpu_or_cuda_readiness(tmp_path, monkeypatch, capsys, status, stdout, stderr, expected):
+    runner = tmp_path / "runner"
+    runner.touch()
+    monkeypatch.setattr(vision_bridge, "runner_path", lambda: runner)
+    monkeypatch.setattr(vision_bridge.subprocess, "run", lambda args, **_kwargs:
+                        subprocess.CompletedProcess(args, status, stdout, stderr))
+    assert vision_bridge.main(["--ocready-vision-capabilities"]) == (0 if expected else 2)
+    output = capsys.readouterr()
+    if expected:
+        assert json.loads(output.out)["backends"] == expected
+    else:
+        assert not output.out and "readiness is unknown" in output.err
+
+
 def test_reference_worker_protocol_preserves_arabic_and_cpu_request(tmp_path, monkeypatch, capsys):
     runner = tmp_path / "llama-mtmd-cli"
     runner.write_bytes(b"native runner")

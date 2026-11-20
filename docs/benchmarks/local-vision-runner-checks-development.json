@@ -1,0 +1,170 @@
+{
+  "scope": "Linux source runner discovery only; no weights loaded; no inference claim",
+  "source": {
+    "revision": "3e0aba91d0f89beb8bb0207c524f7ac2de300266",
+    "dirty": true,
+    "tree_sha256": "d7539a3d0ead5f1f4ce475c8476430a58de5d294a37cfcc5a9db2ef2e9a97eda"
+  },
+  "cases": [
+    {
+      "case": "cpu",
+      "report": {
+        "version": "0.1.0",
+        "edition": "everyday",
+        "scope": "Runner device probes only. Weights are not loaded; successful CUDA inference and model accuracy remain unverified.",
+        "backend_checks": [
+          {
+            "id": "smolvlm-256m-q4",
+            "name": "SmolVLM 256M Q4 \u00b7 English (experimental)",
+            "adapter": "llama.cpp",
+            "assets_valid": true,
+            "assets_error": "",
+            "admitted": true,
+            "admission": "Estimated 563 MB total; runtime memory is monitored. This estimate is not certification.",
+            "cpu_runner": {
+              "status": "responding",
+              "backends": [
+                "cpu"
+              ],
+              "detail": "Runner responded; model inference has not been tested."
+            },
+            "cuda_runner": {
+              "status": "responding",
+              "backends": [
+                "cpu"
+              ],
+              "detail": "Runner responded; model inference has not been tested."
+            },
+            "cpu_available": true,
+            "cuda_device_detected": false,
+            "can_attempt_inference": true,
+            "automatic_backend": "CPU",
+            "inference_verified": false
+          }
+        ]
+      },
+      "runner_sha256": "d1ba0e89d3c2938b1300193f674efd2eeadb6b5ef7539a07d7c9c98303e3e20d",
+      "cuda_runner_sha256": null
+    },
+    {
+      "case": "cuda-native",
+      "report": {
+        "version": "0.1.0",
+        "edition": "everyday",
+        "scope": "Runner device probes only. Weights are not loaded; successful CUDA inference and model accuracy remain unverified.",
+        "backend_checks": [
+          {
+            "id": "smolvlm-256m-q4",
+            "name": "SmolVLM 256M Q4 \u00b7 English (experimental)",
+            "adapter": "llama.cpp",
+            "assets_valid": true,
+            "assets_error": "",
+            "admitted": true,
+            "admission": "Estimated 563 MB total; runtime memory is monitored. This estimate is not certification.",
+            "cpu_runner": {
+              "status": "responding",
+              "backends": [
+                "cpu"
+              ],
+              "detail": "Runner responded; model inference has not been tested."
+            },
+            "cuda_runner": {
+              "status": "responding",
+              "backends": [
+                "cpu",
+                "cuda"
+              ],
+              "detail": "Runner responded; model inference has not been tested."
+            },
+            "cpu_available": true,
+            "cuda_device_detected": true,
+            "can_attempt_inference": true,
+            "automatic_backend": "CUDA",
+            "inference_verified": false
+          }
+        ]
+      },
+      "runner_sha256": "d1ba0e89d3c2938b1300193f674efd2eeadb6b5ef7539a07d7c9c98303e3e20d",
+      "cuda_runner_sha256": "baf8ce68e3aaae53d588a84b9b7bc03dd045c0dafcb48a745add2a64ca28976c"
+    },
+    {
+      "case": "cuda-incompatible",
+      "report": {
+        "version": "0.1.0",
+        "edition": "everyday",
+        "scope": "Runner device probes only. Weights are not loaded; successful CUDA inference and model accuracy remain unverified.",
+        "backend_checks": [
+          {
+            "id": "smolvlm-256m-q4",
+            "name": "SmolVLM 256M Q4 \u00b7 English (experimental)",
+            "adapter": "llama.cpp",
+            "assets_valid": true,
+            "assets_error": "",
+            "admitted": true,
+            "admission": "Estimated 563 MB total; runtime memory is monitored. This estimate is not certification.",
+            "cpu_runner": {
+              "status": "responding",
+              "backends": [
+                "cpu"
+              ],
+              "detail": "Runner responded; model inference has not been tested."
+            },
+            "cuda_runner": {
+              "status": "responding",
+              "backends": [
+                "cpu",
+                "cuda"
+              ],
+              "detail": "Runner responded; model inference has not been tested."
+            },
+            "cpu_available": true,
+            "cuda_device_detected": true,
+            "can_attempt_inference": true,
+            "automatic_backend": "CUDA",
+            "inference_verified": false
+          }
+        ]
+      },
+      "runner_sha256": "d1ba0e89d3c2938b1300193f674efd2eeadb6b5ef7539a07d7c9c98303e3e20d",
+      "cuda_runner_sha256": "d660cec6176050d913168e3d66156236bee09614eb96d6fa7c99e298e2dfa8a9"
+    },
+    {
+      "case": "missing-helper",
+      "report": {
+        "version": "0.1.0",
+        "edition": "everyday",
+        "scope": "Runner device probes only. Weights are not loaded; successful CUDA inference and model accuracy remain unverified.",
+        "backend_checks": [
+          {
+            "id": "smolvlm-256m-q4",
+            "name": "SmolVLM 256M Q4 \u00b7 English (experimental)",
+            "adapter": "llama.cpp",
+            "assets_valid": true,
+            "assets_error": "",
+            "admitted": true,
+            "admission": "Estimated 563 MB total; runtime memory is monitored. This estimate is not certification.",
+            "cpu_runner": {
+              "status": "responding",
+              "backends": [
+                "cpu"
+              ],
+              "detail": "Runner responded; model inference has not been tested."
+            },
+            "cuda_runner": {
+              "status": "missing",
+              "backends": [],
+              "detail": "Runner file is unavailable."
+            },
+            "cpu_available": true,
+            "cuda_device_detected": false,
+            "can_attempt_inference": true,
+            "automatic_backend": "CPU",
+            "inference_verified": false
+          }
+        ]
+      },
+      "runner_sha256": "d1ba0e89d3c2938b1300193f674efd2eeadb6b5ef7539a07d7c9c98303e3e20d",
+      "cuda_runner_sha256": null
+    }
+  ]
+}

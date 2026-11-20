@@ -56,6 +56,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--rotate", type=int, choices=(0, 90, 180, 270), default=0)
     parser.add_argument("--compare", action="store_true", help="Compare two layouts sequentially")
     parser.add_argument("--diagnostics", action="store_true")
+    parser.add_argument("--check-backends", action="store_true", help="Check local vision CPU/CUDA runners without loading model weights; emit JSON")
     parser.add_argument("--ui-smoke-output", type=Path, help=argparse.SUPPRESS)
     args = parser.parse_args(argv)
     try:
@@ -69,7 +70,25 @@ def main(argv: list[str] | None = None) -> int:
         from ocready.core.preprocess import Recipe
         recipe = Recipe(invert=args.invert, grayscale=args.grayscale, autocontrast=args.autocontrast,
                         threshold=args.threshold, rotation=args.rotate)
-        if args.diagnostics:
+        if args.check_backends:
+            if "vision" not in profile["methods"] or args.neural_pack or args.method not in {None, "vision"}:
+                raise OCRError("Backend checks require a build with vision models; choose --method vision for an explicit model selection.")
+            if args.image or args.json or args.text:
+                raise OCRError("Use --check-backends without an image or recognition output mode.")
+            from ocready.core.models import load_pack, load_packs
+            from ocready.engines.vision_checks import check_model_backends
+            packs = [load_pack(args.model_pack)] if args.model_pack else load_packs()
+            if args.pack_id:
+                packs = [pack for pack in packs if pack.id == args.pack_id]
+                if not packs:
+                    raise OCRError(f"No installed vision pack has ID {args.pack_id}.")
+            edition = edition_for(args.edition or profile["edition"])
+            report = diagnostics() if args.diagnostics else {"version": __version__}
+            report.update({"edition": edition.id,
+                           "scope": "Runner device probes only. Weights are not loaded; successful CUDA inference and model accuracy remain unverified.",
+                           "backend_checks": [check_model_backends(pack, edition) for pack in packs]})
+            encoded = json.dumps(report, ensure_ascii=False, indent=2)
+        elif args.diagnostics:
             encoded = json.dumps(diagnostics(), ensure_ascii=False, indent=2)
         elif args.json or args.text:
             if not args.image:
