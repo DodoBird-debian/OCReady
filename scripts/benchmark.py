@@ -19,6 +19,7 @@ from PIL import Image, ImageOps
 from ocready.core.editions import EDITIONS
 from ocready.core.memory import tree_rss
 from ocready.core.timeouts import gui_workload_timeout_seconds, observed_workload_timeout_seconds
+from ocready.core.types import OCRError
 from scripts.packaged_environment import execution_policy, gui_test_platform, runtime_test_environment
 from scripts.provenance import file_sha256, source_record
 
@@ -43,12 +44,38 @@ def redact_details(record: dict) -> dict:
 def check_requested_engine(result: dict, method: str | None, pack_id: str | None) -> None:
     if not method or result["exit_code"]:
         return
-    engine = result["details"].get("engine", "")
     expected = f"{method}:{pack_id}" if pack_id else method
-    matched = engine == expected or (not pack_id and method in {"vision", "neural"} and engine.startswith(method + ":"))
+    details = result["details"]
+    engines = [details.get("engine", "")]
+    if "iterations" in details:
+        iterations = details["iterations"]
+        if not isinstance(iterations, list) or not iterations or any(not isinstance(row, dict) for row in iterations):
+            result["exit_code"] = 2
+            details["error"] = "The repeated GUI workload omitted its recognition identities."
+            return
+        engines += [row.get("engine", "") for row in iterations]
+    matched = all(engine == expected or (not pack_id and method in {"vision", "neural"}
+                                        and isinstance(engine, str) and engine.startswith(method + ":")) for engine in engines)
     if not matched:
         result["exit_code"] = 2
-        result["details"]["error"] = f"Requested {expected}, but the workload returned {engine or 'no engine identity'}."
+        details["error"] = f"Requested {expected}, but the workload returned a different or missing engine identity."
+
+
+def local_pack_identity(vision_path: Path | None, neural_path: Path | None) -> dict | None:
+    """Bind source workload reports to the files actually selected for inference."""
+    if vision_path:
+        from ocready.core.models import load_pack
+        pack = load_pack(vision_path)
+        fields = ("runner", "model", "projector", "cuda_runner")
+    elif neural_path:
+        from ocready.core.neural_packs import load_neural_pack
+        pack = load_neural_pack(neural_path)
+        fields = ("runner", "detector", "recognizer", "dictionary", "cuda_runner")
+    else:
+        return None
+    return {"id": pack.id, "languages": pack.languages, "adapter": getattr(pack, "adapter", "neural-json-v1"),
+            "manifest_sha256": file_sha256(vision_path or neural_path),
+            "assets_sha256": {field: file_sha256(Path(getattr(pack, field))) for field in fields if getattr(pack, field)}}
 
 
 def make_image(path: Path, edition: str, dark=False, maximum=False) -> None:
@@ -94,6 +121,7 @@ def gui_child(image_path: str, edition: str, output: str, loops: int, pack_path:
     remaining = loops
     measurements = []
     failed = False
+    expected_engine = f"vision:{pack.id}" if pack_path else f"neural:{neural_pack.id}" if neural_path else None
 
     def run_next():
         nonlocal remaining, failed
@@ -119,19 +147,23 @@ def gui_child(image_path: str, edition: str, output: str, loops: int, pack_path:
         nonlocal failed
         if window.worker:
             return
-        if window.result is None:
+        if window.result is None or expected_engine and window.result.engine != expected_engine:
             failed = True
-            Path(output).write_text(json.dumps({"error": window.status.text()}), encoding="utf-8")
+            error = window.status.text() if window.result is None else f"Expected {expected_engine}, received {window.result.engine}."
+            Path(output).write_text(json.dumps({"error": error}), encoding="utf-8")
             timer.stop()
             window.close()
             app.quit()
             return
         measurements.append({"characters": len(window.result.text), "elapsed": window.result.elapsed,
+                             "engine": window.result.engine, "backend": window.result.backend,
                              "worker_peak_rss": window.result.peak_rss, "idle_rss": tree_rss()})
         if remaining > 0:
             run_next()
         else:
-            Path(output).write_text(json.dumps({"iterations": measurements, "qt_platform": app.platformName(), "input_route": "clipboard"}), encoding="utf-8")
+            Path(output).write_text(json.dumps({"iterations": measurements, "engine": window.result.engine,
+                                               "backend": window.result.backend, "qt_platform": app.platformName(),
+                                               "input_route": "clipboard"}), encoding="utf-8")
             timer.stop()
             window.close()
             app.quit()
@@ -232,6 +264,7 @@ def main() -> int:
     if args.pack_id:
         selection += ["--pack-id", args.pack_id]
     source = source_record(ROOT)
+    local_identity = local_pack_identity(args.vision_pack, args.neural_pack)
     binary_hash = file_sha256(args.binary) if args.binary else None
     records = []
     with tempfile.TemporaryDirectory(prefix="ocready-benchmark-") as temporary:
@@ -274,9 +307,14 @@ def main() -> int:
                 # Preserve evidence without copying all recognized document contents into reports.
                 if "text" in result["details"]:
                     result["details"] = redact_details(result["details"])
-                check_requested_engine(result, args.method, args.pack_id)
+                requested_method = args.method or ("vision" if args.vision_pack else "neural" if args.neural_pack else None)
+                check_requested_engine(result, requested_method, args.pack_id or (local_identity["id"] if local_identity else None))
                 records.append(result)
                 print(f"{edition:9} {scenario:12} {result['peak_rss_bytes'] / 1e6:7.1f} MB  {'PASS' if result['below_budget'] and not result['exit_code'] else 'FAIL'}", flush=True)
+    try:
+        local_changed = local_pack_identity(args.vision_pack, args.neural_pack) != local_identity
+    except (OCRError, OSError, ValueError):
+        local_changed = True
     report = {"sample_interval_ms": 10, "rss_scope": "observed root plus all descendants; shared mappings may be counted more than once",
               "platform": sys.platform, "python": sys.version.split()[0], "cpu_count": psutil.cpu_count(),
               "binary": bool(args.binary), "scenarios": records,
@@ -284,11 +322,12 @@ def main() -> int:
               "source": source, "sources_changed_during_run": source_record(ROOT) != source,
               "binary_sha256": binary_hash,
               "binary_changed_during_run": bool(args.binary and file_sha256(args.binary) != binary_hash),
-              "build_profile": binary_profile, "requested_method": args.method, "requested_pack_id": args.pack_id}
+              "build_profile": binary_profile, "requested_method": args.method, "requested_pack_id": args.pack_id,
+              "local_pack": local_identity, "local_pack_changed_during_run": local_changed}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return 0 if (all(row["below_budget"] and row["exit_code"] == 0 for row in records)
-                 and not report["sources_changed_during_run"] and not report["binary_changed_during_run"]) else 2
+                 and not report["sources_changed_during_run"] and not report["binary_changed_during_run"] and not local_changed) else 2
 
 
 if __name__ == "__main__":

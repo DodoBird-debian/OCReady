@@ -1773,3 +1773,30 @@ Qt redistribution obligations: https://www.qt.io/development/open-source-lgpl-ob
 - Keep unsaved models' check action disabled.
 - Verify responsive UI event handling and worker cleanup.
 - Inspect the actual native settings layout with a real local runner.
+
+## M75 — independent cross-platform vision qualification
+
+- Compile the standalone JSON worker independently on Linux and Windows.
+- Resolve its native CPU runner from a prepared model pack.
+- Bind the builder, entry point, parser and classifier to worker metadata.
+- Verify the native executable digest and every runtime inventory file.
+- Reject undeclared libraries and inventory paths escaping the distribution.
+- Relocate the verified worker into a Unicode directory before testing.
+- Remove development environment overrides for actual worker inference.
+- Exercise each model through native and compiled JSON interfaces.
+- Retain actual fixture output and error metrics independently of completion.
+- Keep unsupported language cases visible as skipped cases.
+- Bind source benchmarks to model and manifest hashes before/after execution.
+- Verify model identity for every repeated GUI recognition.
+- Retain failures and continue probing the remaining selected models.
+- Keep source/worker evidence distinct from outer onefile release qualification.
+
+## M76 — model-specific native chat templates
+
+- Investigate actual template initialization failures before adding a candidate.
+- Provide a bounded model setting for automatic versus Jinja template rendering.
+- Forward that setting through both supported vision runtime interfaces.
+- Retain compatibility for existing manifests and default command construction.
+- Avoid treating a template failure as a CUDA initialization failure.
+- Test actual Arabic/English transcription before expanding language exposure.
+- Rebuild standalone helpers before attributing new template support to binaries.

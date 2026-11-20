@@ -30,6 +30,30 @@ def test_resource_workload_cannot_pass_after_silently_selecting_another_engine()
         assert result["exit_code"] == expected_status
 
 
+def test_repeated_gui_resources_verify_each_model_identity():
+    for actual in ("vision:large", "vision:small", None):
+        result = {"exit_code": 0, "details": {"engine": "vision:large", "iterations": [
+            {"engine": "vision:large"}, {"engine": actual}]}}
+        check_requested_engine(result, "vision", "large")
+        assert result["exit_code"] == (0 if actual == "vision:large" else 2)
+
+
+def test_source_resource_identity_changes_when_selected_weights_change(tmp_path):
+    from ocready.core.models import ModelPack
+    from scripts.benchmark import local_pack_identity
+    runner, model, projector = (tmp_path / name for name in ("runner", "model", "projector"))
+    for path in (runner, model, projector):
+        path.write_bytes(b"GGUFtest")
+    pack = ModelPack("selected", "Selected", str(runner), str(model), str(projector))
+    manifest = tmp_path / "pack.json"
+    manifest.write_text(json.dumps(pack.to_dict()))
+    before = local_pack_identity(manifest, None)
+    model.write_bytes(b"GGUFdifferent")
+    after = local_pack_identity(manifest, None)
+    assert before["id"] == after["id"] == "selected"
+    assert before["assets_sha256"]["model"] != after["assets_sha256"]["model"]
+
+
 def test_failed_gui_benchmark_preserves_error_without_document_contents():
     safe = redact_details({"text": "private text", "words": 0, "error": "Model exceeds budget", "rss": 500})
     assert safe == {"words": 0, "error": "Model exceeds budget", "rss": 500}

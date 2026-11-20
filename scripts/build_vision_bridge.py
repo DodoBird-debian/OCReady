@@ -45,11 +45,20 @@ def copy_runtime(runner: Path, destination: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--runner", type=Path, required=True, help="A compatible llama-mtmd-cli to include with the bridge")
+    selection = parser.add_mutually_exclusive_group(required=True)
+    selection.add_argument("--runner", type=Path, help="A compatible llama-mtmd-cli to include with the bridge")
+    selection.add_argument("--runner-pack", type=Path, help="Use the native CPU runner from a prepared llama.cpp pack")
     parser.add_argument("--output", type=Path, default=ROOT / "runtime/vision-bridge/cpu")
     parser.add_argument("--jobs", type=int, default=2)
     args = parser.parse_args()
-    runner = args.runner.resolve()
+    if args.runner_pack:
+        from ocready.core.models import load_pack
+        pack = load_pack(args.runner_pack)
+        if pack.adapter != "llama.cpp":
+            parser.error("Choose a llama.cpp pack; a JSON worker cannot be nested as the native runner.")
+        runner = Path(pack.runner).resolve()
+    else:
+        runner = args.runner.resolve()
     if not runner.is_file():
         parser.error("Choose an existing native multimodal runner.")
     source = source_record(ROOT)
@@ -75,6 +84,7 @@ def main() -> None:
     metadata = {"protocol": 1, "adapter": "json-cli-v1", "source": source,
                 "backend_errors_sha256": file_sha256(ROOT / "ocready/core/backend_errors.py"),
                 "backend_probe_sha256": file_sha256(ROOT / "ocready/core/backend_probe.py"),
+                "builder_sha256": file_sha256(Path(__file__)),
                 "entrypoint_sha256": file_sha256(entrypoint), "python": sys.version.split()[0],
                 "native_runner_sha256": file_sha256(distribution / "llama" / runner.name),
                 "files": {p.relative_to(distribution).as_posix(): file_sha256(p) for p in sorted(distribution.rglob("*"))

@@ -1,0 +1,34 @@
+{
+  "source": {
+    "revision": "605a6893a47ed1f36a36e71a1a278565e6f22f89",
+    "dirty": true,
+    "tree_sha256": "3b4fdb992737832e412f46a41366fb3f18b4c7a92bbf22ff9007131e25e547a5"
+  },
+  "cases": [
+    {
+      "backend": "cuda",
+      "error": "OCR engine failed, exit code -6: 0.02.498.198 I cmn          init: llama threadpool init, n_threads = 8\nterminate called after throwing an instance of 'std::runtime_error'\n  what():  this custom template is not supported, try using --jinja"
+    },
+    {
+      "backend": "cpu",
+      "error": "OCR engine failed, exit code -6: 0.00.572.791 I cmn          init: llama threadpool init, n_threads = 8\nterminate called after throwing an instance of 'std::runtime_error'\n  what():  this custom template is not supported, try using --jinja"
+    }
+  ],
+  "scope": "Initial Linux development candidate; CPU and CUDA both fail template initialization. Not a supported model preset or inference result.",
+  "upstream": {
+    "repo": "PaddlePaddle/PaddleOCR-VL-1.5-GGUF",
+    "revision": "cc977c16989848c264d813ec1705cb181b7a21ee"
+  },
+  "asset_sha256": {
+    "PaddleOCR-VL-1.5-mmproj.gguf": "e7f1a72400fba517046f90d964e2fa0f4dac7781ee3b1bc5d2022f5f8cecbd87",
+    "PaddleOCR-VL-1.5.gguf": "299051d54faa065abc505cc39b8383ea338fd3020c775ea3e0ba514a7022328c"
+  },
+  "runner_sha256": {
+    "cpu": "d1ba0e89d3c2938b1300193f674efd2eeadb6b5ef7539a07d7c9c98303e3e20d",
+    "cuda": "baf8ce68e3aaae53d588a84b9b7bc03dd045c0dafcb48a745add2a64ca28976c"
+  },
+  "image_sha256": "7e638e1363968b4fb0b95d8939f24c6e29243e1b26a677c53c08251d65da0bd0",
+  "prompt": "OCR:",
+  "context": 4096,
+  "output_tokens": 512
+}
